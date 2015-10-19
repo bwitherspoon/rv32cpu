@@ -7,9 +7,9 @@ interface axis #(
 
     typedef logic [DATA_WIDTH-1:0] data_t;
 
-    data_t data;
-    logic  valid;
-    logic  ready;
+    data_t tdata;
+    logic  tvalid;
+    logic  tready;
 
     modport master (
         output tvalid,
