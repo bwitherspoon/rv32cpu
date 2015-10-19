@@ -57,17 +57,17 @@ module uart #(
     end
 
     // Write logic
-    // FIXME data shall not change until handshake
+    // FIXME tdata shall not change until handshake
     always_ff @(posedge clk) begin
         if (~resetn) begin
-            write.data  <= '0;
-            write.valid <= 1'b0;
+            write.tdata  <= '0;
+            write.tvalid <= 1'b0;
         end else begin
-            if (write.valid && write.ready)
-                write.valid <= 1'b0;
+            if (write.tvalid && write.tready)
+                write.tvalid <= 1'b0;
             if (state == STOP && rx.txd === rs232.MARK) begin
-                write.data  <= data;
-                write.valid <= 1'b1;
+                write.tdata  <= data;
+                write.tvalid <= 1'b1;
             end
         end
     end
