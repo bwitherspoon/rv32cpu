@@ -1,3 +1,8 @@
+/**
+ * Module: uart
+ * 
+ * A UART controller.
+ */
 module uart #(
     parameter int unsigned DATA_BITS = 8,
     parameter int unsigned STOP_BITS = 1

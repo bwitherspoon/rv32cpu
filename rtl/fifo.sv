@@ -1,6 +1,11 @@
+/**
+ * Module: fifo
+ * 
+ * An AXI4-Stream FIFO.
+ */
 module fifo #(
-    int unsigned DATA_WIDTH = 8,
-    int unsigned ADDR_WIDTH = 9
+    parameter int unsigned DATA_WIDTH = 8,
+    parameter int unsigned ADDR_WIDTH = 9
 )(
     input logic clk,
     input logic resetn,
@@ -10,7 +15,7 @@ module fifo #(
 
     timeunit 1ns;
     timeprecision 1ps;
-
+    
     // Internal registers
     logic [DATA_WIDTH-1:0] ram [0:2**ADDR_WIDTH-1];
 

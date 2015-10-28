@@ -1,3 +1,8 @@
+/**
+ * Module: block_ram
+ * 
+ * A dual port block ram.
+ */
 module block_ram #(
     parameter int unsigned ADDR_WIDTH = 9,
     parameter int unsigned DATA_WIDTH = 32
