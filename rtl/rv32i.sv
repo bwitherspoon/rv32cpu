@@ -51,7 +51,10 @@ package rv32i;
     localparam logic [6:0] OPCODE_CUSTOM_3  = 'b1111011;
 
     typedef union packed {
-        logic [31:0] raw;
+        struct packed {
+            logic [6:0]  opcode;
+            logic [24:0] operand;
+        } no_type;
 
         struct packed {
             logic [6:0] opcode;
@@ -114,5 +117,6 @@ package rv32i;
             logic [5:0] imm_10_5;
             logic       imm_20;
         } uj_type;
-    } inst_t;
+    } ir_t;
+ 
 endpackage : rv32i
