@@ -1,6 +1,6 @@
 module uart #(
-    parameter unsigned int DATA_BITS = 8,
-    parameter unsigned int STOP_BITS = 1
+    parameter int unsigned DATA_BITS = 8,
+    parameter int unsigned STOP_BITS = 1
 )(
     input logic clk,
     input logic resetn,
