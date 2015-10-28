@@ -4,8 +4,8 @@
  * An AXI4-Stream FIFO.
  */
 module fifo #(
-    parameter int unsigned DATA_WIDTH = 8,
-    parameter int unsigned ADDR_WIDTH = 9
+    parameter DATA_WIDTH = 8,
+    parameter ADDR_WIDTH = 9
 )(
     input logic clk,
     input logic resetn,

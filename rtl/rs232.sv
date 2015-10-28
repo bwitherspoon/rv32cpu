@@ -1,6 +1,6 @@
 interface rs232 #(
-    parameter unsigned int DATA_WIDTH = 8,
-    parameter unsigned int STOP_WIDTH = 1
+    parameter DATA_WIDTH = 8,
+    parameter STOP_WIDTH = 1
 )(
     input logic clk
 );
@@ -8,8 +8,8 @@ interface rs232 #(
     timeunit 1ns;
     timeprecision 1ps;
 
-    parameter unsigned int MARK  = 1'b1;
-    parameter unsigned int SPACE = 1'b0;
+    parameter MARK  = 1'b1;
+    parameter SPACE = 1'b0;
 
     logic txd;
     logic rxd;

@@ -4,8 +4,8 @@
  * A dual port block ram.
  */
 module block_ram #(
-    parameter int unsigned ADDR_WIDTH = 9,
-    parameter int unsigned DATA_WIDTH = 32
+    parameter ADDR_WIDTH = 9,
+    parameter DATA_WIDTH = 32
 )(
     input  logic                  clk,
     // Port A
@@ -19,7 +19,7 @@ module block_ram #(
     input  logic [DATA_WIDTH-1:0]   wdata_b,
     output logic [DATA_WIDTH-1:0]   rdata_b
 );
-    localparam int unsigned DATA_BYTES = DATA_WIDTH / 8;
+    localparam DATA_BYTES = DATA_WIDTH / 8;
 
     logic [DATA_WIDTH-1:0] ram [0:2**ADDR_WIDTH-1];
 

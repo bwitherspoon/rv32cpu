@@ -4,8 +4,8 @@
  * A UART controller.
  */
 module uart #(
-    parameter int unsigned DATA_BITS = 8,
-    parameter int unsigned STOP_BITS = 1
+    parameter DATA_BITS = 8,
+    parameter STOP_BITS = 1
 )(
     input logic clk,
     input logic resetn,
