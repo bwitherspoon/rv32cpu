@@ -1,15 +1,11 @@
 interface rs232 #(
-    parameter DATA_WIDTH = 8,
-    parameter STOP_WIDTH = 1
+    parameter DATA_BITS = 8,
+    parameter STOP_BITS = 1  
 )(
     input logic clk
 );
-
-    timeunit 1ns;
-    timeprecision 1ps;
-
-    parameter MARK  = 1'b1;
-    parameter SPACE = 1'b0;
+    localparam MARK  = 1'b1;
+    localparam SPACE = 1'b0;
 
     logic txd;
     logic rxd;
@@ -38,5 +34,38 @@ interface rs232 #(
         output dsr,
         output dcd
     );
+    
+    task automatic transmit(input logic [DATA_BITS-1:0] data);
+        // Start
+        txd = SPACE;
+        repeat (16) @(posedge clk);
+        // Data
+        for (int i = 0; i < DATA_BITS; i++) begin
+            txd = data[i];
+            repeat (16) @(posedge clk);
+        end
+        // Stop
+        repeat (STOP_BITS) begin
+            txd = MARK;
+            repeat (16) @(posedge clk);
+        end
+    endtask
+
+    task automatic receive(output logic [DATA_BITS-1:0] data);
+        // Start
+        wait (rxd === SPACE);
+        repeat (8) @(posedge clk);
+        assert (rxd === SPACE);
+        // Data
+        for (int i = 0; i < DATA_BITS; i++) begin
+            repeat (8) @(posedge clk);
+            data[i] = rxd;
+        end
+        // Stop
+        repeat (STOP_BITS) begin
+            repeat (8) @(posedge clk);
+            assert (rxd === MARK);
+        end
+    endtask
 
 endinterface
