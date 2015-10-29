@@ -1,3 +1,5 @@
+work
+*.vcd
 xsim.dir
 *.log
 *.pb
