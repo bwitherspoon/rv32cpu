@@ -1,4 +1,4 @@
 TOP = core_test
-DEP = $(RTLDIR)/core.sv $(RTLDIR)/regfile.sv $(RTLDIR)/riscv.sv
+DEP = $(shell cat core.f)
 
 include ../common.mk
