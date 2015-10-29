@@ -38,20 +38,20 @@ module uart #(
                     timer <= timer + 1;
                     count <= '0;
                     if (timer === '1)
-                        state <= (rx.txd === rs232.SPACE) ? DATA : IDLE;
+                        state <= (serial.txd === rs232.SPACE) ? DATA : IDLE;
                 end
                 DATA: begin
                     timer <= timer + 1;
                     if (timer === '1) begin
                         count <= count + 1;
-                        data <= {data[6:0], rx.txd};
+                        data <= {data[6:0], serial.txd};
                     end
                     if (count === 3'b110)
                         state <= STOP;
                 end
                 STOP: begin
                     timer <= timer + 1;
-                    if (rx.txd === rs232.MARK)
+                    if (serial.txd === rs232.MARK)
                         state <= IDLE;
                 end
                 default: begin
@@ -70,7 +70,7 @@ module uart #(
         end else begin
             if (write.tvalid && write.tready)
                 write.tvalid <= 1'b0;
-            if (state == STOP && rx.txd === rs232.MARK) begin
+            if (state == STOP && serial.txd === rs232.MARK) begin
                 write.tdata  <= data;
                 write.tvalid <= 1'b1;
             end
