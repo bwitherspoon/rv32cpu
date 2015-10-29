@@ -9,9 +9,9 @@ module uart #(
 )(
     input logic clk,
     input logic resetn,
-    rs232.dce   serial,
-    axis.slave  read,
-    axis.master write
+    rs232.dce   dce,
+    axis.slave  slave,
+    axis.master master
 );
 
     timeunit 1ns;
@@ -31,27 +31,27 @@ module uart #(
             unique case (state)
                 IDLE: begin
                     timer <= '0;
-                    if (serial.txd === rs232.SPACE)
+                    if (dce.txd === dce.SPACE)
                         state <= START;
                 end
                 START: begin
                     timer <= timer + 1;
                     count <= '0;
                     if (timer === '1)
-                        state <= (serial.txd === rs232.SPACE) ? DATA : IDLE;
+                        state <= (dce.txd === dce.SPACE) ? DATA : IDLE;
                 end
                 DATA: begin
                     timer <= timer + 1;
                     if (timer === '1) begin
                         count <= count + 1;
-                        data <= {data[6:0], serial.txd};
+                        data <= {data[6:0], dce.txd};
                     end
                     if (count === 3'b110)
                         state <= STOP;
                 end
                 STOP: begin
                     timer <= timer + 1;
-                    if (serial.txd === rs232.MARK)
+                    if (dce.txd === dce.MARK)
                         state <= IDLE;
                 end
                 default: begin
@@ -65,14 +65,14 @@ module uart #(
     // FIXME tdata shall not change until handshake
     always_ff @(posedge clk) begin
         if (~resetn) begin
-            write.tdata  <= '0;
-            write.tvalid <= 1'b0;
+            master.tdata  <= '0;
+            master.tvalid <= 1'b0;
         end else begin
-            if (write.tvalid && write.tready)
-                write.tvalid <= 1'b0;
-            if (state == STOP && serial.txd === rs232.MARK) begin
-                write.tdata  <= data;
-                write.tvalid <= 1'b1;
+            if (master.tvalid && master.tready)
+                master.tvalid <= 1'b0;
+            if (state == STOP && dce.txd === dce.MARK) begin
+                master.tdata  <= data;
+                master.tvalid <= 1'b1;
             end
         end
     end
