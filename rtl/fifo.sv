@@ -21,7 +21,7 @@ module fifo #(
 
     initial
         for (int i = 0; i < 2**ADDR_WIDTH; i++)
-            ram[i] = '1;
+            ram[i] = '0;
 
     logic [ADDR_WIDTH:0] raddr = '0;
     logic [ADDR_WIDTH:0] waddr = '0;
