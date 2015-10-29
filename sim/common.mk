@@ -1,5 +1,5 @@
 TOP ?= top
-FILES += $(TOP).sv
+DEP += $(TOP).sv
 
 INSTALLDIR = /opt/altera/15.0/modelsim_ase
 
@@ -22,8 +22,8 @@ vcd: $(TOP).vcd
 $(TOP).vcd: work/_lib.qdb
 	$(VSIM) -batch -quiet -nostdout -logfile $(TOP).log -do $(VCDDO) $(TOP)
 
-work/_lib.qdb: $(FILES) work/_info
-	$(VLOG) -quiet $(FILES)
+work/_lib.qdb: $(DEP) work/_info
+	$(VLOG) -quiet $(DEP)
 
 work/_info:
 	$(VLIB) work
