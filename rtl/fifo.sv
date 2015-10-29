@@ -27,8 +27,8 @@ module fifo #(
     logic [ADDR_WIDTH:0] waddr = '0;
 
     // Internal signals
-    wire rhs = read.ready & read.valid;
-    wire whs = write.ready & write.valid;
+    wire rhs = read.tready & read.tvalid;
+    wire whs = write.tready & write.tvalid;
 
     wire empty = raddr == waddr;
     wire full  = raddr[ADDR_WIDTH] != waddr[ADDR_WIDTH] &&
