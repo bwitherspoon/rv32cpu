@@ -2,6 +2,7 @@
 ../../rtl/block_ram.sv
 ../../rtl/core.sv
 ../../rtl/fifo.sv
+../../rtl/imem.sv
 ../../rtl/regfile.sv
 ../../rtl/rs232.sv
 ../../rtl/rv32i.sv

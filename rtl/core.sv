@@ -21,5 +21,14 @@ module core (
     .waddr(), 
     .wdata()
   );
+  
+  imem #(
+      .ADDR_WIDTH(9), 
+      .DATA_WIDTH(32)
+  ) imem (
+      .clk(clk), 
+      .addr(), 
+      .data()
+  );
 
 endmodule
