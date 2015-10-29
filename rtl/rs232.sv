@@ -36,7 +36,7 @@ interface rs232 #(
         output cts,
         input  dtr,
         output dsr,
-        output dcd,
+        output dcd
     );
 
 endinterface
