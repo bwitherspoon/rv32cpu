@@ -1,5 +1,5 @@
 interface axis #(
-    parameter int unsigned DATA_WIDTH = 32
+    parameter DATA_WIDTH = 32
 )(
     input logic aclk,
     input logic aresetn
