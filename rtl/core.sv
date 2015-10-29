@@ -8,6 +8,18 @@ module core (
     input logic resetn
 );
 
+  regfile #(
+    .ADDR_WIDTH(5), 
+    .DATA_WIDTH(32)
+  ) regfile (
+    .clk(clk), 
+    .raddr1(), 
+    .rdata1(), 
+    .raddr2(), 
+    .rdata2(), 
+    .wen(), 
+    .waddr(), 
+    .wdata()
+  );
+
 endmodule
-
-
