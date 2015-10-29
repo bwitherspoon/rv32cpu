@@ -1,3 +1,7 @@
+/*
+ * core.sv
+ */
+ 
 /**
  * Module: core
  * 
@@ -9,8 +13,8 @@ module core (
 );
 
   regfile #(
-    .ADDR_WIDTH(5), 
-    .DATA_WIDTH(32)
+    .ADDR_WIDTH(riscv::REGS_ADDR_WIDTH), 
+    .DATA_WIDTH(riscv::REGS_DATA_WIDTH)
   ) regfile (
     .clk(clk), 
     .raddr1(), 
@@ -23,8 +27,8 @@ module core (
   );
   
   imem #(
-      .ADDR_WIDTH(9), 
-      .DATA_WIDTH(32)
+      .ADDR_WIDTH(riscv::IMEM_ADDR_WIDTH), 
+      .DATA_WIDTH(riscv::IMEM_ADDR_WIDTH)
   ) imem (
       .clk(clk), 
       .addr(), 
