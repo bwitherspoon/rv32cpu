@@ -1,6 +1,6 @@
 /**
  * Module: imem
- * 
+ *
  * Byte addressable instruction memory
  */
 module imem #(
@@ -13,9 +13,9 @@ module imem #(
 );
 
     localparam DATA_BYTES = DATA_WIDTH / 8;
-    
+
     logic [7:0] mem [0:2**ADDR_WIDTH-1];
-  
+
     always_ff @(posedge clk)
         for (int i = 0; i < DATA_BYTES; i = i + 1)
             data[8*i +: 8] <= mem[addr + i];

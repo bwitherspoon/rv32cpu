@@ -1,6 +1,6 @@
 /**
  * Module: regfile
- * 
+ *
  * A register file.
  */
 module regfile #(
@@ -25,7 +25,7 @@ module regfile #(
 `ifndef SYNTHESIS
     initial for (int i = 0; i < 2**ADDR_WIDTH-1; i = i + 1) regs[i] = 0;
 `endif
-    
+
     logic rzero1 = raddr1 == {ADDR_WIDTH{1'b0}};
     logic rzero2 = raddr2 == {ADDR_WIDTH{1'b0}};
     logic wzero  = waddr  == {ADDR_WIDTH{1'b0}};

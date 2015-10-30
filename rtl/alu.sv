@@ -8,7 +8,7 @@ import riscv::word_t;
 
 /**
  * Module: alu
- * 
+ *
  * An ALU.
  */
 module alu (

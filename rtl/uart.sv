@@ -1,6 +1,6 @@
 /**
  * Module: uart
- * 
+ *
  * A UART controller.
  */
 module uart (

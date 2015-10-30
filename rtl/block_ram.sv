@@ -1,6 +1,6 @@
 /**
  * Module: block_ram
- * 
+ *
  * A dual port block ram.
  */
 module block_ram #(

@@ -13,5 +13,5 @@ module decode (
     output riscv::wort_t rs2,
     output riscv::word_t op2
 );
-    
+
 endmodule

@@ -1,6 +1,6 @@
 interface rs232 #(
     parameter DATA_BITS = 8,
-    parameter STOP_BITS = 1  
+    parameter STOP_BITS = 1
 )(
     input logic clk
 );
@@ -34,7 +34,7 @@ interface rs232 #(
         output dsr,
         output dcd
     );
-    
+
     task automatic transmit(input logic [DATA_BITS-1:0] data);
         // Start
         txd = SPACE;
