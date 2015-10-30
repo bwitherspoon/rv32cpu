@@ -1,5 +1,5 @@
 interface axis #(
-    parameter TDATA_WIDTH = 8,
+    parameter TDATA_WIDTH = 8
 )(
     input logic aclk,
     input logic aresetn
