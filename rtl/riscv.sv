@@ -7,8 +7,6 @@ package riscv;
     import funct3::funct3_t;
 
     localparam WORD_WIDTH = 32;
-    localparam SHAMT_WIDTH = 5;
-    localparam FUNCT_WIDTH = 3;
     localparam REGS_ADDR_WIDTH = 5;
     localparam REGS_DATA_WIDTH = WORD_WIDTH;
     localparam IMEM_ADDR_WIDTH = 9;
