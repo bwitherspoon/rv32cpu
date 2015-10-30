@@ -2,7 +2,7 @@
  * fetch.sv
  */
 
-import riscv::tgt_t;
+import riscv::target_t;
 import riscv::pc_t;
 import riscv::ir_t;
 
@@ -15,7 +15,7 @@ module fetch (
     input  logic    clk,
     input  logic    resetn,
     input  logic    bubble,
-    input  tgt_t    target,
+    input  target_t target,
     input  pc_t     jal_bxx_tgt,
     input  pc_t     jalr_tgt,
     output pc_t     pc,

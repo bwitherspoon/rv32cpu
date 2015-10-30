@@ -44,7 +44,7 @@ package riscv;
         JALR_TGT     = 'b00,
         JAL_BXX_TGT  = 'b01,
         PC_PLUS4_TGT = 'b10
-    } tgt_t;
+    } target_t;
 
     // Instruction type
     typedef union packed {
