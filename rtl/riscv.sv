@@ -12,6 +12,9 @@ package riscv;
     localparam IMEM_ADDR_WIDTH = 9;
     localparam IMEM_DATA_WIDTH = WORD_WIDTH;
     
+    typedef logic [WORD_WIDTH-1:0] word_t;
+    typedef logic [IMEM_ADDR_WIDTH-1:0] pc_t;
+    
     typedef union packed {
         struct packed {
             opcode_t     opcode;
