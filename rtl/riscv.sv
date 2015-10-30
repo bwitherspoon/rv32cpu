@@ -111,6 +111,15 @@ package riscv;
         } uj;
     } ir_t;
 
+    typedef enum logic [1:0] {
+        OP2_RS2,
+        OP2_I_IMM,
+        OP2_S_IMM,
+        OP2_B_IMM,
+        OP2_U_IMM,
+        OP2_J_IMM
+    } op2_sel_t;
+
     // NOP instruction
     localparam ir_t NOP = {
         opcode::OP_IMM,
