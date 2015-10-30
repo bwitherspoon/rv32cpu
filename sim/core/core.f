@@ -1,5 +1,6 @@
 ../../rtl/opcode.sv
 ../../rtl/funct3.sv
+../../rtl/funct7.sv
 ../../rtl/riscv.sv
 ../../rtl/axis.sv
 ../../rtl/block_ram.sv

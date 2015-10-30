@@ -5,6 +5,7 @@ package riscv;
 
     import opcode::opcode_t;
     import funct3::funct3_t;
+    import funct7::funct7_t;
 
     localparam WORD_WIDTH = 32;
     localparam REGS_ADDR_WIDTH = 5;
@@ -27,7 +28,7 @@ package riscv;
             funct3_t    funct3;
             logic [4:0] rs1;
             logic [4:0] rs2;
-            logic [6:0] funct7;
+            funct7_t    funct7;
         } r_type;
 
         struct packed {
