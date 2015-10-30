@@ -41,9 +41,9 @@ package riscv;
 
     // PC target type
     typedef enum logic [1:0] {
-        JALR_TGT     = 'b00,
-        JAL_BXX_TGT  = 'b01,
-        PC_PLUS4_TGT = 'b10
+        JALR_TGT,
+        JAL_BXX_TGT,
+        PC_PLUS4_TGT
     } target_t;
 
     // Instruction type
