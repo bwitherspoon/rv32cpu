@@ -3,6 +3,7 @@
 ../../rtl/axis.sv
 ../../rtl/block_ram.sv
 ../../rtl/core.sv
+../../rtl/fetch.sv
 ../../rtl/fifo.sv
 ../../rtl/imem.sv
 ../../rtl/regfile.sv
