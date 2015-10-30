@@ -12,7 +12,6 @@ package riscv;
 
     // Word type
     typedef union packed {
-        logic       [31:0] bits;
         logic [ 3:0][ 7:0] bytes;
         logic [ 1:0][15:0] halfs;
     } word_t;
@@ -36,6 +35,13 @@ package riscv;
 
     // ALU shift amount type
     typedef logic [4:0] shamt_t;
+
+    // PC multiplexer select type
+    typedef enum logic [1:0] {
+        JALR = 'b00,
+        JAL  = 'b01,
+        NEXT = 'b10
+    } pc_sel_t;
 
     // Instruction type
     typedef union packed {
@@ -106,5 +112,13 @@ package riscv;
             logic       imm_20;
         } uj_type;
     } ir_t;
+
+    localparam ir_t NOP = {
+        opcode::OP_IMM,
+        addr_t'(0),
+        funct3::ADDI,
+        addr_t'(0),
+        12'h000
+    };
 
 endpackage
