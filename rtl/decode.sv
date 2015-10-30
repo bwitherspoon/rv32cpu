@@ -2,7 +2,7 @@
  * decode.sv
  */
 
-import riscv::pc_t;
+import riscv::ir_t;
 import riscv::word_t;
 import riscv::imm_t;
 import riscv::opcode_t;
@@ -11,13 +11,15 @@ import riscv::funct7_t;
 
 /**
  * Module: decode
+ *
+ * Instruction decode stage
  */
 module decode (
     input  logic       clk,
     input  logic [1:0] rs1_sel,
     input  logic [1:0] rs2_sel,
     input  logic [2:0] op2_sel,
-    input  pc_t        ir,
+    input  ir_t        ir,
     input  word_t      bypass_alu,
     input  word_t      bypass_mem,
     input  word_t      bypass_wb,
