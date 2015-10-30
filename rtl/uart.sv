@@ -3,10 +3,7 @@
  * 
  * A UART controller.
  */
-module uart #(
-    parameter DATA_BITS = 8,
-    parameter STOP_BITS = 1
-)(
+module uart (
     input logic clk,
     input logic resetn,
     rs232.dce   dce,
