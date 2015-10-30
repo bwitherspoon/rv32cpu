@@ -16,6 +16,9 @@ package riscv;
         logic [ 1:0][15:0] halfword;
     } word_t;
 
+    // Immediate type
+    typedef logic signed [31:0] imm_t;
+
     // Program counter type
     typedef logic [8:0]  pc_t;
 
@@ -45,12 +48,7 @@ package riscv;
 
     // Instruction type
     typedef union packed {
-        struct packed {
-            opcode_t     opcode;
-            logic [24:0] operand;
-        } generic;
-
-        struct packed {
+      struct packed {
             opcode_t    opcode;
             addr_t      rd;
             funct3_t    funct3;
