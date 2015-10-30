@@ -23,11 +23,12 @@ module core (
         .clk(clk),
         .resetn(resetn),
         .bubble(),
-        .pc_sel(),
+        .target(),
         .jal_bxx_tgt(),
         .jalr_tgt(),
         .pc(),
-        .ir()
+        .ir(),
+        .misaligned()
     );
 
     execute execute (

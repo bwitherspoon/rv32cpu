@@ -12,8 +12,8 @@ package riscv;
 
     // Word type
     typedef union packed {
-        logic [ 3:0][ 7:0] bytes;
-        logic [ 1:0][15:0] halfs;
+        logic [ 3:0][ 7:0] octet;
+        logic [ 1:0][15:0] halfword;
     } word_t;
 
     // Program counter type
@@ -36,12 +36,12 @@ package riscv;
     // ALU shift amount type
     typedef logic [4:0] shamt_t;
 
-    // PC multiplexer select type
+    // PC target type
     typedef enum logic [1:0] {
-        JALR = 'b00,
-        JAL  = 'b01,
-        NEXT = 'b10
-    } pc_sel_t;
+        JALR_TGT     = 'b00,
+        JAL_BXX_TGT  = 'b01,
+        PC_PLUS4_TGT = 'b10
+    } tgt_t;
 
     // Instruction type
     typedef union packed {
@@ -113,6 +113,7 @@ package riscv;
         } uj_type;
     } ir_t;
 
+    // NOP instruction
     localparam ir_t NOP = {
         opcode::OP_IMM,
         addr_t'(0),
@@ -120,5 +121,8 @@ package riscv;
         addr_t'(0),
         12'h000
     };
+
+    // Boot address
+    localparam pc_t BOOT_ADDR = 'h2000;
 
 endpackage
