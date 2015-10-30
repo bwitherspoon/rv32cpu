@@ -8,10 +8,7 @@ module core (
     input logic resetn
 );
 
-    regfile #(
-        .ADDR_WIDTH(riscv::REGS_ADDR_WIDTH),
-        .DATA_WIDTH(riscv::REGS_DATA_WIDTH)
-    ) regfile (
+    regfile regfile (
         .clk(clk),
         .raddr1(),
         .rdata1(),

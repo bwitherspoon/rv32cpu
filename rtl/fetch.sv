@@ -14,10 +14,7 @@ module fetch (
     output riscv::ir_t ir
 );
 
-    imem #(
-        .ADDR_WIDTH(riscv::IMEM_ADDR_WIDTH),
-        .DATA_WIDTH(riscv::IMEM_DATA_WIDTH)
-    ) imem (
+    imem imem (
         .clk(clk),
         .addr(),
         .data()

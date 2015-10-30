@@ -1,25 +1,25 @@
+/*
+ * imem.sv
+ */
+
+import riscv::pc_t;
+import riscv::word_t;
+
 /**
  * Module: imem
  *
  * Byte addressable instruction memory
  */
-module imem #(
-    parameter ADDR_WIDTH = 9,
-    parameter DATA_WIDTH = 32
-)(
-    input  logic                  clk,
-    input  logic [ADDR_WIDTH-1:0] addr,
-    output logic [DATA_WIDTH-1:0] data
+module imem (
+    input  logic  clk,
+    input  pc_t   addr,
+    output word_t data
 );
 
-    localparam DATA_BYTES = DATA_WIDTH / 8;
-
-    logic [7:0] mem [0:2**ADDR_WIDTH-1];
+    logic [7:0] mem [0:2**$bits(pc_t)-1];
 
     always_ff @(posedge clk)
-        for (int i = 0; i < DATA_BYTES; i = i + 1)
-            data[8*i +: 8] <= mem[addr + i];
+        for (int i = 0; i < $bits(word_t) / 8; i = i + 1)
+            data.bytes[i] <= mem[addr + i];
 
 endmodule
-
-
