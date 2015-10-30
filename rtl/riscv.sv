@@ -12,10 +12,25 @@ package riscv;
     localparam REGS_DATA_WIDTH = WORD_WIDTH;
     localparam IMEM_ADDR_WIDTH = 9;
     localparam IMEM_DATA_WIDTH = WORD_WIDTH;
-    
-    typedef logic [WORD_WIDTH-1:0] word_t;
+
+    typedef logic [WORD_WIDTH-1:0]      word_t;
     typedef logic [IMEM_ADDR_WIDTH-1:0] pc_t;
-    
+
+    typedef enum logic [3:0] {
+        ADD  = 'b0000,
+        SLL  = 'b0001,
+        SLT  = 'b0010,
+        SLTU = 'b0011,
+        XOR  = 'b0100,
+        SRL  = 'b0101,
+        OR   = 'b0110,
+        AND  = 'b0111,
+        SUB  = 'b1000,
+        SRA  = 'b1101
+    } funct_t;
+
+    typedef logic [4:0] shamt_t;
+
     typedef union packed {
         struct packed {
             opcode_t     opcode;
