@@ -16,13 +16,8 @@ import riscv::funct7_t;
  */
 module decode (
     input  logic       clk,
-    input  logic [1:0] rs1_sel,
-    input  logic [1:0] rs2_sel,
-    input  logic [2:0] op2_sel,
+    input  logic [1:0] op2_sel,
     input  ir_t        ir,
-    input  word_t      bypass_alu,
-    input  word_t      bypass_mem,
-    input  word_t      bypass_wb,
     output opcode_t    opcode,
     output funct3_t    funct3,
     output funct7_t    funct7,
