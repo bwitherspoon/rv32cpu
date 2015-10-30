@@ -20,8 +20,8 @@ module fifo_test;
         @(posedge clk) #1;
     endtask
 
-    axis #(.DATA_WIDTH(DATA_WIDTH)) read (.aclk(clk), .aresetn(resetn));
-    axis #(.DATA_WIDTH(DATA_WIDTH)) write (.aclk(clk), .aresetn(resetn));
+    axis #(.TDATA_WIDTH(DATA_WIDTH)) read (.aclk(clk), .aresetn(resetn));
+    axis #(.TDATA_WIDTH(DATA_WIDTH)) write (.aclk(clk), .aresetn(resetn));
     fifo #(.DATA_WIDTH(DATA_WIDTH),.ADDR_WIDTH(ADDR_WIDTH)) dut (.*);
 
     // Subroutines

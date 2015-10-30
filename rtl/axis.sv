@@ -1,15 +1,17 @@
 interface axis #(
-    parameter DATA_WIDTH = 32
+    parameter TDATA_WIDTH = 8,
 )(
     input logic aclk,
     input logic aresetn
 );
+    timeunit 1ns;
+    timeprecision 1ps;
 
-    typedef logic [DATA_WIDTH-1:0] data_t;
+    typedef logic [TDATA_WIDTH-1:0] tdata_t;
 
-    data_t tdata;
-    logic  tvalid;
-    logic  tready;
+    tdata_t tdata;
+    logic   tvalid;
+    logic   tready;
 
     modport master (
         output tvalid,
