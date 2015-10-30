@@ -1,5 +1,6 @@
+../../rtl/opcode.sv
+../../rtl/funct3.sv
 ../../rtl/riscv.sv
-../../rtl/rv32i.sv
 ../../rtl/axis.sv
 ../../rtl/block_ram.sv
 ../../rtl/core.sv

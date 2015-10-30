@@ -3,7 +3,7 @@
  */
 
 import riscv::WORD_WIDTH;
-import rv32i::ir_t;
+import riscv::ir_t;
 
 /**
  * Module: fetch
