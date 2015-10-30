@@ -9,7 +9,6 @@
 ../../rtl/execute.sv
 ../../rtl/fetch.sv
 ../../rtl/fifo.sv
-../../rtl/imem.sv
 ../../rtl/regfile.sv
 ../../rtl/rs232.sv
 ../../rtl/uart.sv
