@@ -55,7 +55,7 @@ package riscv;
             addr_t      rs1;
             addr_t      rs2;
             funct7_t    funct7;
-        } r_type;
+        } r;
 
         struct packed {
             opcode_t    opcode;
@@ -66,7 +66,7 @@ package riscv;
             logic [3:0] imm_4_1;
             logic [5:0] imm_10_5;
             logic       imm_11;
-        } i_type;
+        } i;
 
         struct packed {
             opcode_t    opcode;
@@ -77,7 +77,7 @@ package riscv;
             addr_t      rs2;
             logic [5:0] imm_10_5;
             logic       imm_11;
-        } s_type;
+        } s;
 
         struct packed {
             opcode_t    opcode;
@@ -88,7 +88,7 @@ package riscv;
             addr_t      rs2;
             logic [5:0] imm_10_5;
             logic       imm_12;
-        } sb_type;
+        } sb;
 
         struct packed {
             opcode_t     opcode;
@@ -97,7 +97,7 @@ package riscv;
             logic [4:0]  imm_19_15;
             logic [10:0] imm_30_20;
             logic        imm_31;
-        } u_type;
+        } u;
 
         struct packed {
             opcode_t    opcode;
@@ -108,7 +108,7 @@ package riscv;
             logic [3:0] imm_4_1;
             logic [5:0] imm_10_5;
             logic       imm_20;
-        } uj_type;
+        } uj;
     } ir_t;
 
     // NOP instruction
