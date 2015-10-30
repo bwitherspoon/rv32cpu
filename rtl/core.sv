@@ -33,4 +33,13 @@ module core (
         .ir()
     );
 
+    execute execute (
+        .clk(clk),
+        .pc(),
+        .bypass_alu(),
+        .out(),
+        .jal_bxx_tgt(),
+        .jalr_tgt()
+    );
+
 endmodule
