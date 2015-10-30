@@ -1,24 +1,17 @@
-/*
- * fetch.sv
- */
-
-import riscv::WORD_WIDTH;
-import riscv::ir_t;
-
 /**
  * Module: fetch
  *
  * Instruction fetch stage
  */
 module fetch (
-    input  logic                  clk,
-    input  logic                  resetn,
-    input  logic                  bubble,
-    input  logic [1:0]            pc_sel,
-    input  logic [WORD_WIDTH-1:0] jal_bxx_tgt,
-    input  logic [WORD_WIDTH-1:0] jalr_tgt,
-    output logic [WORD_WIDTH-1:0] pc,
-    output ir_t                   ir
+    input  logic       clk,
+    input  logic       resetn,
+    input  logic       bubble,
+    input  logic [1:0] pc_sel,
+    input  riscv::pc_t jal_bxx_tgt,
+    input  riscv::pc_t jalr_tgt,
+    output riscv::pc_t pc,
+    output riscv::ir_t ir
 );
 
     imem #(
