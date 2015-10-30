@@ -20,6 +20,6 @@ module imem (
 
     always_ff @(posedge clk)
         for (int i = 0; i < $bits(word_t) / 8; i = i + 1)
-            data.bytes[i] <= mem[addr + i];
+            data[8*i +: 8] <= mem[addr + i];
 
 endmodule
