@@ -111,7 +111,7 @@ package riscv;
         } uj;
     } ir_t;
 
-    typedef enum logic [1:0] {
+    typedef enum logic [2:0] {
         OP2_RS2,
         OP2_I_IMM,
         OP2_S_IMM,
