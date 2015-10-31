@@ -48,7 +48,7 @@ module decode (
 
     // Second operand
     always_comb
-        case (op2_sel)
+        unique case (op2_sel)
             riscv::OP2_RS2:   op2 = rdata2;
             riscv::OP2_I_IMM: op2 = i_imm;
             riscv::OP2_S_IMM: op2 = s_imm;
