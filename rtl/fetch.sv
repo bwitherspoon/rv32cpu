@@ -47,7 +47,7 @@ module fetch (
 
     // Target
     always_comb
-        case (target)
+        unique case (target)
             riscv::JALR_TGT:     tgt = jalr_tgt;
             riscv::JAL_BXX_TGT:  tgt = jal_bxx_tgt;
             riscv::PC_PLUS4_TGT: tgt = pc + 4;
