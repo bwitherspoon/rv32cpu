@@ -19,7 +19,7 @@ module alu (
     output word_t  out
 );
     always_comb
-        case (funct)
+        unique case (funct)
             riscv::ADD:  out = op1 + op2;
             riscv::SUB:  out = op1 - op2;
             riscv::SLL:  out = op1 << op2;
