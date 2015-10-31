@@ -4,12 +4,8 @@
 ../../rtl/riscv.sv
 ../../rtl/alu.sv
 ../../rtl/axis.sv
-../../rtl/block_ram.sv
 ../../rtl/core.sv
-../../rtl/decode.sv
 ../../rtl/execute.sv
 ../../rtl/fetch.sv
-../../rtl/fifo.sv
 ../../rtl/regfile.sv
 ../../rtl/rs232.sv
-../../rtl/uart.sv

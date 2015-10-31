@@ -1,4 +1,4 @@
-module uart_test;
+module uart_tb;
 
     timeunit 1ns;
     timeprecision 1ps;
@@ -17,15 +17,15 @@ module uart_test;
     endtask
 
     rs232 serial(.*);
-    
+
     axis read(
         .aclk(clk),
         .aresetn(resetn));
-    
+
     axis write(
         .aclk(clk),
         .aresetn(resetn));
-    
+
     uart dut(
         .clk(clk),
         .resetn(resetn),

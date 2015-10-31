@@ -1,4 +1,4 @@
-TOP = core_test
-DEP = $(shell cat core.f)
+TOP = core_tb
+SRC = $(shell cat $(TOP).f)
 
 include ../common.mk

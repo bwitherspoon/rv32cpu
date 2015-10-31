@@ -1,34 +1,53 @@
 TOP ?= top
-DEP += $(TOP).sv
 
-INSTALLDIR = /opt/altera/15.0/modelsim_ase
+SIM_HOME ?= /opt/altera/15.0/modelsim_ase
+UVM_HOME ?= /opt/accellera/uvm/1.2
 
-VLIB = $(INSTALLDIR)/bin/vlib
-VLOG = $(INSTALLDIR)/bin/vlog
-VSIM = $(INSTALLDIR)/bin/vsim
+PATH := $(SIM_HOME)/bin:$(UVM_HOME)/bin:$(PATH)
 
 PRJDIR = ../..
 SIMDIR = $(PRJDIR)/sim
 RTLDIR = $(PRJDIR)/rtl
 
-RUNDO = "run -all"
-VCDDO = "vcd file $@; vcd add /$(TOP)/dut/*; run -all"
+VLIB = vlib work
 
-$(TOP): work/_lib.qdb
-	$(VSIM) -batch -quiet -nostdout -logfile $(TOP).log -do $(RUNDO) $(TOP)
+VLOG = vlog \
+       $(VLOG_OPT) \
+       +incdir+. \
+       -quiet \
+       -writetoplevels $(TOP).top \
+       $(SRC) \
+       $(TOP).sv
+
+VSIM = vsim \
+       $(VSIM_OPT) \
+       -batch \
+       -quiet \
+       -do $(DO) \
+       -logfile $(TOP).log \
+       -f $(TOP).top
+
+all: $(TOP)
+
+lib: work/_lib.qdb
 
 vcd: $(TOP).vcd
 
-$(TOP).vcd: work/_lib.qdb
-	$(VSIM) -batch -quiet -nostdout -logfile $(TOP).log -do $(VCDDO) $(TOP)
+$(TOP): DO = "run -all; quit"
+$(TOP): work/_lib.qdb
+	$(VSIM)
 
-work/_lib.qdb: $(DEP) work/_info
-	$(VLOG) -quiet $(DEP)
+$(TOP).vcd: DO = "vcd file $@; vcd add /$(TOP)/dut/*; run -all; quit"
+$(TOP).vcd: work/_lib.qdb
+	$(VSIM)
+
+work/_lib.qdb: $(SRC) work/_info
+	$(VLOG)
 
 work/_info:
-	$(VLIB) work
+	$(VLIB)
 
 clean:
-	-$(RM) -rf $(TOP).vcd $(TOP).log work/
+	-$(RM) -rf $(TOP).vcd $(TOP).top $(TOP).log work/
 
-.PHONY: $(TOP) vcd clean
+.PHONY: all lib vcd $(TOP) clean
