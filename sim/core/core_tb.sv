@@ -1,10 +1,10 @@
 module core_test;
-  
+
     timeunit 1ns;
     timeprecision 1ps;
-    
+
     localparam CLOCK_PERIOD = 100;
-  
+
       // Clock
     bit clk = 0;
     initial forever #(CLOCK_PERIOD/2) clk = ~clk;
@@ -18,9 +18,9 @@ module core_test;
     endtask
 
     core core(.*);
-    
+
     initial $finish;
-    
+
 endmodule
 
 
