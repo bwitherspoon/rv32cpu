@@ -15,6 +15,7 @@ VLOG = vlog \
        $(VLOG_OPT) \
        +incdir+. \
        -quiet \
+       -lint \
        -writetoplevels $(TOP).top \
        $(SRC) \
        $(TOP).sv
