@@ -1,4 +1,13 @@
 TOP = core_tb
-SRC = $(shell cat $(TOP).f)
+SRC = $(RTLDIR)/opcode.sv  \
+      $(RTLDIR)/funct3.sv  \
+      $(RTLDIR)/funct7.sv  \
+      $(RTLDIR)/riscv.sv   \
+      $(RTLDIR)/alu.sv     \
+      $(RTLDIR)/axis.sv    \
+      $(RTLDIR)/core.sv    \
+      $(RTLDIR)/execute.sv \
+      $(RTLDIR)/fetch.sv   \
+      $(RTLDIR)/regfile.sv
 
 include ../common.mk
