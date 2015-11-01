@@ -58,25 +58,20 @@ package riscv;
         } r;
 
         struct packed {
-            opcode_t    opcode;
-            addr_t      rd;
-            funct3_t    funct3;
-            addr_t      rs1;
-            logic       imm_0;
-            logic [3:0] imm_4_1;
-            logic [5:0] imm_10_5;
-            logic       imm_11;
+            opcode_t     opcode;
+            addr_t       rd;
+            funct3_t     funct3;
+            addr_t       rs1;
+            logic [11:0] imm_11_0;
         } i;
 
         struct packed {
             opcode_t    opcode;
-            logic       imm_0;
-            logic [3:0] imm_4_1;
+            logic [4:0] imm_4_0;
             funct3_t    funct3;
             addr_t      rs1;
             addr_t      rs2;
-            logic [5:0] imm_10_5;
-            logic       imm_11;
+            logic [6:0] imm_11_5;
         } s;
 
         struct packed {
@@ -93,20 +88,15 @@ package riscv;
         struct packed {
             opcode_t     opcode;
             addr_t       rd;
-            logic [2:0]  imm_14_12;
-            logic [4:0]  imm_19_15;
-            logic [10:0] imm_30_20;
-            logic        imm_31;
+            logic [19:0] imm_31_12;
         } u;
 
         struct packed {
             opcode_t    opcode;
             addr_t      rd;
-            logic [2:0] imm_14_12;
-            logic [4:0] imm_19_15;
+            logic [7:0] imm_19_12;
             logic       imm_11;
-            logic [3:0] imm_4_1;
-            logic [5:0] imm_10_5;
+            logic [9:0] imm_10_1;
             logic       imm_20;
         } uj;
     } ir_t;

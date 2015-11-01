@@ -32,16 +32,11 @@ module decode (
     output word_t    rs1
 );
     // Immediate sign extension
-    imm_t i_imm = imm_t'(
-        {ir.i.imm_11, ir.i.imm_10_5, ir.i.imm_4_1, ir.i.imm_0});
-    imm_t s_imm = imm_t'(
-        {ir.s.imm_11, ir.s.imm_10_5, ir.s.imm_4_1, ir.s.imm_0});
-    imm_t b_imm = imm_t'(
-        {ir.sb.imm_12, ir.sb.imm_11, ir.sb.imm_10_5, ir.sb.imm_4_1, 1'b0});
-    imm_t u_imm = imm_t'(
-        {ir.u.imm_31, ir.u.imm_30_20, ir.u.imm_19_15, ir.u.imm_14_12, 12'd0});
-    imm_t j_imm = imm_t'(
-        {ir.uj.imm_20, ir.uj.imm_19_15, ir.uj.imm_14_12, ir.uj.imm_11, ir.uj.imm_10_5, ir.uj.imm_4_1, 1'b0});
+    imm_t i_imm = imm_t'(ir.i.imm_11_0);
+    imm_t s_imm = imm_t'({ir.s.imm_11_5, ir.s.imm_4_0});
+    imm_t b_imm = imm_t'({ir.sb.imm_12, ir.sb.imm_11, ir.sb.imm_10_5, ir.sb.imm_4_1, 1'b0});
+    imm_t u_imm = imm_t'({ir.u.imm_31_12, 12'd0});
+    imm_t j_imm = imm_t'({ir.uj.imm_20, ir.uj.imm_19_12, ir.uj.imm_11, ir.uj.imm_10_1, 1'b0});
 
     // Control signals
     assign opcode = ir.r.opcode;
