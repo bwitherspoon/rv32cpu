@@ -4,6 +4,7 @@
 
 import riscv::op1_sel_t;
 import riscv::op2_sel_t;
+import riscv::pc_t;
 import riscv::ir_t;
 import riscv::data_t;
 import riscv::imm_t;
@@ -44,7 +45,7 @@ module decode (
 
     // Register file addresses
     assign raddr1 = ir.r.rs1;
-    assign raddr1 = ir.r.rs2;
+    assign raddr2 = ir.r.rs2;
 
     // Control signals
     assign opcode = ir.r.opcode;
