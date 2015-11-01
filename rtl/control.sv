@@ -15,7 +15,7 @@ import riscv::op2_sel_t;
  */
 module control (
      input  logic     clk,
-     input  opcode_t  op,
+     input  opcode_t  opcode,
      input  funct3_t  funct3,
      input  funct7_t  funct7,
      output logic     invalid,
@@ -27,32 +27,32 @@ module control (
 );
 
     always_comb
-        unique case (op)
-            opcode::LOAD:      invalid = 'b1;
-            opcode::LOAD_FP:   invalid = 'b1;
-            opcode::CUSTOM_0:  invalid = 'b1;
-            opcode::MISC_MEM:  invalid = 'b1;
-            opcode::OP_IMM:    invalid = 'b1;
-            opcode::AUIPC:     invalid = 'b1;
-            opcode::OP_IMM_32: invalid = 'b1;
-            opcode::STORE:     invalid = 'b1;
-            opcode::STORE_FP:  invalid = 'b1;
-            opcode::CUSTOM_1:  invalid = 'b1;
-            opcode::AMO:       invalid = 'b1;
-            opcode::OP:        invalid = 'b1;
-            opcode::LUI:       invalid = 'b1;
-            opcode::OP_32:     invalid = 'b1;
-            opcode::MADD:      invalid = 'b1;
-            opcode::MSUB:      invalid = 'b1;
-            opcode::NMSUB:     invalid = 'b1;
-            opcode::NMADD:     invalid = 'b1;
-            opcode::OP_FP:     invalid = 'b1;
-            opcode::CUSTOM_2:  invalid = 'b1;
-            opcode::BRANCH:    invalid = 'b1;
-            opcode::JALR:      invalid = 'b1;
-            opcode::JAL:       invalid = 'b1;
-            opcode::SYSTEM:    invalid = 'b1;
-            opcode::CUSTOM_3:  invalid = 'b1;
+        unique case (opcode)
+            opcodes::LOAD:      invalid = 'b1;
+            opcodes::LOAD_FP:   invalid = 'b1;
+            opcodes::CUSTOM_0:  invalid = 'b1;
+            opcodes::MISC_MEM:  invalid = 'b1;
+            opcodes::OP_IMM:    invalid = 'b1;
+            opcodes::AUIPC:     invalid = 'b1;
+            opcodes::OP_IMM_32: invalid = 'b1;
+            opcodes::STORE:     invalid = 'b1;
+            opcodes::STORE_FP:  invalid = 'b1;
+            opcodes::CUSTOM_1:  invalid = 'b1;
+            opcodes::AMO:       invalid = 'b1;
+            opcodes::OP:        invalid = 'b1;
+            opcodes::LUI:       invalid = 'b1;
+            opcodes::OP_32:     invalid = 'b1;
+            opcodes::MADD:      invalid = 'b1;
+            opcodes::MSUB:      invalid = 'b1;
+            opcodes::NMSUB:     invalid = 'b1;
+            opcodes::NMADD:     invalid = 'b1;
+            opcodes::OP_FP:     invalid = 'b1;
+            opcodes::CUSTOM_2:  invalid = 'b1;
+            opcodes::BRANCH:    invalid = 'b1;
+            opcodes::JALR:      invalid = 'b1;
+            opcodes::JAL:       invalid = 'b1;
+            opcodes::SYSTEM:    invalid = 'b1;
+            opcodes::CUSTOM_3:  invalid = 'b1;
             default:            invalid = 'b1;
         endcase
 

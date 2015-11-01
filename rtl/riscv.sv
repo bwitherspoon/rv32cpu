@@ -3,7 +3,7 @@
  */
 package riscv;
 
-    import opcode::opcode_t;
+    import opcodes::opcode_t;
     import funct::funct3_t;
     import funct::funct7_t;
     import aluop::aluop_t;
@@ -97,7 +97,7 @@ package riscv;
 
     // NOP instruction
     localparam ir_t NOP = {
-        opcode::OP_IMM,
+        opcodes::OP_IMM,
         reg_t'(0),
         funct::ADDI,
         reg_t'(0),

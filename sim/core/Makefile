@@ -1,5 +1,5 @@
 TOP = core_tb
-SRC = $(RTLDIR)/opcode.sv  \
+SRC = $(RTLDIR)/opcodes.sv \
       $(RTLDIR)/funct.sv   \
       $(RTLDIR)/aluop.sv   \
       $(RTLDIR)/riscv.sv   \

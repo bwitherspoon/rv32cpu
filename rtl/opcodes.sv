@@ -1,9 +1,9 @@
 /**
- * Package: opcode
+ * Package: opcodes
  *
  * RISV-V opcodes
  */
-package opcode;
+package opcodes;
 
     typedef logic [7:0] opcode_t;
 
