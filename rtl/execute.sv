@@ -12,7 +12,7 @@ import riscv::data_t;
 module execute (
     input  logic   clk,
     input  pc_t    pc,
-    input  funct_t funct,
+    input  funct_t fun,
     input  data_t  op1,
     input  data_t  op2,
     output data_t  out,
@@ -24,7 +24,7 @@ module execute (
 );
 
     alu alu (
-        .funct(funct),
+        .fun(fun),
         .op1(op1),
         .op2(op2),
         .out(out)

@@ -6,6 +6,7 @@ package riscv;
     import opcode::opcode_t;
     import funct3::funct3_t;
     import funct7::funct7_t;
+    import funct::funct_t;
 
     // Register address type
     typedef logic [4:0]  reg_t;
@@ -21,20 +22,6 @@ package riscv;
 
     // Program counter type
     typedef logic [8:0]  pc_t;
-
-    // ALU function type
-    typedef enum logic [3:0] {
-        ADD  = 'b0000,
-        SLL  = 'b0001,
-        SLT  = 'b0010,
-        SLTU = 'b0011,
-        XOR  = 'b0100,
-        SRL  = 'b0101,
-        OR   = 'b0110,
-        AND  = 'b0111,
-        SUB  = 'b1000,
-        SRA  = 'b1101
-    } funct_t;
 
     // PC target type
     typedef enum logic [1:0] {
