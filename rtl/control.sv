@@ -5,8 +5,8 @@
 import riscv::opcode_t;
 import riscv::funct3_t;
 import riscv::funct7_t;
-import riscv::op1_sel_t;
-import riscv::op2_sel_t;
+import ctrl::op1_sel_t;
+import ctrl::op2_sel_t;
 
 /**
  * Module: control
