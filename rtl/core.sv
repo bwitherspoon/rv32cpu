@@ -8,6 +8,10 @@ module core (
     input logic resetn
 );
 
+    control control (
+        .clk(clk)
+    );
+
     regfile regfile (
         .clk(clk)
     );
@@ -15,7 +19,7 @@ module core (
     fetch fetch (
         .clk(clk)
     );
-    
+
     decode decode (
         .clk(clk)
     );
