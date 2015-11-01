@@ -36,9 +36,6 @@ package riscv;
         SRA  = 'b1101
     } funct_t;
 
-    // ALU shift amount type
-    typedef logic [4:0] shamt_t;
-
     // PC target type
     typedef enum logic [1:0] {
         JALR_TGT,

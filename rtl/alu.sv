@@ -3,7 +3,6 @@
  */
 
 import riscv::funct_t;
-import riscv::shamt_t;
 import riscv::data_t;
 
 /**
