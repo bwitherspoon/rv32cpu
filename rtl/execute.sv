@@ -5,6 +5,7 @@
 import riscv::pc_t;
 import riscv::aluop_t;
 import riscv::data_t;
+import riscv::reg_t;
 
 /**
  * Module: execute
@@ -16,13 +17,13 @@ module execute (
     input  data_t  op1,
     input  data_t  op2,
     input  data_t  rs2_id,
-    input  data_t  rd_id,
+    input  reg_t   rd_id,
     output data_t  result,
     output pc_t    target,
     output logic   equal,
     output logic   less,
     output data_t  rs2_ex,
-    output data_t  rd_ex
+    output reg_t   rd_ex
 );
 
     alu alu (
