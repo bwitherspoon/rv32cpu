@@ -8,7 +8,7 @@ package riscv;
     import funct7::funct7_t;
 
     // Register address type
-    typedef logic [4:0]  addr_t;
+    typedef logic [4:0]  reg_t;
 
     // Word type
     typedef union packed {
@@ -50,18 +50,18 @@ package riscv;
     typedef union packed {
       struct packed {
             opcode_t    opcode;
-            addr_t      rd;
+            reg_t       rd;
             funct3_t    funct3;
-            addr_t      rs1;
-            addr_t      rs2;
+            reg_t       rs1;
+            reg_t       rs2;
             funct7_t    funct7;
         } r;
 
         struct packed {
             opcode_t     opcode;
-            addr_t       rd;
+            reg_t        rd;
             funct3_t     funct3;
-            addr_t       rs1;
+            reg_t        rs1;
             logic [11:0] imm_11_0;
         } i;
 
@@ -69,8 +69,8 @@ package riscv;
             opcode_t    opcode;
             logic [4:0] imm_4_0;
             funct3_t    funct3;
-            addr_t      rs1;
-            addr_t      rs2;
+            reg_t       rs1;
+            reg_t       rs2;
             logic [6:0] imm_11_5;
         } s;
 
@@ -79,21 +79,21 @@ package riscv;
             logic       imm_11;
             logic [3:0] imm_4_1;
             funct3_t    funct3;
-            addr_t      rs1;
-            addr_t      rs2;
+            reg_t       rs1;
+            reg_t       rs2;
             logic [5:0] imm_10_5;
             logic       imm_12;
         } sb;
 
         struct packed {
             opcode_t     opcode;
-            addr_t       rd;
+            reg_t        rd;
             logic [19:0] imm_31_12;
         } u;
 
         struct packed {
             opcode_t    opcode;
-            addr_t      rd;
+            reg_t       rd;
             logic [7:0] imm_19_12;
             logic       imm_11;
             logic [9:0] imm_10_1;
@@ -113,9 +113,9 @@ package riscv;
     // NOP instruction
     localparam ir_t NOP = {
         opcode::OP_IMM,
-        addr_t'(0),
+        reg_t'(0),
         funct3::ADDI,
-        addr_t'(0),
+        reg_t'(0),
         12'h000
     };
 

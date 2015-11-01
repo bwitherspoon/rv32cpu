@@ -9,7 +9,7 @@ import riscv::imm_t;
 import riscv::opcode_t;
 import riscv::funct3_t;
 import riscv::funct7_t;
-import riscv::addr_t;
+import riscv::reg_t;
 
 /**
  * Module: decode
@@ -25,8 +25,8 @@ module decode (
     output opcode_t  opcode,
     output funct3_t  funct3,
     output funct7_t  funct7,
-    output addr_t    raddr1,
-    output addr_t    raddr2,
+    output reg_t     raddr1,
+    output reg_t     raddr2,
     output data_t    op1,
     output data_t    op2,
     output data_t    rs1
