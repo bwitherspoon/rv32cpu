@@ -23,13 +23,6 @@ package riscv;
     // Program counter type
     typedef logic [8:0]  pc_t;
 
-    // PC target type
-    typedef enum logic [1:0] {
-        JALR_TGT,
-        JAL_BXX_TGT,
-        PC_PLUS4_TGT
-    } target_t;
-
     // Instruction type
     typedef union packed {
       struct packed {
@@ -103,7 +96,7 @@ package riscv;
         12'h000
     };
 
-    // Boot address
-    localparam pc_t BOOT_ADDR = 'h2000;
+    // Initial program counter address
+    localparam pc_t INIT_PC = 'h2000;
 
 endpackage
