@@ -2,7 +2,7 @@
  * alu.sv
  */
 
-import riscv::funct_t;
+import riscv::aluop_t;
 import riscv::data_t;
 
 /**
@@ -11,22 +11,22 @@ import riscv::data_t;
  * An ALU.
  */
 module alu (
-    input  funct_t fun,
+    input  aluop_t opcode,
     input  data_t  op1,
     input  data_t  op2,
     output data_t  out
 );
     always_comb
-        unique case (fun)
-            funct::ADD:  out = op1 + op2;
-            funct::SUB:  out = op1 - op2;
-            funct::SLL:  out = op1 << op2;
-            funct::SLT:  out = signed'(op1) < signed'(op2);
-            funct::SLTU: out = op1 < op2;
-            funct::XOR:  out = op1 ^ op2;
-            funct::SRL:  out = op1 >> op2;
-            funct::SRA:  out = signed'(op1) >>> op2;
-            funct::OR:   out = op1 | op2;
-            funct::AND:  out = op1 & op2;
+        unique case (opcode)
+            aluop::ADD:  out = op1 + op2;
+            aluop::SUB:  out = op1 - op2;
+            aluop::SLL:  out = op1 << op2;
+            aluop::SLT:  out = signed'(op1) < signed'(op2);
+            aluop::SLTU: out = op1 < op2;
+            aluop::XOR:  out = op1 ^ op2;
+            aluop::SRL:  out = op1 >> op2;
+            aluop::SRA:  out = signed'(op1) >>> op2;
+            aluop::OR:   out = op1 | op2;
+            aluop::AND:  out = op1 & op2;
         endcase
 endmodule

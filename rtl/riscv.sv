@@ -6,7 +6,7 @@ package riscv;
     import opcode::opcode_t;
     import funct3::funct3_t;
     import funct7::funct7_t;
-    import funct::funct_t;
+    import aluop::aluop_t;
 
     // Register address type
     typedef logic [4:0]  reg_t;

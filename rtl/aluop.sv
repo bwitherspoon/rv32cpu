@@ -1,9 +1,9 @@
 /**
- * Package: operation
+ * Package: aluop
  */
-package funct;
+package aluop;
 
-    // ALU function type
+    // ALU operation type
     typedef enum logic [3:0] {
         ADD  = 'b0000,
         SLL  = 'b0001,
@@ -15,7 +15,7 @@ package funct;
         AND  = 'b0111,
         SUB  = 'b1000,
         SRA  = 'b1101
-    } funct_t;
+    } aluop_t;
 
 endpackage
 
