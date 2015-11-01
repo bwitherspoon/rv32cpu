@@ -49,12 +49,13 @@ module decode (
     // Second operand
     always_comb
         unique case (op2_sel)
-            riscv::OP2_SRC_2: op2 = rdata2;
-            riscv::OP2_IMM_I: op2 = i_imm;
-            riscv::OP2_IMM_S: op2 = s_imm;
-            riscv::OP2_IMM_B: op2 = b_imm;
-            riscv::OP2_IMM_U: op2 = u_imm;
-            riscv::OP2_IMM_J: op2 = j_imm;
+            riscv::SRC_2: op2 = rdata2;
+            riscv::IMM_I: op2 = i_imm;
+            riscv::IMM_S: op2 = s_imm;
+            riscv::IMM_B: op2 = b_imm;
+            riscv::IMM_U: op2 = u_imm;
+            riscv::IMM_J: op2 = j_imm;
+            riscv::CONST: op2 = 'd4;
         endcase
 
 endmodule

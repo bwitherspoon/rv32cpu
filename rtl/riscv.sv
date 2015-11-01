@@ -78,13 +78,15 @@ package riscv;
         } uj;
     } ir_t;
 
+    // Operand select
     typedef enum logic [2:0] {
-        OP2_SRC_2,
-        OP2_IMM_I,
-        OP2_IMM_S,
-        OP2_IMM_B,
-        OP2_IMM_U,
-        OP2_IMM_J
+        SRC_2,
+        IMM_I,
+        IMM_S,
+        IMM_B,
+        IMM_U,
+        IMM_J,
+        CONST
     } op2_sel_t;
 
     // NOP instruction
