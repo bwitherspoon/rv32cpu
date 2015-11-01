@@ -12,4 +12,6 @@ SRC = $(RTLDIR)/opcode.sv  \
       $(RTLDIR)/fetch.sv   \
       $(RTLDIR)/regfile.sv
 
+VSIM_OPT += +nowarn3722 +nowarn3017
+
 include ../common.mk
