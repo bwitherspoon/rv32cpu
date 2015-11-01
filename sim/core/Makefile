@@ -14,4 +14,4 @@ SRC = $(RTLDIR)/opcode.sv  \
 
 VSIM_OPT += +nowarn3722 +nowarn3017
 
-include ../common.mk
+include ../modelsim.mk

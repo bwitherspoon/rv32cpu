@@ -1,4 +1,4 @@
 TOP = fifo_tb
 SRC = $(RTLDIR)/fifo.sv $(RTLDIR)/axis.sv
 
-include ../common.mk
+include ../modelsim.mk
