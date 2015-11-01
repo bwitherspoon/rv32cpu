@@ -79,12 +79,12 @@ package riscv;
     } ir_t;
 
     typedef enum logic [2:0] {
-        OP2_RS2,
-        OP2_I_IMM,
-        OP2_S_IMM,
-        OP2_B_IMM,
-        OP2_U_IMM,
-        OP2_J_IMM
+        OP2_SRC_2,
+        OP2_IMM_I,
+        OP2_IMM_S,
+        OP2_IMM_B,
+        OP2_IMM_U,
+        OP2_IMM_J
     } op2_sel_t;
 
     // NOP instruction
