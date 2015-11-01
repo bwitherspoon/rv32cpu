@@ -25,7 +25,6 @@ module execute (
 
     alu alu (
         .funct(funct),
-        .shamt(),
         .op1(op1),
         .op2(op2),
         .out(out)

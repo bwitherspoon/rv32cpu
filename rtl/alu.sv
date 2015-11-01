@@ -13,7 +13,6 @@ import riscv::word_t;
  */
 module alu (
     input  funct_t funct,
-    input  shamt_t shamt,
     input  word_t  op1,
     input  word_t  op2,
     output word_t  out
@@ -27,7 +26,7 @@ module alu (
             riscv::SLTU: out = op1 < op2;
             riscv::XOR:  out = op1 ^ op2;
             riscv::SRL:  out = op1 >> op2;
-            riscv::SRA:  out = signed'(op1) >> op2;
+            riscv::SRA:  out = signed'(op1) >>> op2;
             riscv::OR:   out = op1 | op2;
             riscv::AND:  out = op1 & op2;
         endcase
