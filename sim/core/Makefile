@@ -1,7 +1,6 @@
 TOP = core_tb
 SRC = $(RTLDIR)/opcode.sv  \
-      $(RTLDIR)/funct3.sv  \
-      $(RTLDIR)/funct7.sv  \
+      $(RTLDIR)/funct.sv   \
       $(RTLDIR)/aluop.sv   \
       $(RTLDIR)/riscv.sv   \
       $(RTLDIR)/alu.sv     \

@@ -1,7 +1,9 @@
 /**
- * Package: funct3
+ * Package: funct
  */
-package funct3;
+package funct;
+
+    typedef logic [6:0] funct7_t;
 
     typedef logic [2:0] funct3_t;
 

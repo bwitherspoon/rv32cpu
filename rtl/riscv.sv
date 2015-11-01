@@ -4,8 +4,8 @@
 package riscv;
 
     import opcode::opcode_t;
-    import funct3::funct3_t;
-    import funct7::funct7_t;
+    import funct::funct3_t;
+    import funct::funct7_t;
     import aluop::aluop_t;
 
     // Register address type
@@ -99,7 +99,7 @@ package riscv;
     localparam ir_t NOP = {
         opcode::OP_IMM,
         reg_t'(0),
-        funct3::ADDI,
+        funct::ADDI,
         reg_t'(0),
         12'h000
     };
