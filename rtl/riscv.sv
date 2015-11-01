@@ -14,7 +14,7 @@ package riscv;
     typedef union packed {
         logic [ 3:0][ 7:0] octet;
         logic [ 1:0][15:0] halfword;
-    } word_t;
+    } data_t;
 
     // Immediate type
     typedef logic signed [31:0] imm_t;

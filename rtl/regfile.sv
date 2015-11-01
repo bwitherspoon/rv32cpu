@@ -3,7 +3,7 @@
  */
 
 import riscv::addr_t;
-import riscv::word_t;
+import riscv::data_t;
 
 /**
  * Module: regfile
@@ -14,17 +14,17 @@ module regfile (
     input  logic  clk,
 
     input  addr_t raddr1,
-    output word_t rdata1,
+    output data_t rdata1,
 
     input  addr_t raddr2,
-    output word_t rdata2,
+    output data_t rdata2,
 
     input  logic  wen,
     input  addr_t waddr,
-    input  word_t wdata
+    input  data_t wdata
 );
 
-    word_t regs [0:2**$bits(addr_t)-1];
+    data_t regs [0:2**$bits(addr_t)-1];
 
 `ifndef SYNTHESIS
     initial

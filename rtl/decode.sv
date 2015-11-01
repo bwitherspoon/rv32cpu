@@ -4,7 +4,7 @@
 
 import riscv::op2_sel_t;
 import riscv::ir_t;
-import riscv::word_t;
+import riscv::data_t;
 import riscv::imm_t;
 import riscv::opcode_t;
 import riscv::funct3_t;
@@ -20,16 +20,16 @@ module decode (
     input  logic     clk,
     input  op2_sel_t op2_sel,
     input  ir_t      ir,
-    input  word_t    rdata1,
-    input  word_t    rdata2,
+    input  data_t    rdata1,
+    input  data_t    rdata2,
     output opcode_t  opcode,
     output funct3_t  funct3,
     output funct7_t  funct7,
     output addr_t    raddr1,
     output addr_t    raddr2,
-    output word_t    op1,
-    output word_t    op2,
-    output word_t    rs1
+    output data_t    op1,
+    output data_t    op2,
+    output data_t    rs1
 );
     // Immediate sign extension
     imm_t i_imm = imm_t'(ir.i.imm_11_0);

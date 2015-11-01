@@ -4,7 +4,7 @@
 
 import riscv::funct_t;
 import riscv::shamt_t;
-import riscv::word_t;
+import riscv::data_t;
 
 /**
  * Module: alu
@@ -13,9 +13,9 @@ import riscv::word_t;
  */
 module alu (
     input  funct_t funct,
-    input  word_t  op1,
-    input  word_t  op2,
-    output word_t  out
+    input  data_t  op1,
+    input  data_t  op2,
+    output data_t  out
 );
     always_comb
         unique case (funct)
