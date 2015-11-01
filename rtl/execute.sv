@@ -15,10 +15,14 @@ module execute (
     input  aluop_t aluop,
     input  data_t  op1,
     input  data_t  op2,
+    input  data_t  rs2_id,
+    input  data_t  rd_id,
     output data_t  result,
     output pc_t    target,
     output logic   equal,
-    output logic   less
+    output logic   less,
+    output data_t  rs2_ex,
+    output data_t  rd_ex
 );
 
     alu alu (
@@ -28,4 +32,10 @@ module execute (
         .out(result)
     );
 
+    // Pipeline registers
+    always_ff @(posedge clk) begin
+        rs2_ex <= rs2_id;
+        rd_ex  <= rd_id;
+    end
+    
 endmodule
