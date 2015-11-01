@@ -16,8 +16,7 @@ module execute (
     input  data_t  op1,
     input  data_t  op2,
     output data_t  out,
-    output pc_t    jal_bxx_tgt,
-    output pc_t    jalr_tgt,
+    output pc_t    target,
     output logic   eq,
     output logic   lt,
     output logic   ltu
