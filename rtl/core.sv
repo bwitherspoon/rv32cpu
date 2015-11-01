@@ -15,6 +15,10 @@ module core (
     fetch fetch (
         .clk(clk)
     );
+    
+    decode decode (
+        .clk(clk)
+    );
 
     execute execute (
         .clk(clk)
