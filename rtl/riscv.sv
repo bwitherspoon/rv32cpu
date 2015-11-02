@@ -11,6 +11,9 @@ package riscv;
     // Register address type
     typedef logic [4:0]  reg_t;
 
+    // Memory address type
+    typedef logic [11:0] addr_t;
+
     // Word type
     typedef union packed {
         logic [ 3:0][ 7:0] octet;

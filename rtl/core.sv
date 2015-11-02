@@ -28,4 +28,8 @@ module core (
         .clk(clk)
     );
 
+    memory memory (
+        .clk(clk)
+    );
+
 endmodule

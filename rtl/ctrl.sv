@@ -25,6 +25,8 @@ package ctrl;
         logic bubble;
         logic kill;
         logic jump;
+        logic load;
+        logic store;
         op1_sel_t op1_sel;
         op2_sel_t op2_sel;
     } ctrl_t;
