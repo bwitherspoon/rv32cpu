@@ -91,6 +91,6 @@ package riscv;
     };
 
     // Initial program counter address
-    localparam pc_t INIT_PC = 'h2000;
+    localparam pc_t INIT = 'h2000;
 
 endpackage

@@ -37,7 +37,7 @@ module fetch (
     // Program counter
     always_ff @(posedge clk)
         if (~resetn)
-            pc_i <= riscv::INIT_PC;
+            pc_i <= riscv::INIT;
         else if (~bubble)
             pc_i <= tgt;
 
