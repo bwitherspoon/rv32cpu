@@ -7,6 +7,7 @@ import riscv::funct3_t;
 import riscv::funct7_t;
 import ctrl::op1_sel_t;
 import ctrl::op2_sel_t;
+import ctrl::ctrl_t;
 
 /**
  * Module: control
@@ -20,40 +21,32 @@ module control (
      input  funct7_t  funct7,
      output logic     invalid,
      output logic     bubble,
-     output logic     kill,
      output logic     jump,
+     output logic     load,
+     output logic     store,
+     output logic     register,
      output op1_sel_t op1_sel,
      output op1_sel_t op2_sel
 );
 
+    ctrl_t id;
+
     always_comb
         unique case (opcode)
-            opcodes::LOAD:      invalid = 'b1;
-            opcodes::LOAD_FP:   invalid = 'b1;
-            opcodes::CUSTOM_0:  invalid = 'b1;
-            opcodes::MISC_MEM:  invalid = 'b1;
-            opcodes::OP_IMM:    invalid = 'b1;
-            opcodes::AUIPC:     invalid = 'b1;
-            opcodes::OP_IMM_32: invalid = 'b1;
-            opcodes::STORE:     invalid = 'b1;
-            opcodes::STORE_FP:  invalid = 'b1;
-            opcodes::CUSTOM_1:  invalid = 'b1;
-            opcodes::AMO:       invalid = 'b1;
-            opcodes::OP:        invalid = 'b1;
-            opcodes::LUI:       invalid = 'b1;
-            opcodes::OP_32:     invalid = 'b1;
-            opcodes::MADD:      invalid = 'b1;
-            opcodes::MSUB:      invalid = 'b1;
-            opcodes::NMSUB:     invalid = 'b1;
-            opcodes::NMADD:     invalid = 'b1;
-            opcodes::OP_FP:     invalid = 'b1;
-            opcodes::CUSTOM_2:  invalid = 'b1;
-            opcodes::BRANCH:    invalid = 'b1;
-            opcodes::JALR:      invalid = 'b1;
-            opcodes::JAL:       invalid = 'b1;
-            opcodes::SYSTEM:    invalid = 'b1;
-            opcodes::CUSTOM_3:  invalid = 'b1;
-            default:            invalid = 'b1;
+            opcodes::OP_IMM:
+                unique case (funct3)
+                    funct::ADDI:  id = ctrl::ADDI;
+                    funct::SLTI:  id = ctrl::SLTI;
+                    funct::SLTIU: id = ctrl::SLTIU;
+                    funct::ANDI:  id = ctrl::ANDI;
+                    funct::ORI:   id = ctrl::ORI;
+                    funct::XORI:  id = ctrl::XORI;
+                    default:      id = ctrl::INVALID;
+                endcase
+            opcodes::AUIPC:
+                id = ctrl::AUIPC;
+            default:
+                id = ctrl::INVALID;
         endcase
 
 endmodule

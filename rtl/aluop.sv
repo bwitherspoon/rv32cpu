@@ -14,7 +14,8 @@ package aluop;
         OR   = 'b0110,
         AND  = 'b0111,
         SUB  = 'b1000,
-        SRA  = 'b1101
+        SRA  = 'b1101,
+        XXX  = 'x
     } aluop_t;
 
 endpackage
