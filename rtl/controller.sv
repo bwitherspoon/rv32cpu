@@ -10,11 +10,11 @@ import ctrl::op2_sel_t;
 import ctrl::ctrl_t;
 
 /**
- * Module: control
+ * Module: controller
  *
  * Control unit
  */
-module control (
+module controller (
      input  logic     clk,
      input  opcode_t  opcode,
      input  funct3_t  funct3,
