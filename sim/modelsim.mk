@@ -22,6 +22,7 @@ VLOG = vlog \
 
 VSIM = vsim \
        $(VSIM_OPT) \
+       -note 3116 \
        -batch \
        -quiet \
        -do $(DO) \
