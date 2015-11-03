@@ -36,7 +36,7 @@ package ctrl;
         op2_sel_t op2_sel;
     } ctrl_t;
 
-    localparam ctrl_t INVALID = {
+    localparam ctrl_t INVALID = '{
         invalid:   '1,
         bubble:    '0,
         jump:      '1,
@@ -47,7 +47,7 @@ package ctrl;
         op1_sel:   X,
         op2_sel:   XXX
     };
-    localparam ctrl_t ADDI = {
+    localparam ctrl_t ADDI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -58,7 +58,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t SLTI = {
+    localparam ctrl_t SLTI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -69,7 +69,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t SLTIU = {
+    localparam ctrl_t SLTIU = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -80,7 +80,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t ANDI = {
+    localparam ctrl_t ANDI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -91,7 +91,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t ORI = {
+    localparam ctrl_t ORI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -102,7 +102,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t XORI = {
+    localparam ctrl_t XORI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -113,7 +113,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t SLLI = {
+    localparam ctrl_t SLLI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -124,7 +124,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t SRLI = {
+    localparam ctrl_t SRLI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -135,7 +135,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t SRAI = {
+    localparam ctrl_t SRAI = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -146,7 +146,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t AUIPC = {
+    localparam ctrl_t AUIPC = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -157,7 +157,7 @@ package ctrl;
         op1_sel:   PC,
         op2_sel:   U_IMM
     };
-    localparam ctrl_t LW = {
+    localparam ctrl_t LW = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
@@ -168,7 +168,7 @@ package ctrl;
         op1_sel:   RS1,
         op2_sel:   I_IMM
     };
-    localparam ctrl_t SW = {
+    localparam ctrl_t SW = '{
         invalid:   '0,
         bubble:    '0,
         jump:      '0,
