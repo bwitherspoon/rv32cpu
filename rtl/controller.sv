@@ -5,9 +5,9 @@
 import riscv::opcode_t;
 import riscv::funct3_t;
 import riscv::funct7_t;
-import ctrl::op1_sel_t;
-import ctrl::op2_sel_t;
-import ctrl::ctrl_t;
+import control::op1_sel_t;
+import control::op2_sel_t;
+import control::ctrl_t;
 
 /**
  * Module: controller
@@ -35,18 +35,18 @@ module controller (
         unique case (opcode)
             opcodes::OP_IMM:
                 unique case (funct3)
-                    funct::ADDI:  id = ctrl::ADDI;
-                    funct::SLTI:  id = ctrl::SLTI;
-                    funct::SLTIU: id = ctrl::SLTIU;
-                    funct::ANDI:  id = ctrl::ANDI;
-                    funct::ORI:   id = ctrl::ORI;
-                    funct::XORI:  id = ctrl::XORI;
-                    default:      id = ctrl::INVALID;
+                    funct::ADDI:  id = control::ADDI;
+                    funct::SLTI:  id = control::SLTI;
+                    funct::SLTIU: id = control::SLTIU;
+                    funct::ANDI:  id = control::ANDI;
+                    funct::ORI:   id = control::ORI;
+                    funct::XORI:  id = control::XORI;
+                    default:      id = control::INVALID;
                 endcase
             opcodes::AUIPC:
-                id = ctrl::AUIPC;
+                id = control::AUIPC;
             default:
-                id = ctrl::INVALID;
+                id = control::INVALID;
         endcase
 
 endmodule

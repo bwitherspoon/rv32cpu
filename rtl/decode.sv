@@ -2,8 +2,8 @@
  * decode.sv
  */
 
-import ctrl::op1_sel_t;
-import ctrl::op2_sel_t;
+import control::op1_sel_t;
+import control::op2_sel_t;
 import riscv::pc_t;
 import riscv::ir_t;
 import riscv::data_t;
@@ -53,19 +53,19 @@ module decode (
     assign funct7 = ir.r.funct7;
 
     // First operand
-    data_t op1_mux = (op1_sel == ctrl::RS1) ? rdata1 : pc;
+    data_t op1_mux = (op1_sel == control::RS1) ? rdata1 : pc;
 
     // Second operand
     data_t op2_mux;
     always_comb
         unique case (op2_sel)
-            ctrl::RS2:   op2_mux = rdata2;
-            ctrl::I_IMM: op2_mux = i_imm;
-            ctrl::S_IMM: op2_mux = s_imm;
-            ctrl::B_IMM: op2_mux = b_imm;
-            ctrl::U_IMM: op2_mux = u_imm;
-            ctrl::J_IMM: op2_mux = j_imm;
-            ctrl::FOUR:  op2_mux = 'd4;
+            control::RS2:   op2_mux = rdata2;
+            control::I_IMM: op2_mux = i_imm;
+            control::S_IMM: op2_mux = s_imm;
+            control::B_IMM: op2_mux = b_imm;
+            control::U_IMM: op2_mux = u_imm;
+            control::J_IMM: op2_mux = j_imm;
+            control::FOUR:  op2_mux = 'd4;
         endcase
 
     // Pipeline registers
