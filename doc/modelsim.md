@@ -14,7 +14,5 @@ The following installation instructions are for Linux.
 - Test the installation
     - `$ /opt/altera/15.0/modelsim_ase/bin/vsim -c -do exit`
     - If you receive the error `Error: cannot find "./bin/../linux_rh60/vsim"` then apply the following kludge.
-      - `$ sudo sed -i -e 's/linux_rh60/linux/g' /opt/altera/15.0/modelsim_ase/vco`
-
-
- 
+      - `$ cd /opt/altera/15.0/modelsim_ase/vco`
+      - `$ sudo ln -s linuxaloem linux_rh60`
