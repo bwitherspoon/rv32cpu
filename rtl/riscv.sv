@@ -15,10 +15,8 @@ package riscv;
     typedef logic [11:0] addr_t;
 
     // Word type
-    typedef union packed {
-        logic [ 3:0][ 7:0] octet;
-        logic [ 1:0][15:0] halfword;
-    } data_t;
+    localparam XLEN = 32;
+    typedef logic [XLEN-1:0] data_t;
 
     // Immediate type
     typedef logic signed [31:0] imm_t;

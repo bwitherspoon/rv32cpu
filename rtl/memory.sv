@@ -25,10 +25,10 @@ module memory (
     logic [7:0] mem [0:2**$bits(addr_t)-1];
 
     always_ff @(posedge clk)
-        for (int i = 0; i < 4; i++) begin
+        for (int i = 0; i < $bits(data_t)/8; i++) begin
             if (store)
-                mem[addr_t'(result) + i] = rs2.octet[i];
-            data.octet[i] = mem[addr_t'(result) + i];
+                mem[addr_t'(result) + i] = rs2[8*i +: 8];
+            data[8*i +: 8] = mem[addr_t'(result) + i];
         end
 
     assign out = (load) ? data : result;
