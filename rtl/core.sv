@@ -8,7 +8,7 @@ module core (
     input logic resetn
 );
 
-    controller controller (
+    control control (
         .clk(clk)
     );
 
