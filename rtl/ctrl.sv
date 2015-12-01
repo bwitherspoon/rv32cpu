@@ -1,7 +1,7 @@
 /**
  * Package: control
  */
-package control;
+package ctrl;
 
     import aluop::aluop_t;
 
