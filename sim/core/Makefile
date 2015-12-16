@@ -6,7 +6,7 @@ SRC = $(RTLDIR)/opcodes.sv \
       $(RTLDIR)/riscv.sv   \
       $(RTLDIR)/alu.sv     \
       $(RTLDIR)/axis.sv    \
-      $(RTLDIR)/control.sv \
+      $(RTLDIR)/ctrl.sv \
       $(RTLDIR)/core.sv    \
       $(RTLDIR)/decode.sv  \
       $(RTLDIR)/execute.sv \
