@@ -91,4 +91,7 @@ package riscv;
     // Initial program counter address
     localparam pc_t INIT = 'h2000;
 
+    // Trap address
+    localparam pc_t TRAP = 'h0FFF;
+
 endpackage
