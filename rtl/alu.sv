@@ -30,5 +30,6 @@ module alu (
             aluop::SRA:  out = signed'(op1) >>> shamt;
             aluop::OR:   out = op1 | op2;
             aluop::AND:  out = op1 & op2;
+            aluop::OP2:  out = op2;
         endcase
 endmodule
