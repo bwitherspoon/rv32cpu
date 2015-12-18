@@ -20,7 +20,7 @@ module fetch (
     output ir_t     ir
 );
     // Internal signals
-    pc_t pc_next = riscv::INIT_ADDR;
+    pc_t pc_next;
 
     // Instruction memory
     logic [7:0] mem [0:2**$bits(pc_t)-1];
@@ -31,15 +31,15 @@ module fetch (
 
     // Program counter
    always_ff @(posedge clk)
+       pc <= pc_next;
+
+    always_ff @(posedge clk)
         if (~resetn)
             pc_next <= riscv::INIT_ADDR;
         else
-            pc <= pc_next;
-
-    always_ff @(posedge clk)
-        unique case (pc_sel)
-            riscv::PC_TARGET: pc_next <= target;
-            riscv::PC_TRAP:   pc_next <= riscv::TRAP_ADDR;
-            default:          pc_next <= pc_next + 4;
-        endcase
+            unique case (pc_sel)
+                riscv::PC_TARGET: pc_next <= target;
+                riscv::PC_TRAP:   pc_next <= riscv::TRAP_ADDR;
+                default:          pc_next <= pc_next + 4;
+            endcase
 endmodule
