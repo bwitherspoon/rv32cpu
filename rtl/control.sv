@@ -21,6 +21,57 @@ module control (
      output ctrl_t   ctrl
 );
     // Pipeline control signals
+    localparam ctrl_t CTRL_INVALID = '{
+        load:    'x,
+        store:   '0,
+        write:   '0,
+        link:    'x,
+        alu_op:  ALU_XXX,
+        pc_sel:  PC_TRAP,
+        op1_sel: OP1_XXX,
+        op2_sel: OP2_XXX
+    };
+    localparam ctrl_t CTRL_NOP = '{
+        load:    'x,
+        store:   '0,
+        write:   '0,
+        link:    'x,
+        alu_op:  ALU_XXX,
+        pc_sel:  PC_PLUS4,
+        op1_sel: OP1_XXX,
+        op2_sel: OP2_XXX
+    };
+    localparam ctrl_t CTRL_ADDI = '{
+        load:    '0,
+        store:   '0,
+        write:   '1,
+        link:    '0,
+        alu_op:  ALU_ADD,
+        pc_sel:  PC_PLUS4,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_t CTRL_ADD = '{
+        load:    '0,
+        store:   '0,
+        write:   '1,
+        link:    '0,
+        alu_op:  ALU_ADD,
+        pc_sel:  PC_PLUS4,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_t CTRL_SUB = '{
+        load:    '0,
+        store:   '0,
+        write:   '1,
+        link:    '0,
+        alu_op:  ALU_SUB,
+        pc_sel:  PC_PLUS4,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+
     ctrl_t ctrl_id = CTRL_NOP;
 
     struct packed {

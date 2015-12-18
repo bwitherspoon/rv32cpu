@@ -145,11 +145,11 @@ package riscv;
 
     // NOP instruction
     localparam ir_t BUBBLE = {
-        OPCODE_OP_IMM,
+        funct7_t'(0),
         reg_t'(0),
         FUNCT3_ADDI,
         reg_t'(0),
-        12'h000
+        OPCODE_OP_IMM
     };
 
     /*
@@ -208,56 +208,5 @@ package riscv;
         op1_sel_t op1_sel;
         op2_sel_t op2_sel;
     } ctrl_t;
-
-    localparam ctrl_t CTRL_INVALID = '{
-        load:    'x,
-        store:   '0,
-        write:   '0,
-        link:    'x,
-        alu_op:  ALU_XXX,
-        pc_sel:  PC_TRAP,
-        op1_sel: OP1_XXX,
-        op2_sel: OP2_XXX
-    };
-    localparam ctrl_t CTRL_NOP = '{
-        load:    'x,
-        store:   '0,
-        write:   '0,
-        link:    'x,
-        alu_op:  ALU_XXX,
-        pc_sel:  PC_PLUS4,
-        op1_sel: OP1_XXX,
-        op2_sel: OP2_XXX
-    };
-    localparam ctrl_t CTRL_ADDI = '{
-        load:    '0,
-        store:   '0,
-        write:   '1,
-        link:    '0,
-        alu_op:  ALU_ADD,
-        pc_sel:  PC_PLUS4,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
-    };
-    localparam ctrl_t CTRL_ADD = '{
-        load:    '0,
-        store:   '0,
-        write:   '1,
-        link:    '0,
-        alu_op:  ALU_ADD,
-        pc_sel:  PC_PLUS4,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
-    };
-    localparam ctrl_t CTRL_SUB = '{
-        load:    '0,
-        store:   '0,
-        write:   '1,
-        link:    '0,
-        alu_op:  ALU_SUB,
-        pc_sel:  PC_PLUS4,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
-    };
 
 endpackage
