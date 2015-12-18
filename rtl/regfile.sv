@@ -29,7 +29,7 @@ module regfile (
 `ifndef SYNTHESIS
     initial
         for (int i = 0; i < 2**$bits(reg_t)-1; i++)
-            regs[i] = 0;
+            regs[i] = $random;
 `endif
 
     always @(negedge clk)

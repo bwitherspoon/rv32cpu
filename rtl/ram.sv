@@ -2,8 +2,8 @@
  * ram.sv
  */
 
-import riscv::addr_t;
-import riscv::data_t;
+import data::addr_t;
+import data::data_t;
 
 typedef logic [$bits(data_t)/8-1:0] en_t;
 

@@ -13,10 +13,10 @@ module memory (
     input  logic  clk,
     input  logic  load,
     input  logic  store,
-    input  data_t result,
+    input  data_t val,
     input  data_t rs2,
-    input  reg_t  rd_i,
-    output reg_t  rd_o,
+    input  reg_t  rd_mem,
+    output reg_t  rd_wb,
     output data_t out
 );
 
@@ -27,13 +27,13 @@ module memory (
     always_ff @(posedge clk)
         for (int i = 0; i < $bits(data_t)/8; i++) begin
             if (store)
-                mem[addr_t'(result) + i] = rs2[8*i +: 8];
-            data[8*i +: 8] = mem[addr_t'(result) + i];
+                mem[addr_t'(val) + i] = rs2[8*i +: 8];
+            data[8*i +: 8] = mem[addr_t'(val + i)];
         end
 
-    assign out = (load) ? data : result;
+    assign out = (load) ? data : val;
 
     always_ff @(posedge clk)
-        rd_o <= rd_i;
+        rd_wb <= rd_mem;
 
 endmodule
