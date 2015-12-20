@@ -57,6 +57,15 @@ module control (
         op1_sel: OP1_XXX,
         op2_sel: OP2_U_IMM
     };
+    localparam ctrl_t CTRL_AUIPC = '{
+        reg_en:  1'b1,
+        mem_op:  NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        pc_sel:  PC_NEXT,
+        op1_sel: OP1_PC,
+        op2_sel: OP2_U_IMM
+    };
     localparam ctrl_t CTRL_ADD = '{
         reg_en:  1'b1,
         mem_op:  NONE,
@@ -115,6 +124,8 @@ module control (
                 endcase
             OPCODE_LUI:
                 id = CTRL_LUI;
+            OPCODE_AUIPC:
+                id = CTRL_AUIPC;
             default:
                 id = CTRL_INVALID;
         endcase

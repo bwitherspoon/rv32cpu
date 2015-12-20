@@ -21,8 +21,7 @@ module top;
 
     initial begin
         $readmemh("main.txt", core.memory.bram.mem, 0, 31);
-        //$monitor("x1: %h", core.regfile.regs[1]);
-        //$monitor("x2: %h", core.regfile.regs[2]);
+        $monitor("x3: %h", core.regfile.regs[3]);
         $dumpvars();
         reset();
         repeat (32) @(posedge clk);
