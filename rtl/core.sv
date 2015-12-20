@@ -9,9 +9,12 @@ import riscv::*;
  *
  */
 module core (
-    input logic  clk,
-    input logic  resetn
+    input  logic  clk,
+    input  logic  resetn,
+    output logic [3:0] led
 );
+    assign led = '0;
+
     // Control signals
     opcode_t opcode;
     funct3_t funct3;
@@ -23,6 +26,7 @@ module core (
 
     // Local memory signals
     word_t dmem_rdata;
+    word_t imem_rdata;
 
     // Register file signals
     addr_t rs1_addr;
@@ -31,7 +35,7 @@ module core (
     word_t rs2_data;
 
     // Fetch signals
-    word_t pc;
+    word_t pc = riscv::INST_ADDR;
 
     // Decode signals
     imm_t i_imm;
@@ -84,7 +88,6 @@ module core (
         .dmem_addr(mem.data),
         .dmem_wdata(mem.rs2),
         .imem_addr(pc),
-        .imem_rdata(id.ir),
         .imem_error(),
         .*
     );
@@ -109,6 +112,8 @@ module core (
                 riscv::PC_TRAP: pc <= riscv::TRAP_ADDR;
                 riscv::PC_NEXT: pc <= pc + 4;
             endcase
+
+    assign id.ir = (ctrl.ir_sel == IR_MEMORY) ? imem_rdata : INST_NOP;
 
     always_ff @(posedge clk)
         id.pc <= pc;
@@ -139,7 +144,7 @@ module core (
         unique case (ctrl.op1_sel)
             OP1_RS1: op1 = rs1_data;
             OP1_PC:  op1 = id.pc;
-            OP1_XXX: op1 = 'x;
+            default: op1 = 'x;
         endcase
 
     // Second operand
@@ -151,16 +156,16 @@ module core (
             OP2_B_IMM: op2 = b_imm;
             OP2_U_IMM: op2 = u_imm;
             OP2_J_IMM: op2 = j_imm;
-            OP2_XXX:   op2 = 'x;
+            default:   op2 = 'x;
         endcase
 
     always_ff @(posedge clk) begin
-        ex.pc    <= id.pc;
-        ex.op1   <= op1;
-        ex.op2   <= op2;
-        ex.rs1   <= rs1_data;
-        ex.rs2   <= rs2_data;
-        ex.rd    <= rd;
+        ex.pc  <= id.pc;
+        ex.op1 <= op1;
+        ex.op2 <= op2;
+        ex.rs1 <= rs1_data;
+        ex.rs2 <= rs2_data;
+        ex.rd  <= rd;
     end
 
     /*

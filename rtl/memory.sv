@@ -43,7 +43,7 @@ module memory (
         .enb('1),
         .web('0),
         .addrb(imem_addr[ADDR_WIDTH+1:2]),
-        .dib(),
+        .dib('0),
         .dob(imem_rdata)
     );
 

@@ -18,14 +18,16 @@ module top;
         #1 resetn = 1;
     endtask
 
+    logic [3:0] led;
+
     core core(.*);
 
     initial begin
-        $readmemh("main.txt", core.memory.bram.mem, 0, 31);
-        $dumpfile("top.vcd")
+        $readmemh("main.hex", core.memory.bram.mem, 0, 5);
+        $dumpfile("top.vcd");
         $dumpvars();
         reset();
-        repeat (32) @(posedge clk);
+        repeat (10) @(posedge clk);
         $finish;
     end
 
