@@ -1,14 +1,7 @@
 rtl/alu.sv
-rtl/axis.sv
+rtl/bram.sv
 rtl/control.sv
 rtl/core.sv
-rtl/decode.sv
-rtl/execute.sv
-rtl/fetch.sv
-rtl/fifo.sv
 rtl/memory.sv
-rtl/ram.sv
 rtl/regfile.sv
 rtl/riscv.sv
-rtl/rs232.sv
-rtl/uart.sv
