@@ -45,7 +45,6 @@ module core (
 
     // Execute signals
     word_t alu_out;
-    word_t data;
 
     // Writeback signals
     word_t rd_data;
@@ -97,22 +96,6 @@ module core (
         .*
     );
 
-    // Pipeline
-    always_ff @(posedge clk) begin
-        id.pc    <= pc;
-        ex.pc    <= pc;
-        ex.op1   <= op1;
-        ex.op2   <= op2;
-        ex.rs1   <= rs1_data;
-        ex.rs2   <= rs2_data;
-        ex.rd    <= rd;
-        mem.rs2  <= ex.rs2;
-        mem.rd   <= ex.rd;
-        mem.data <= data;
-        wb.rd    <= mem.rd;
-        wb.data  <= mem.data;
-    end
-
     /*
      * Fetch
      */
@@ -126,6 +109,9 @@ module core (
                 riscv::PC_TRAP: pc <= riscv::TRAP_ADDR;
                 riscv::PC_NEXT: pc <= pc + 4;
             endcase
+
+    always_ff @(posedge clk)
+        id.pc <= pc;
 
     /*
      * Decode
@@ -168,9 +154,23 @@ module core (
             OP2_XXX:   op2 = 'x;
         endcase
 
+    always_ff @(posedge clk) begin
+        ex.pc    <= id.pc;
+        ex.op1   <= op1;
+        ex.op2   <= op2;
+        ex.rs1   <= rs1_data;
+        ex.rs2   <= rs2_data;
+        ex.rd    <= rd;
+    end
+
     /*
      * Execute
      */
+
+    // Comparators
+    assign eq  = ex.rs1 == ex.rs2;
+    assign lt  = signed'(ex.rs1) < signed'(ex.rs2);
+    assign ltu = ex.rs1 < ex.rs2;
 
     alu alu (
         .opcode(ctrl.alu_op),
@@ -179,13 +179,11 @@ module core (
         .out(alu_out)
     );
 
-    // Output data
-    assign data = (ctrl.link_en) ? ex.pc + 4 : alu_out;
-
-    // Comparators
-    assign eq  = ex.rs1 == ex.rs2;
-    assign lt  = signed'(ex.rs1) < signed'(ex.rs2);
-    assign ltu = ex.rs1 < ex.rs2;
+    always_ff @(posedge clk) begin
+        mem.rs2  <= ex.rs2;
+        mem.rd   <= ex.rd;
+        mem.data <= (ctrl.link_en) ? ex.pc + 4 : alu_out;
+    end
 
     /*
      * Memory
@@ -198,6 +196,11 @@ module core (
                 ctrl.mem_op == LOAD_BYTE_UNSIGNED;
 
     assign rd_data = (load) ? dmem_rdata : wb.data;
+
+    always_ff @(posedge clk) begin
+        wb.rd    <= mem.rd;
+        wb.data  <= mem.data;
+    end
 
 endmodule
 
