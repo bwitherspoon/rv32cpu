@@ -4,3 +4,4 @@ work
 xsim.dir
 *.log
 *.pb
+.Xil/
