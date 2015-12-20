@@ -7,13 +7,13 @@ import riscv::*;
 /**
  * Module: alu
  *
- * An ALU.
+ * An arithmetic and logic unit (ALU) for RISC-V
  */
 module alu (
-    input  alu_t  opcode,
-    input  data_t op1,
-    input  data_t op2,
-    output data_t out
+    input  alu_op_t opcode,
+    input  word_t   op1,
+    input  word_t   op2,
+    output word_t   out
 );
     logic [6:0] shamt = op2[5:0];
 
@@ -30,6 +30,6 @@ module alu (
             ALU_OR:   out = op1 | op2;
             ALU_AND:  out = op1 & op2;
             ALU_OP2:  out = op2;
-            ALU_XXX:  out = 'x;
+            default:  out = 'x;
         endcase
 endmodule

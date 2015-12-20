@@ -11,7 +11,7 @@ import riscv::*;
  */
 module control (
      input  logic    clk,
-     input logic    resetn,
+     input  logic    resetn,
      input  opcode_t opcode,
      input  funct3_t funct3,
      input  funct7_t funct7,
@@ -20,146 +20,143 @@ module control (
      input  logic    ltu,
      output ctrl_t   ctrl
 );
-    // Pipeline control signals
+    // Instuction control structures
     localparam ctrl_t CTRL_INVALID = '{
-        load:    'x,
-        store:   '0,
-        write:   '0,
-        link:    'x,
+        reg_en:  1'b0,
+        mem_op:  NONE,
+        link_en: 1'bx,
         alu_op:  ALU_XXX,
         pc_sel:  PC_TRAP,
         op1_sel: OP1_XXX,
         op2_sel: OP2_XXX
     };
     localparam ctrl_t CTRL_NOP = '{
-        load:    'x,
-        store:   '0,
-        write:   '0,
-        link:    'x,
+        reg_en:  1'b0,
+        mem_op:  NONE,
+        link_en: 1'bx,
         alu_op:  ALU_XXX,
-        pc_sel:  PC_PLUS4,
+        pc_sel:  PC_NEXT,
         op1_sel: OP1_XXX,
         op2_sel: OP2_XXX
     };
     localparam ctrl_t CTRL_ADDI = '{
-        load:    '0,
-        store:   '0,
-        write:   '1,
-        link:    '0,
+        reg_en:  1'b1,
+        mem_op:  NONE,
+        link_en: 1'b0,
         alu_op:  ALU_ADD,
-        pc_sel:  PC_PLUS4,
+        pc_sel:  PC_NEXT,
         op1_sel: OP1_RS1,
         op2_sel: OP2_I_IMM
     };
+    localparam ctrl_t CTRL_LUI = '{
+        reg_en:  1'b1,
+        mem_op:  NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_OP2,
+        pc_sel:  PC_NEXT,
+        op1_sel: OP1_XXX,
+        op2_sel: OP2_U_IMM
+    };
     localparam ctrl_t CTRL_ADD = '{
-        load:    '0,
-        store:   '0,
-        write:   '1,
-        link:    '0,
+        reg_en:  1'b1,
+        mem_op:  NONE,
+        link_en: 1'b0,
         alu_op:  ALU_ADD,
-        pc_sel:  PC_PLUS4,
+        pc_sel:  PC_NEXT,
         op1_sel: OP1_RS1,
         op2_sel: OP2_RS2
     };
     localparam ctrl_t CTRL_SUB = '{
-        load:    '0,
-        store:   '0,
-        write:   '1,
-        link:    '0,
+        reg_en:  1'b1,
+        mem_op:  NONE,
+        link_en: 1'b0,
         alu_op:  ALU_SUB,
-        pc_sel:  PC_PLUS4,
+        pc_sel:  PC_NEXT,
         op1_sel: OP1_RS1,
         op2_sel: OP2_RS2
     };
 
-    ctrl_t ctrl_id = CTRL_NOP;
+    // Pipeline control signals
+    ctrl_t id = CTRL_NOP;
 
     struct packed {
-        logic     load;
-        logic     store;
-        logic     write;
-        logic     link;
-        alu_t     alu_op;
-        pc_sel_t  pc_sel;
-    } ctrl_ex;
+        logic    reg_en;
+        mem_op_t mem_op;
+        logic    link_en;
+        alu_op_t alu_op;
+        pc_sel_t pc_sel;
+    } ex;
 
     struct packed {
-        logic     load;
-        logic     store;
-        logic     write;
-    } ctrl_mem;
+        logic    reg_en;
+        mem_op_t mem_op;
+    } mem;
 
     struct packed {
-        logic     write;
-    } ctrl_wb;
+        logic reg_en;
+    } wb;
 
-    // Decode stage registers
+    // Decode stage
     always_comb
         unique case (opcode)
             OPCODE_OP_IMM:
                 unique case (funct3)
                     FUNCT3_ADDI:
-                        ctrl_id = CTRL_ADDI;
+                        id = CTRL_ADDI;
                     default:
-                        ctrl_id = CTRL_INVALID;
+                        id = CTRL_INVALID;
                 endcase
             OPCODE_OP:
                 unique case (funct3)
                     FUNCT3_ADD_SUB:
-                        ctrl_id = (funct7[5]) ? CTRL_ADD : CTRL_SUB;
+                        id = (funct7[5]) ? CTRL_ADD : CTRL_SUB;
                     default:
-                        ctrl_id = CTRL_INVALID;
+                        id = CTRL_INVALID;
                 endcase
+            OPCODE_LUI:
+                id = CTRL_LUI;
             default:
-                ctrl_id = CTRL_INVALID;
+                id = CTRL_INVALID;
         endcase
 
-    // Execute stage registers
+    // Execute stage
     always_ff @(posedge clk)
         if (~resetn) begin
-            ctrl_ex.load   <= 0;
-            ctrl_ex.store  <= 0;
-            ctrl_ex.write  <= 0;
-            ctrl_ex.link   <= 0;
-            ctrl_ex.alu_op <= ALU_ADD;
-            ctrl_ex.pc_sel <= PC_PLUS4;
+            ex.reg_en <= 1'b0;
+            ex.mem_op <= NONE;
+            ex.pc_sel <= PC_NEXT;
         end else begin
-            ctrl_ex.load   <= ctrl_id.load;
-            ctrl_ex.store  <= ctrl_id.store;
-            ctrl_ex.write  <= ctrl_id.write;
-            ctrl_ex.link   <= ctrl_id.link;
-            ctrl_ex.alu_op <= ctrl_id.alu_op;
-            ctrl_ex.pc_sel <= ctrl_id.pc_sel;
+            ex.reg_en  <= id.reg_en;
+            ex.mem_op  <= id.mem_op;
+            ex.link_en <= id.link_en;
+            ex.alu_op  <= id.alu_op;
+            ex.pc_sel  <= id.pc_sel;
         end
 
-    // Memory stage registers
+    // Memory stage
     always_ff @(posedge clk)
         if (~resetn) begin
-            ctrl_mem.load  <= 0;
-            ctrl_mem.store <= 0;
-            ctrl_mem.write <= 0;
+            mem.reg_en <= 1'b0;
+            mem.mem_op <= NONE;
         end else begin
-            ctrl_mem.load  <= ctrl_ex.load;
-            ctrl_mem.store <= ctrl_ex.store;
-            ctrl_mem.write <= ctrl_ex.write;
+            mem.reg_en <= ex.reg_en;
+            mem.mem_op <= ex.mem_op;
         end
 
-    // Writeback stage registers
-    always_ff @(posedge clk) begin
+    // Writeback stage
+    always_ff @(posedge clk)
         if (~resetn)
-            ctrl_wb.write <= 0;
+            wb.reg_en <= 1'b0;
         else
-            ctrl_wb.write <= ctrl_mem.write;
-    end
+            wb.reg_en <= mem.reg_en;
 
-    // Datapath control signals
-    assign ctrl.load    = ctrl_mem.load;
-    assign ctrl.store   = ctrl_mem.store;
-    assign ctrl.write   = ctrl_wb.write;
-    assign ctrl.link    = ctrl_ex.link;
-    assign ctrl.alu_op  = ctrl_ex.alu_op;
-    assign ctrl.pc_sel  = ctrl_ex.pc_sel;
-    assign ctrl.op1_sel = ctrl_id.op1_sel;
-    assign ctrl.op2_sel = ctrl_id.op2_sel;
+    // Output control
+    assign ctrl.reg_en  = wb.reg_en;
+    assign ctrl.mem_op  = mem.mem_op;
+    assign ctrl.link_en = ex.link_en;
+    assign ctrl.alu_op  = ex.alu_op;
+    assign ctrl.pc_sel  = ex.pc_sel;
+    assign ctrl.op1_sel = id.op1_sel;
+    assign ctrl.op2_sel = id.op2_sel;
 
 endmodule

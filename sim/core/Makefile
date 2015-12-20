@@ -1,17 +1,10 @@
-TOP = core_tb
-SRC = $(RTLDIR)/opcodes.sv \
-      $(RTLDIR)/funct.sv   \
-      $(RTLDIR)/aluop.sv   \
-      $(RTLDIR)/ctrl.sv    \
-      $(RTLDIR)/riscv.sv   \
-      $(RTLDIR)/alu.sv     \
-      $(RTLDIR)/axis.sv    \
-      $(RTLDIR)/ctrl.sv \
-      $(RTLDIR)/core.sv    \
-      $(RTLDIR)/decode.sv  \
-      $(RTLDIR)/execute.sv \
-      $(RTLDIR)/fetch.sv   \
-      $(RTLDIR)/memory.sv  \
+TOP = top
+PKG = $(RTLDIR)/riscv.sv
+SRC = $(RTLDIR)/alu.sv          \
+      $(RTLDIR)/bram.sv         \
+      $(RTLDIR)/control.sv      \
+      $(RTLDIR)/core.sv         \
+      $(RTLDIR)/memory.sv       \
       $(RTLDIR)/regfile.sv
 
 VSIM_OPT += +nowarn3722 +nowarn3017

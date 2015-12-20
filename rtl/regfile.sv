@@ -2,8 +2,8 @@
  * regfile.sv
  */
 
-import riscv::reg_t;
-import riscv::data_t;
+import riscv::addr_t;
+import riscv::word_t;
 
 /**
  * Module: regfile
@@ -12,31 +12,28 @@ import riscv::data_t;
  */
 module regfile (
     input  logic  clk,
-
-    input  reg_t  raddr1,
-    output data_t rdata1,
-
-    input  reg_t  raddr2,
-    output data_t rdata2,
-
-    input  logic  wen,
-    input  reg_t  waddr,
-    input  data_t wdata
+    input  addr_t rs1_addr,
+    input  addr_t rs2_addr,
+    output word_t rs1_data,
+    output word_t rs2_data,
+    input  logic  rd_en,
+    input  addr_t rd_addr,
+    input  word_t rd_data
 );
 
-    data_t regs [0:2**$bits(reg_t)-1];
+    word_t regs [0:2**$bits(addr_t)-1];
 
 `ifndef SYNTHESIS
     initial
-        for (int i = 0; i < 2**$bits(reg_t)-1; i++)
+        for (int i = 0; i < 2**$bits(addr_t)-1; i++)
             regs[i] = $random;
 `endif
 
     always @(negedge clk)
-        if (wen && waddr != '0)
-            regs[waddr] <= wdata;
+        if (rd_en && rd_addr != '0)
+            regs[rd_addr] <= rd_data;
 
-    assign rdata1 = raddr1 == '0 ? '0 : regs[raddr1];
-    assign rdata2 = raddr2 == '0 ? '0 : regs[raddr2];
+    assign rs1_data = rs1_addr == '0 ? '0 : regs[rs1_addr];
+    assign rs2_data = rs2_addr == '0 ? '0 : regs[rs2_addr];
 
 endmodule

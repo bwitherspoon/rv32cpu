@@ -1,9 +1,8 @@
 TOP ?= top
 
 SIM_HOME ?= /opt/altera/15.0/modelsim_ase
-UVM_HOME ?= /opt/accellera/uvm/1.2
 
-PATH := $(SIM_HOME)/bin:$(UVM_HOME)/bin:$(PATH)
+PATH := $(SIM_HOME)/bin:$(PATH)
 
 PRJDIR = ../..
 SIMDIR = $(PRJDIR)/sim
@@ -17,6 +16,7 @@ VLOG = vlog \
        -quiet \
        -lint \
        -writetoplevels $(TOP).top \
+       $(PKG) \
        $(SRC) \
        $(TOP).sv
 

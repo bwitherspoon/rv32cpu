@@ -7,13 +7,12 @@ import riscv::*;
 /**
  * Module: core
  *
- * The processor core.
  */
 module core (
-    input logic clk,
-    input logic resetn
+    input logic  clk,
+    input logic  resetn
 );
-
+    // Control signals
     opcode_t opcode;
     funct3_t funct3;
     funct7_t funct7;
@@ -21,106 +20,185 @@ module core (
     logic lt;
     logic ltu;
     ctrl_t ctrl;
-    pc_t target;
-    pc_t pc_id;
-    pc_t pc_ex;
-    ir_t ir;
-    data_t rdata1;
-    data_t rdata2;
-    reg_t raddr1;
-    reg_t raddr2;
-    data_t op1;
-    data_t op2;
-    data_t rs1;
-    data_t rs2_ex;
-    data_t rs2_mem;
-    reg_t rd_ex;
-    reg_t rd_mem;
-    reg_t rd_wb;
-    data_t val;
-    data_t out;
 
-    control control (
-        .clk(clk),
-        .resetn(resetn),
-        .opcode(opcode),
-        .funct3(funct3),
-        .funct7(funct7),
-        .eq(eq),
-        .lt(lt),
-        .ltu(ltu),
-        .ctrl(ctrl)
-    );
+    // Local memory signals
+    word_t dmem_rdata;
 
-    fetch fetch (
-        .clk(clk),
-        .resetn(resetn),
-        .target(target),
-        .pc_sel(ctrl.pc_sel),
-        .pc(pc_id),
-        .ir(ir)
-    );
+    // Register file signals
+    addr_t rs1_addr;
+    addr_t rs2_addr;
+    word_t rs1_data;
+    word_t rs2_data;
 
-    decode decode (
-        .clk(clk),
-        .op1_sel(ctrl.op1_sel),
-        .op2_sel(ctrl.op2_sel),
-        .pc_id(pc_id),
-        .ir(ir),
-        .rdata1(rdata1),
-        .rdata2(rdata2),
-        .raddr1(raddr1),
-        .raddr2(raddr2),
-        .opcode(opcode),
-        .funct3(funct3),
-        .funct7(funct7),
-        .pc_ex(pc_ex),
-        .op1(op1),
-        .op2(op2),
-        .rs1(rs1),
-        .rs2(rs2_ex),
-        .rd(rd_ex)
-    );
+    // Fetch signals
+    word_t pc;
 
-    execute execute (
-        .clk(clk),
-        .alu_op(ctrl.alu_op),
-        .link(ctrl.link),
-        .pc(pc_ex),
-        .op1(op1),
-        .op2(op2),
-        .rs1(rs1),
-        .rs2_ex(rs2_ex),
-        .rd_ex(rd_ex),
-        .val(val),
-        .target(target),
-        .rs2_mem(rs2_mem),
-        .rd_mem(rd_mem),
-        .eq(eq),
-        .lt(lt),
-        .ltu(ltu)
-    );
+    // Decode signals
+    imm_t i_imm;
+    imm_t s_imm;
+    imm_t b_imm;
+    imm_t u_imm;
+    imm_t j_imm;
+    word_t op1;
+    word_t op2;
+    addr_t rd;
 
+    // Execute signals
+    word_t alu_out;
+    word_t data;
+
+    // Writeback signals
+    word_t rd_data;
+
+    // Pipeline signals
+    struct packed {
+        word_t pc;
+        inst_t ir;
+    } id;
+
+    struct packed {
+        word_t pc;
+        word_t op1;
+        word_t op2;
+        word_t rs1;
+        word_t rs2;
+        addr_t rd;
+    } ex;
+
+    struct packed {
+        word_t rs2;
+        addr_t rd;
+        word_t data;
+    } mem;
+
+    struct packed {
+        addr_t rd;
+        word_t data;
+    } wb;
+
+    // Control
+    control control (.*);
+
+    // Local memory
     memory memory (
-        .clk(clk),
-        .load(ctrl.load),
-        .store(ctrl.store),
-        .val(val),
-        .rs2(rs2_mem),
-        .rd_mem(rd_mem),
-        .rd_wb(rd_wb),
-        .out(out)
+        .dmem_op(ctrl.mem_op),
+        .dmem_addr(mem.data),
+        .dmem_wdata(mem.rs2),
+        .imem_addr(pc),
+        .imem_rdata(id.ir),
+        .imem_error(),
+        .*
     );
 
+    // Register file
     regfile regfile (
-        .clk(clk),
-        .raddr1(raddr1),
-        .rdata1(rdata1),
-        .raddr2(raddr2),
-        .rdata2(rdata2),
-        .wen(ctrl.write),
-        .waddr(rd_wb),
-        .wdata(out)
+        .rd_en(ctrl.reg_en),
+        .rd_addr(wb.rd),
+        .*
     );
+
+    // Pipeline
+    always_ff @(posedge clk) begin
+        id.pc    <= pc;
+        ex.pc    <= pc;
+        ex.op1   <= op1;
+        ex.op2   <= op2;
+        ex.rs1   <= rs1_data;
+        ex.rs2   <= rs2_data;
+        ex.rd    <= rd;
+        mem.rs2  <= ex.rs2;
+        mem.rd   <= ex.rd;
+        mem.data <= data;
+        wb.rd    <= mem.rd;
+        wb.data  <= mem.data;
+    end
+
+    /*
+     * Fetch
+     */
+
+    always_ff @(posedge clk)
+        if (~resetn)
+            pc <= riscv::INST_ADDR;
+        else
+            unique case (ctrl.pc_sel)
+                riscv::PC_ADDR: pc <= alu_out;
+                riscv::PC_TRAP: pc <= riscv::TRAP_ADDR;
+                riscv::PC_NEXT: pc <= pc + 4;
+            endcase
+
+    /*
+     * Decode
+     */
+
+    // Immediate sign extension
+    assign i_imm = signed'(id.ir.i.imm_11_0);
+    assign s_imm = signed'({id.ir.s.imm_11_5, id.ir.s.imm_4_0});
+    assign b_imm = signed'({id.ir.sb.imm_12, id.ir.sb.imm_11, id.ir.sb.imm_10_5, id.ir.sb.imm_4_1, 1'b0});
+    assign u_imm = signed'({id.ir.u.imm_31_12, 12'd0});
+    assign j_imm = signed'({id.ir.uj.imm_20, id.ir.uj.imm_19_12, id.ir.uj.imm_11, id.ir.uj.imm_10_1, 1'b0});
+
+    // Register addresses
+    assign rs1_addr = id.ir.r.rs1;
+    assign rs2_addr = id.ir.r.rs2;
+    assign rd       = id.ir.r.rd;
+
+    // Control signals
+    assign opcode = id.ir.r.opcode;
+    assign funct3 = id.ir.r.funct3;
+    assign funct7 = id.ir.r.funct7;
+
+    // First operand
+    always_comb
+        unique case (ctrl.op1_sel)
+            OP1_RS1: op1 = rs1_data;
+            OP1_PC:  op1 = id.pc;
+            OP1_XXX: op1 = 'x;
+        endcase
+
+    // Second operand
+    always_comb
+        unique case (ctrl.op2_sel)
+            OP2_RS2:   op2 = rs2_data;
+            OP2_I_IMM: op2 = i_imm;
+            OP2_S_IMM: op2 = s_imm;
+            OP2_B_IMM: op2 = b_imm;
+            OP2_U_IMM: op2 = u_imm;
+            OP2_J_IMM: op2 = j_imm;
+            OP2_XXX:   op2 = 'x;
+        endcase
+
+    /*
+     * Execute
+     */
+
+    alu alu (
+        .opcode(ctrl.alu_op),
+        .op1(ex.op1),
+        .op2(ex.op2),
+        .out(alu_out)
+    );
+
+    // Output data
+    assign data = (ctrl.link_en) ? ex.pc + 4 : alu_out;
+
+    // Comparators
+    assign eq  = ex.rs1 == ex.rs2;
+    assign lt  = signed'(ex.rs1) < signed'(ex.rs2);
+    assign ltu = ex.rs1 < ex.rs2;
+
+    /*
+     * Memory
+     */
+
+    wire load = ctrl.mem_op == LOAD_WORD ||
+                ctrl.mem_op == LOAD_HALF ||
+                ctrl.mem_op == LOAD_BYTE ||
+                ctrl.mem_op == LOAD_HALF_UNSIGNED ||
+                ctrl.mem_op == LOAD_BYTE_UNSIGNED;
+
+    assign rd_data = (load) ? dmem_rdata : wb.data;
 
 endmodule
+
+
