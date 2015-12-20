@@ -14,14 +14,15 @@ module top;
     bit resetn = 1;
     task reset();
         resetn = 0;
-        @(posedge clk) #1 resetn = 1;
+        repeat (2) @(posedge clk);
+        #1 resetn = 1;
     endtask
 
     core core(.*);
 
     initial begin
         $readmemh("main.txt", core.memory.bram.mem, 0, 31);
-        $monitor("x3: %h", core.regfile.regs[3]);
+        $dumpfile("top.vcd")
         $dumpvars();
         reset();
         repeat (32) @(posedge clk);
