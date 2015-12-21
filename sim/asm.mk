@@ -4,10 +4,10 @@ OBJCOPY       := $(CROSS_COMPILE)objcopy
 
 OD ?= od
 
-%.elf: %.S
-	$(AS) -m32 -o $@ $<
+%.o: %.S
+	$(AS) -m32 -R -o $@ $<
 
-%.bin: %.elf
+%.bin: %.o
 	$(OBJCOPY) -O binary -j .text $< $@
 
 %.txt: %.bin
