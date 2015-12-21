@@ -28,7 +28,7 @@ module memory (
     word_t      ram_dia;
     word_t      ram_doa;
 
-    assign ram_ena = dmem_op != riscv::NONE;
+    assign ram_ena = dmem_op != riscv::LOAD_STORE_NONE;
 
     ram #(
         .DATA_WIDTH($bits(word_t)),

@@ -153,7 +153,7 @@ package riscv;
 
     // Memory operation type
     typedef enum logic [3:0] {
-        NONE,
+        LOAD_STORE_NONE,
         LOAD_WORD,
         LOAD_HALF,
         LOAD_BYTE,

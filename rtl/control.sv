@@ -43,7 +43,7 @@ module control (
     // Control signals for supported instructions
     localparam ctrl_id_t CTRL_INVALID = '{
         reg_en:  1'b0,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'bx,
         alu_op:  ALU_XXX,
         jmp_br:  JMP_BR_NONE,
@@ -52,7 +52,7 @@ module control (
     };
     localparam ctrl_id_t CTRL_ADDI = '{
         reg_en:  1'b1,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_br:  JMP_BR_NONE,
@@ -61,7 +61,7 @@ module control (
     };
     localparam ctrl_id_t CTRL_LUI = '{
         reg_en:  1'b1,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
         alu_op:  ALU_OP2,
         jmp_br:  JMP_BR_NONE,
@@ -70,7 +70,7 @@ module control (
     };
     localparam ctrl_id_t CTRL_AUIPC = '{
         reg_en:  1'b1,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_br:  JMP_BR_NONE,
@@ -79,7 +79,7 @@ module control (
     };
     localparam ctrl_id_t CTRL_ADD = '{
         reg_en:  1'b1,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_br:  JMP_BR_NONE,
@@ -88,7 +88,7 @@ module control (
     };
     localparam ctrl_id_t CTRL_SUB = '{
         reg_en:  1'b1,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
         alu_op:  ALU_SUB,
         jmp_br:  JMP_BR_NONE,
@@ -97,7 +97,7 @@ module control (
     };
     localparam ctrl_id_t CTRL_JAL = '{
         reg_en:  1'b1,
-        mem_op:  NONE,
+        mem_op:  LOAD_STORE_NONE,
         link_en: 1'b1,
         alu_op:  ALU_ADD,
         jmp_br:  JMP_BR_JAL,
@@ -191,11 +191,11 @@ module control (
     always_ff @(posedge clk)
         if (~resetn) begin
             ex.reg_en <= 1'b0;
-            ex.mem_op <= NONE;
+            ex.mem_op <= LOAD_STORE_NONE;
             ex.jmp_br <= JMP_BR_NONE;
         end else begin
             ex.reg_en  <= (jump_branch === 1'b1) ? 1'b0 : id.reg_en;
-            ex.mem_op  <= (jump_branch === 1'b1) ? NONE : id.mem_op;
+            ex.mem_op  <= (jump_branch === 1'b1) ? LOAD_STORE_NONE : id.mem_op;
             ex.link_en <= id.link_en;
             ex.alu_op  <= id.alu_op;
             ex.jmp_br  <= id.jmp_br;
@@ -205,7 +205,7 @@ module control (
     always_ff @(posedge clk)
         if (~resetn) begin
             mem.reg_en <= 1'b0;
-            mem.mem_op <= NONE;
+            mem.mem_op <= LOAD_STORE_NONE;
         end else begin
             mem.reg_en <= ex.reg_en;
             mem.mem_op <= ex.mem_op;
