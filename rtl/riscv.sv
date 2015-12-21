@@ -187,12 +187,6 @@ package riscv;
         PC_TRAP
     } pc_sel_t;
 
-    // Instruction register select
-    typedef enum logic {
-        IR_MEMORY,
-        IR_BUBBLE
-    } ir_sel_t;
-
     // First operand select
     typedef enum logic {
         OP1_RS1,
@@ -218,7 +212,6 @@ package riscv;
         logic     link_en;
         alu_op_t  alu_op;
         pc_sel_t  pc_sel;
-        ir_sel_t  ir_sel;
         op1_sel_t op1_sel;
         op2_sel_t op2_sel;
     } ctrl_t;

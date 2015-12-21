@@ -26,11 +26,8 @@ module top;
         $readmemh("main.txt", core.memory.ram.mem);
         $dumpfile("top.vcd");
         $dumpvars();
-
-        $monitor("%g: M[512]=%H", $time, core.memory.ram.mem[128]);
-
         reset();
-        repeat (25) @(posedge clk);
+        repeat (30) @(posedge clk);
         $finish;
     end
 

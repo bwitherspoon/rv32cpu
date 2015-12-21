@@ -113,7 +113,7 @@ module core (
                 riscv::PC_NEXT: pc <= pc + 4;
             endcase
 
-    assign id.ir = (ctrl.ir_sel == IR_MEMORY) ? imem_rdata : INST_NOP;
+    assign id.ir = imem_rdata;
 
     always_ff @(posedge clk)
         id.pc <= pc;

@@ -1,7 +1,6 @@
     .file   "main.S"
     .text
     .align  2
-     .globl  _start
 
 _start:
     lui  t0,1
