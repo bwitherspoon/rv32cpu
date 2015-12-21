@@ -30,10 +30,10 @@ module memory (
 
     assign ram_ena = dmem_op != riscv::NONE;
 
-    bram #(
+    ram #(
         .DATA_WIDTH($bits(word_t)),
         .ADDR_WIDTH(ADDR_WIDTH)
-    ) bram (
+    ) ram (
         .clk(clk),
         .ena(ram_ena),
         .wea(ram_wea),

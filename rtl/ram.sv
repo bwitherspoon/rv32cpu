@@ -1,9 +1,9 @@
 /**
- * Module: bram
+ * Module: ram
  *
  * Synchronous RAM with byte enable
  */
-module bram #(
+module ram #(
     DATA_WIDTH = 32,
     ADDR_WIDTH = 10
 )(
