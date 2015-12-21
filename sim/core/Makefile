@@ -1,10 +1,10 @@
 TOP = top
 PKG = $(RTLDIR)/riscv.sv
-SRC = $(RTLDIR)/alu.sv          \
-      $(RTLDIR)/bram.sv         \
-      $(RTLDIR)/control.sv      \
-      $(RTLDIR)/core.sv         \
-      $(RTLDIR)/memory.sv       \
+SRC = $(RTLDIR)/alu.sv     \
+      $(RTLDIR)/control.sv \
+      $(RTLDIR)/core.sv    \
+      $(RTLDIR)/memory.sv  \
+      $(RTLDIR)/ram.sv     \
       $(RTLDIR)/regfile.sv
 
 VSIM_OPT += +nowarn3722 +nowarn3017
