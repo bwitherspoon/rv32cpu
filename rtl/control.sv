@@ -152,28 +152,49 @@ module control (
         logic reg_en;
     } wb;
 
+    logic invalid;
+
     // Decode
     always_comb begin
+        invalid = 1'b0;
         unique case (opcode)
             OPCODE_STORE:
                 unique case (funct3)
                     FUNCT3_SW: id = CTRL_SW;
                     FUNCT3_SH: id = CTRL_SH;
                     FUNCT3_SB: id = CTRL_SB;
-                    default:   id = CTRL_INVALID;
+                    default: begin
+                        $display("ERROR: Invalid funct3 in STORE instruction");
+                        invalid = 1'b1;
+                        id = CTRL_INVALID;
+                    end
                 endcase
             OPCODE_OP_IMM:
                 unique case (funct3)
                     FUNCT3_ADDI: id = CTRL_ADDI;
+                    default: begin
+                        $display("ERROR: Invalid funct3 in OP_IMM instruction");
+                        invalid = 1'b1;
+                        id = CTRL_INVALID;
+                    end
                 endcase
             OPCODE_OP:
                 unique case (funct3)
                     FUNCT3_ADD_SUB: id = (funct7[5]) ? CTRL_ADD : CTRL_SUB;
+                    default: begin
+                        $display("ERROR: Invalid funct3 in OP instruction");
+                        invalid = 1'b1;
+                        id = CTRL_INVALID;
+                    end
                 endcase
             OPCODE_LUI:   id = CTRL_LUI;
             OPCODE_AUIPC: id = CTRL_AUIPC;
             OPCODE_JAL:   id = CTRL_JAL;
-            default:      id = CTRL_INVALID;
+            default: begin
+                $display("ERROR: Invalid opcode in instruction");
+                invalid = 1'b1;
+                id = CTRL_INVALID;
+            end
         endcase
     end
 
