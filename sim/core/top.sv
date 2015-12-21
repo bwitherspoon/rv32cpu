@@ -23,11 +23,14 @@ module top;
     core core(.*);
 
     initial begin
-        $readmemh("main.hex", core.memory.bram.mem, 0, 5);
+        $readmemh("main.txt", core.memory.ram.mem);
         $dumpfile("top.vcd");
         $dumpvars();
+
+        $monitor("%g: M[512]=%H", $time, core.memory.ram.mem[128]);
+
         reset();
-        repeat (10) @(posedge clk);
+        repeat (25) @(posedge clk);
         $finish;
     end
 

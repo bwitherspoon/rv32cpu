@@ -50,15 +50,6 @@ module control (
         op1_sel: OP1_XXX,
         op2_sel: OP2_XXX
     };
-    localparam ctrl_id_t CTRL_NOP = '{
-        reg_en:  1'b0,
-        mem_op:  NONE,
-        link_en: 1'bx,
-        alu_op:  ALU_XXX,
-        jmp_br:  JMP_BR_NONE,
-        op1_sel: OP1_XXX,
-        op2_sel: OP2_XXX
-    };
     localparam ctrl_id_t CTRL_ADDI = '{
         reg_en:  1'b1,
         mem_op:  NONE,
@@ -113,6 +104,33 @@ module control (
         op1_sel: OP1_PC,
         op2_sel: OP2_J_IMM
     };
+    localparam ctrl_id_t CTRL_SW = '{
+        reg_en:  1'b0,
+        mem_op:  STORE_WORD,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_br:  JMP_BR_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_S_IMM
+    };
+    localparam ctrl_id_t CTRL_SH = '{
+            reg_en:  1'b0,
+            mem_op:  STORE_HALF,
+            link_en: 1'b0,
+            alu_op:  ALU_ADD,
+            jmp_br:  JMP_BR_NONE,
+            op1_sel: OP1_RS1,
+            op2_sel: OP2_S_IMM
+    };
+    localparam ctrl_id_t CTRL_SB = '{
+            reg_en:  1'b0,
+            mem_op:  STORE_BYTE,
+            link_en: 1'b0,
+            alu_op:  ALU_ADD,
+            jmp_br:  JMP_BR_NONE,
+            op1_sel: OP1_RS1,
+            op2_sel: OP2_S_IMM
+    };
 
     // Pipeline control signals
     ctrl_id_t id;
@@ -137,6 +155,13 @@ module control (
     // Decode
     always_comb begin
         unique case (opcode)
+            OPCODE_STORE:
+                unique case (funct3)
+                    FUNCT3_SW: id = CTRL_SW;
+                    FUNCT3_SH: id = CTRL_SH;
+                    FUNCT3_SB: id = CTRL_SB;
+                    default:   id = CTRL_INVALID;
+                endcase
             OPCODE_OP_IMM:
                 unique case (funct3)
                     FUNCT3_ADDI: id = CTRL_ADDI;

@@ -10,7 +10,7 @@ OD ?= od
 %.bin: %.elf
 	$(OBJCOPY) -O binary -j .text $< $@
 
-%.hex: %.bin
+%.txt: %.bin
 	$(OD) -An -tx4 -w4 -v $< > $@
 
 %.vh: %.elf

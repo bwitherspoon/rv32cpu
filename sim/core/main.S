@@ -1,10 +1,28 @@
-    .text;
-    .globl _start;
+    .file   "main.S"
+    .text
+    .align  2
+     .globl  _start
 
 _start:
-    lui   x2, 9
-    addi  x3, x0, 2
-    auipc x4, 7
-    jal   x1, _start
+    lui  t0,1
     nop
     nop
+    nop
+    nop
+    nop
+    addi t0,t0,1
+    nop
+    nop
+    nop
+    nop
+    nop
+    sw   t0,512(zero)
+    sh   t0,514(zero)
+    sb   t0,515(zero)
+    nop
+    nop
+    nop
+    nop
+    nop
+    jal  x0,_start
+
