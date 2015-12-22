@@ -262,7 +262,7 @@ module control (
 
     struct packed {
         logic reg_en;
-        logic load;
+        logic load_en;
     } wb;
 
     wire beq  = ex.jmp_op == JMP_OP_BEQ  & eq;
@@ -284,7 +284,7 @@ module control (
 
     // External signals
     assign ctrl.reg_en  = wb.reg_en;
-    assign ctrl.load    = wb.load;
+    assign ctrl.load_en = wb.load_en;
     assign ctrl.mem_op  = mem.mem_op;
     assign ctrl.link_en = ex.link_en;
     assign ctrl.alu_op  = ex.alu_op;
@@ -402,8 +402,8 @@ module control (
         if (~resetn)
             wb.reg_en <= 1'b0;
         else begin
-            wb.reg_en <= mem.reg_en;
-            wb.load   <= ld;
+            wb.reg_en  <= mem.reg_en;
+            wb.load_en <= ld;
         end
     end : writeback
 

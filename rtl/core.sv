@@ -52,6 +52,7 @@ module core (
 
     // Writeback signals
     word_t rd_data;
+    word_t rd_addr;
 
     // Pipeline signals
     struct packed {
@@ -63,20 +64,20 @@ module core (
         word_t pc;
         word_t op1;
         word_t op2;
-        word_t rs1;
-        word_t rs2;
-        addr_t rd;
+        word_t rs1_data;
+        word_t rs2_data;
+        addr_t rd_addr;
     } ex;
 
     struct packed {
-        word_t rs2;
-        addr_t rd;
-        word_t data;
+        word_t rs2_data;
+        addr_t rd_addr;
+        word_t ex_data;
     } mem;
 
     struct packed {
-        addr_t rd;
-        word_t data;
+        addr_t rd_addr;
+        word_t ex_data;
     } wb;
 
     // Control
@@ -85,8 +86,8 @@ module core (
     // Local memory
     memory memory (
         .dmem_op(ctrl.mem_op),
-        .dmem_addr(mem.data),
-        .dmem_wdata(mem.rs2),
+        .dmem_addr(mem.ex_data),
+        .dmem_wdata(mem.rs2_data),
         .imem_addr(pc),
         .imem_error(),
         .*
@@ -95,7 +96,7 @@ module core (
     // Register file
     regfile regfile (
         .rd_en(ctrl.reg_en),
-        .rd_addr(wb.rd),
+        .rd_addr(wb.rd_addr),
         .*
     );
 
@@ -132,14 +133,14 @@ module core (
     // Register addresses
     assign rs1_addr = id.ir.r.rs1;
     assign rs2_addr = id.ir.r.rs2;
-    assign rd       = id.ir.r.rd;
+    assign rd_addr  = id.ir.r.rd;
 
     // Control signals
     assign opcode = id.ir.r.opcode;
     assign funct3 = id.ir.r.funct3;
     assign funct7 = id.ir.r.funct7;
 
-    // First operand
+    // First operand mux
     always_comb
         unique case (ctrl.op1_sel)
             OP1_RS1: op1 = rs1_data;
@@ -147,7 +148,7 @@ module core (
             default: op1 = 'x;
         endcase
 
-    // Second operand
+    // Second operand mux
     always_comb
         unique case (ctrl.op2_sel)
             OP2_RS2:   op2 = rs2_data;
@@ -160,12 +161,12 @@ module core (
         endcase
 
     always_ff @(posedge clk) begin
-        ex.pc  <= id.pc;
-        ex.op1 <= op1;
-        ex.op2 <= op2;
-        ex.rs1 <= rs1_data;
-        ex.rs2 <= rs2_data;
-        ex.rd  <= rd;
+        ex.pc       <= id.pc;
+        ex.op1      <= op1;
+        ex.op2      <= op2;
+        ex.rs1_data <= rs1_data;
+        ex.rs2_data <= rs2_data;
+        ex.rd_addr  <= rd_addr;
     end
 
     /*
@@ -173,9 +174,9 @@ module core (
      */
 
     // Comparators
-    assign eq  = ex.rs1 == ex.rs2;
-    assign lt  = signed'(ex.rs1) < signed'(ex.rs2);
-    assign ltu = ex.rs1 < ex.rs2;
+    assign eq  = ex.rs1_data == ex.rs2_data;
+    assign lt  = signed'(ex.rs1_data) < signed'(ex.rs2_data);
+    assign ltu = ex.rs1_data < ex.rs2_data;
 
     alu alu (
         .opcode(ctrl.alu_op),
@@ -185,19 +186,19 @@ module core (
     );
 
     always_ff @(posedge clk) begin
-        mem.rs2  <= ex.rs2;
-        mem.rd   <= ex.rd;
-        mem.data <= (ctrl.link_en) ? ex.pc + 4 : alu_out;
+        mem.rs2_data <= ex.rs2_data;
+        mem.rd_addr  <= ex.rd_addr;
+        mem.ex_data <= (ctrl.link_en) ? ex.pc + 4 : alu_out;
     end
 
     /*
-     * Memory
+     * Memory / Writeback
      */
-    assign rd_data = (ctrl.load) ? dmem_rdata : wb.data;
+    assign rd_data = (ctrl.load_en) ? dmem_rdata : wb.ex_data;
 
     always_ff @(posedge clk) begin
-        wb.rd    <= mem.rd;
-        wb.data  <= mem.data;
+        wb.rd_addr  <= mem.rd_addr;
+        wb.ex_data  <= mem.ex_data;
     end
 
 endmodule
