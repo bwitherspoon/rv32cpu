@@ -50,8 +50,8 @@ module memory (
     // Misaligned instruction address
     assign imem_error = | imem_addr[1:0];
 
-    // Data store operation
-    always_comb
+    // Store
+    always_comb begin : store
         unique case (dmem_op)
             riscv::STORE_WORD: begin
                 ram_dia = dmem_wdata;
@@ -86,41 +86,52 @@ module memory (
                     end
                 endcase
             default: begin
-                ram_dia = dmem_wdata;
+                ram_dia = 'x;
                 ram_wea = '0;
             end
         endcase
+    end : store
 
-    // Data load operation
-    always_comb
-        unique case (dmem_op)
+    // Load
+    mem_op_t    load_op;
+    logic [1:0] load_addr;
+
+    always_ff @(posedge clk) begin
+        load_op   <= dmem_op;
+        load_addr <= dmem_addr[1:0];
+    end
+
+    always_comb begin : load
+        unique case (load_op)
             riscv::LOAD_WORD:
                 dmem_rdata = ram_doa;
             riscv::LOAD_HALF:
-                if (dmem_addr[1])
+                if (load_addr[1])
                     dmem_rdata = {{16{ram_doa[31]}}, ram_doa[31:16]};
                 else
                     dmem_rdata = {{16{ram_doa[15]}}, ram_doa[15:0]};
             riscv::LOAD_BYTE:
-                unique case (dmem_addr[1:0])
+                unique case (load_addr)
                     2'b00: dmem_rdata = {{24{ram_doa[7]}},  ram_doa[7:0]};
                     2'b01: dmem_rdata = {{24{ram_doa[15]}}, ram_doa[15:8]};
                     2'b10: dmem_rdata = {{24{ram_doa[23]}}, ram_doa[23:16]};
                     2'b11: dmem_rdata = {{24{ram_doa[31]}}, ram_doa[31:24]};
                 endcase
             riscv::LOAD_HALF_UNSIGNED:
-                if (dmem_addr[1])
+                if (load_addr[1])
                     dmem_rdata = {16'h0000, ram_doa[31:16]};
                 else
                     dmem_rdata = {16'h0000, ram_doa[15:0]};
             riscv::LOAD_BYTE_UNSIGNED:
-                unique case (dmem_addr[1:0])
+                unique case (load_addr)
                     2'b00: dmem_rdata = {24'h000000, ram_doa[7:0]};
                     2'b01: dmem_rdata = {24'h000000, ram_doa[15:8]};
                     2'b10: dmem_rdata = {24'h000000, ram_doa[23:16]};
                     2'b11: dmem_rdata = {24'h000000, ram_doa[31:24]};
                 endcase
             default:
-                dmem_rdata = ram_doa;
+                dmem_rdata = 'x;
         endcase
+    end : load
+
 endmodule

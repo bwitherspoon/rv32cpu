@@ -167,7 +167,51 @@ module control (
         op1_sel: OP1_PC,
         op2_sel: OP2_B_IMM
     };
-
+    localparam ctrl_id_t CTRL_LW = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_WORD,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_LH = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_HALF,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+     localparam ctrl_id_t CTRL_LHU = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_HALF_UNSIGNED,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_LB = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_BYTE,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_LBU = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_BYTE_UNSIGNED,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
     localparam ctrl_id_t CTRL_SW = '{
         reg_en:  1'b0,
         mem_op:  STORE_WORD,
@@ -218,6 +262,7 @@ module control (
 
     struct packed {
         logic reg_en;
+        logic load;
     } wb;
 
     wire beq  = ex.jmp_op == JMP_OP_BEQ  & eq;
@@ -231,8 +276,15 @@ module control (
 
     assign ex.jmp = ex.jmp_op == JMP_OP_JAL;
 
+    wire ld = mem.mem_op == LOAD_WORD ||
+              mem.mem_op == LOAD_HALF ||
+              mem.mem_op == LOAD_BYTE ||
+              mem.mem_op == LOAD_HALF_UNSIGNED ||
+              mem.mem_op == LOAD_BYTE_UNSIGNED;
+
     // External signals
     assign ctrl.reg_en  = wb.reg_en;
+    assign ctrl.load    = wb.load;
     assign ctrl.mem_op  = mem.mem_op;
     assign ctrl.link_en = ex.link_en;
     assign ctrl.alu_op  = ex.alu_op;
@@ -285,13 +337,26 @@ module control (
                             id = CTRL_NOP;
                         end
                     endcase
+                OPCODE_LOAD:
+                    unique case (funct3)
+                        FUNCT3_LW:  id = CTRL_LW;
+                        FUNCT3_LH:  id = CTRL_LH;
+                        FUNCT3_LHU: id = CTRL_LHU;
+                        FUNCT3_LB:  id = CTRL_LB;
+                        FUNCT3_LBU: id = CTRL_LBU;
+                        default: begin
+                            $display("ERROR: Invalid width in LOAD");
+                            invalid = 1'b1;
+                            id = CTRL_NOP;
+                        end
+                    endcase
                 OPCODE_STORE:
                     unique case (funct3)
                         FUNCT3_SW: id = CTRL_SW;
                         FUNCT3_SH: id = CTRL_SH;
                         FUNCT3_SB: id = CTRL_SB;
                         default: begin
-                            $display("ERROR: Invalid funct3 in STORE");
+                            $display("ERROR: Invalid width in STORE");
                             invalid = 1'b1;
                             id = CTRL_NOP;
                         end
@@ -336,8 +401,10 @@ module control (
     always_ff @(posedge clk) begin : writeback
         if (~resetn)
             wb.reg_en <= 1'b0;
-        else
+        else begin
             wb.reg_en <= mem.reg_en;
+            wb.load   <= ld;
+        end
     end : writeback
 
 endmodule

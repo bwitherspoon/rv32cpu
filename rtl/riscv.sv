@@ -208,6 +208,7 @@ package riscv;
     // Data path control signals
     typedef struct packed {
         logic     reg_en;
+        logic     load;
         mem_op_t  mem_op;
         logic     link_en;
         alu_op_t  alu_op;

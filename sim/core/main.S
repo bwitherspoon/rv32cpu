@@ -3,13 +3,11 @@
     .align  2
 
 _start:
-    lui  t0,1
+    nop
+    lui  t0,8
     nop
     nop
-    nop
-    nop
-    nop
-    addi t0,t0,1
+    addi t0,t0,10
     nop
     nop
     nop
@@ -23,5 +21,10 @@ _start:
     nop
     nop
     nop
+    lw   t1,512(zero)
+    lh   t2,512(zero)
+    lhu  t3,512(zero)
+    lb   t4,512(zero)
+    lbu  t5,512(zero)
     jal  x0,_start
 

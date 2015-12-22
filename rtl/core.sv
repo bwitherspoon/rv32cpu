@@ -193,14 +193,7 @@ module core (
     /*
      * Memory
      */
-
-    wire load = ctrl.mem_op == LOAD_WORD ||
-                ctrl.mem_op == LOAD_HALF ||
-                ctrl.mem_op == LOAD_BYTE ||
-                ctrl.mem_op == LOAD_HALF_UNSIGNED ||
-                ctrl.mem_op == LOAD_BYTE_UNSIGNED;
-
-    assign rd_data = (load) ? dmem_rdata : wb.data;
+    assign rd_data = (ctrl.load) ? dmem_rdata : wb.data;
 
     always_ff @(posedge clk) begin
         wb.rd    <= mem.rd;
