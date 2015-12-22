@@ -35,7 +35,7 @@ module core (
     word_t rs2_data;
 
     // Fetch signals
-    word_t pc = riscv::INST_ADDR;
+    word_t pc = riscv::TEXT_ADDR;
 
     // Decode signals
     imm_t i_imm;
@@ -105,7 +105,7 @@ module core (
 
     always_ff @(posedge clk)
         if (~resetn)
-            pc <= riscv::INST_ADDR;
+            pc <= riscv::TEXT_ADDR;
         else
             unique case (ctrl.pc_sel)
                 riscv::PC_ADDR: pc <= alu_out;
@@ -201,5 +201,3 @@ module core (
     end
 
 endmodule
-
-

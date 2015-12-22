@@ -83,7 +83,7 @@ package riscv;
     localparam word_t TRAP_ADDR = '0;
 
     // Instruction base address
-    localparam word_t INST_ADDR = '0;
+    localparam word_t TEXT_ADDR = '0;
 
     // Memory base address
     localparam word_t DATA_ADDR = 32'h400;
