@@ -10,11 +10,9 @@ import riscv::*;
  */
 module core (
     input  logic  clk,
-    input  logic  reset,
+    input  logic  resetn,
     output logic [3:0] led
 );
-    wire resetn = ~reset;
-
     // Control signals
     opcode_t opcode;
     funct3_t funct3;
