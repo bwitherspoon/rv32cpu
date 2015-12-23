@@ -23,11 +23,8 @@ module top;
     core core(.*);
 
     initial begin
-        $dumpfile("top.vcd");
-        $dumpvars();
-
         reset();
-        repeat (15) @(posedge clk);
+        repeat (10) @(posedge clk);
         $finish;
     end
 

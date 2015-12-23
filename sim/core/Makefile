@@ -7,6 +7,4 @@ SRC = $(RTLDIR)/alu.sv     \
       $(RTLDIR)/ram.sv     \
       $(RTLDIR)/regfile.sv
 
-VSIM_OPT += +nowarn3722 +nowarn3017
-
-include ../modelsim.mk
+include ../vivado.mk
