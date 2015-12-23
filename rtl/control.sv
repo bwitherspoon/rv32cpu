@@ -16,7 +16,8 @@ module control (
      input  logic    eq,
      input  logic    lt,
      input  logic    ltu,
-     output ctrl_t   ctrl
+     output ctrl_t   ctrl,
+     output logic    invalid
 );
     // Types
     typedef enum logic [2:0] {
@@ -276,11 +277,14 @@ module control (
 
     assign ex.jmp = ex.jmp_op == JMP_OP_JAL;
 
-    wire ld = mem.mem_op == LOAD_WORD ||
-              mem.mem_op == LOAD_HALF ||
-              mem.mem_op == LOAD_BYTE ||
-              mem.mem_op == LOAD_HALF_UNSIGNED ||
-              mem.mem_op == LOAD_BYTE_UNSIGNED;
+    wire load = mem.mem_op == LOAD_WORD ||
+                mem.mem_op == LOAD_HALF ||
+                mem.mem_op == LOAD_BYTE ||
+                mem.mem_op == LOAD_HALF_UNSIGNED ||
+                mem.mem_op == LOAD_BYTE_UNSIGNED;
+
+    wire stall = ex.jmp | mem.jmp;
+    wire flush = ex.br | mem.br;
 
     // External signals
     assign ctrl.reg_en  = wb.reg_en;
@@ -292,12 +296,10 @@ module control (
     assign ctrl.op1_sel = id.op1_sel;
     assign ctrl.op2_sel = id.op2_sel;
 
-    logic invalid;
-
     // Stages
     always_comb begin : decode
         invalid = 1'b0;
-        if (ex.jmp | mem.jmp)
+        if (stall)
             id = CTRL_NOP;
         else begin
             unique case (opcode)
@@ -376,11 +378,11 @@ module control (
             ex.mem_op <= LOAD_STORE_NONE;
             ex.jmp_op <= JMP_OP_NONE;
         end else begin
-            ex.reg_en  <= (ex.br | mem.br) ? 1'b0 : id.reg_en;
-            ex.mem_op  <= (ex.br | mem.br) ? LOAD_STORE_NONE : id.mem_op;
+            ex.reg_en  <= (flush) ? 1'b0 : id.reg_en;
+            ex.mem_op  <= (flush) ? LOAD_STORE_NONE : id.mem_op;
             ex.link_en <= id.link_en;
             ex.alu_op  <= id.alu_op;
-            ex.jmp_op  <= (ex.br | mem.br) ? JMP_OP_NONE : id.jmp_op;
+            ex.jmp_op  <= (flush) ? JMP_OP_NONE : id.jmp_op;
         end
     end : execute
 
@@ -403,7 +405,7 @@ module control (
             wb.reg_en <= 1'b0;
         else begin
             wb.reg_en  <= mem.reg_en;
-            wb.load_en <= ld;
+            wb.load_en <= load;
         end
     end : writeback
 
