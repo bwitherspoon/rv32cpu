@@ -9,9 +9,9 @@ import riscv::*;
  *
  */
 module core (
-    input  logic  clk,
-    input  logic  resetn,
-    output logic [3:0] led
+    input  logic        clk,
+    input  logic        resetn,
+    output logic [15:0] gpio
 );
     // Control signals
     opcode_t opcode;
@@ -102,11 +102,9 @@ module core (
     // Simple memory mapped external IO
     always_ff @(posedge clk)
         if (~resetn)
-            led <= '0;
+            gpio <= '0;
         else if (ctrl.mem_op == STORE_WORD && | mem.ex_data[31:12])
-            led <= mem.rs2_data[3:0];
-        else
-            led <= led;
+            gpio <= mem.rs2_data[15:0];
 
     /*
      * Fetch
