@@ -18,7 +18,7 @@ module top;
         #1 resetn = 1;
     endtask
 
-    logic [3:0] led;
+    logic [15:0] gpio;
 
     core core(.*);
 
