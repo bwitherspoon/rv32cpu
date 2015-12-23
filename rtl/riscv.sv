@@ -49,35 +49,40 @@ package riscv;
 
     typedef logic [2:0] funct3_t;
 
-    localparam funct3_t FUNCT3_JALR  = 'b000;
+    localparam funct3_t FUNCT3_BEQ       = 'b000;
+    localparam funct3_t FUNCT3_BNE       = 'b001;
+    localparam funct3_t FUNCT3_BLT       = 'b100;
+    localparam funct3_t FUNCT3_BGE       = 'b101;
+    localparam funct3_t FUNCT3_BLTU      = 'b110;
+    localparam funct3_t FUNCT3_BGEU      = 'b111;
 
-    localparam funct3_t FUNCT3_BEQ   = 'b000;
-    localparam funct3_t FUNCT3_BNE   = 'b001;
-    localparam funct3_t FUNCT3_BLT   = 'b100;
-    localparam funct3_t FUNCT3_BGE   = 'b101;
-    localparam funct3_t FUNCT3_BLTU  = 'b110;
-    localparam funct3_t FUNCT3_BGEU  = 'b111;
+    localparam funct3_t FUNCT3_LB        = 'b000;
+    localparam funct3_t FUNCT3_LH        = 'b001;
+    localparam funct3_t FUNCT3_LW        = 'b010;
+    localparam funct3_t FUNCT3_LBU       = 'b100;
+    localparam funct3_t FUNCT3_LHU       = 'b101;
 
-    localparam funct3_t FUNCT3_LB    = 'b000;
-    localparam funct3_t FUNCT3_LH    = 'b001;
-    localparam funct3_t FUNCT3_LW    = 'b010;
-    localparam funct3_t FUNCT3_LBU   = 'b100;
-    localparam funct3_t FUNCT3_LHU   = 'b101;
-
-    localparam funct3_t FUNCT3_SB    = 'b000;
-    localparam funct3_t FUNCT3_SH    = 'b001;
-    localparam funct3_t FUNCT3_SW    = 'b010;
+    localparam funct3_t FUNCT3_SB        = 'b000;
+    localparam funct3_t FUNCT3_SH        = 'b001;
+    localparam funct3_t FUNCT3_SW        = 'b010;
 
     localparam funct3_t FUNCT3_ADDI      = 'b000;
-    localparam funct3_t FUNCT3_SLLI      = 'b001;
     localparam funct3_t FUNCT3_SLTI      = 'b010;
     localparam funct3_t FUNCT3_SLTIU     = 'b011;
     localparam funct3_t FUNCT3_XORI      = 'b100;
-    localparam funct3_t FUNCT3_SLRI_SRAI = 'b101;
+    localparam funct3_t FUNCT3_SRLI_SRAI = 'b101;
     localparam funct3_t FUNCT3_ORI       = 'b110;
     localparam funct3_t FUNCT3_ANDI      = 'b111;
+    localparam funct3_t FUNCT3_SLLI      = 'b001;
 
     localparam funct3_t FUNCT3_ADD_SUB   = 'b000;
+    localparam funct3_t FUNCT3_SLL       = 'b001;
+    localparam funct3_t FUNCT3_SLT       = 'b010;
+    localparam funct3_t FUNCT3_SLTU      = 'b011;
+    localparam funct3_t FUNCT3_XOR       = 'b100;
+    localparam funct3_t FUNCT3_SRL_SRA   = 'b101;
+    localparam funct3_t FUNCT3_OR        = 'b110;
+    localparam funct3_t FUNCT3_AND       = 'b111;
 
     // Trap base address
     localparam word_t TRAP_ADDR = '0;

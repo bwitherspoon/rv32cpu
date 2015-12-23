@@ -60,6 +60,78 @@ module control (
         op1_sel: OP1_RS1,
         op2_sel: OP2_I_IMM
     };
+    localparam ctrl_id_t CTRL_SLTI = '{
+       reg_en:  1'b1,
+       mem_op:  LOAD_STORE_NONE,
+       link_en: 1'b0,
+       alu_op:  ALU_SLT,
+       jmp_op:  JMP_OP_NONE,
+       op1_sel: OP1_RS1,
+       op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_SLTIU = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SLTU,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_ANDI = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_AND,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_ORI = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_OR,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_XORI = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_XOR,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_SLLI = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SLL,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_SRLI = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
+    localparam ctrl_id_t CTRL_SRAI = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_ADD,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_I_IMM
+    };
     localparam ctrl_id_t CTRL_LUI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
@@ -87,11 +159,83 @@ module control (
         op1_sel: OP1_RS1,
         op2_sel: OP2_RS2
     };
+    localparam ctrl_id_t CTRL_SLT = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SLT,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_SLTU = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SLTU,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_AND = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_AND,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_OR = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_OR,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_XOR = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_XOR,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_SLL = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SLL,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_SRL = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SRL,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
     localparam ctrl_id_t CTRL_SUB = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
         alu_op:  ALU_SUB,
+        jmp_op:  JMP_OP_NONE,
+        op1_sel: OP1_RS1,
+        op2_sel: OP2_RS2
+    };
+    localparam ctrl_id_t CTRL_SRA = '{
+        reg_en:  1'b1,
+        mem_op:  LOAD_STORE_NONE,
+        link_en: 1'b0,
+        alu_op:  ALU_SRA,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
         op2_sel: OP2_RS2
@@ -305,7 +449,14 @@ module control (
             unique case (opcode)
                 OPCODE_OP_IMM:
                     unique case (funct3)
-                        FUNCT3_ADDI: id = CTRL_ADDI;
+                        FUNCT3_ADDI:      id = CTRL_ADDI;
+                        FUNCT3_SLTI:      id = CTRL_SLTI;
+                        FUNCT3_SLTIU:     id = CTRL_SLTIU;
+                        FUNCT3_XORI:      id = CTRL_XORI;
+                        FUNCT3_SRLI_SRAI: id = (funct7[5]) ? CTRL_SRAI : CTRL_SRLI;
+                        FUNCT3_ORI:       id = CTRL_ORI;
+                        FUNCT3_ANDI:      id = CTRL_ANDI;
+                        FUNCT3_SLLI:      id = CTRL_SLLI;
                         default: begin
                             $display("ERROR: Invalid funct3 in OP_IMM");
                             invalid = 1'b1;
@@ -315,6 +466,13 @@ module control (
                 OPCODE_OP:
                     unique case (funct3)
                         FUNCT3_ADD_SUB: id = (funct7[5]) ? CTRL_ADD : CTRL_SUB;
+                        FUNCT3_SLL:     id = CTRL_SLL;
+                        FUNCT3_SLT:     id = CTRL_SLT;
+                        FUNCT3_SLTU:    id = CTRL_SLTU;
+                        FUNCT3_XOR:     id = CTRL_XOR;
+                        FUNCT3_SRL_SRA: id = (funct7[5]) ? CTRL_SRA : CTRL_SRL;
+                        FUNCT3_OR:      id = CTRL_OR;
+                        FUNCT3_AND:     id = CTRL_AND;
                         default: begin
                             $display("ERROR: Invalid funct3 in OP");
                             invalid = 1'b1;
