@@ -10,10 +10,10 @@ import riscv::*;
  */
 module core (
     input  logic  clk,
-    input  logic  resetn,
+    input  logic  reset,
     output logic [3:0] led
 );
-    assign led = '0;
+    wire resetn = ~reset;
 
     // Control signals
     opcode_t opcode;
@@ -81,13 +81,14 @@ module core (
     } wb;
 
     // Control
-    control control (.*);
+    control control (.invalid(), .*);
 
     // Local memory
     memory memory (
         .dmem_op(ctrl.mem_op),
         .dmem_addr(mem.ex_data),
         .dmem_wdata(mem.rs2_data),
+        .dmem_error(),
         .imem_addr(pc),
         .imem_error(),
         .*
@@ -99,6 +100,15 @@ module core (
         .rd_addr(wb.rd_addr),
         .*
     );
+
+    // Simple memory mapped external IO
+    always_ff @(posedge clk)
+        if (~resetn)
+            led <= '0;
+        else if (ctrl.mem_op == STORE_WORD && | mem.ex_data[31:12])
+            led <= mem.rs2_data[3:0];
+        else
+            led <= led;
 
     /*
      * Fetch
@@ -192,13 +202,16 @@ module core (
     end
 
     /*
-     * Memory / Writeback
+     * Memory
      */
-    assign rd_data = (ctrl.load_en) ? dmem_rdata : wb.ex_data;
-
     always_ff @(posedge clk) begin
         wb.rd_addr  <= mem.rd_addr;
         wb.ex_data  <= mem.ex_data;
     end
+
+    /*
+     * Writeback
+     */
+    assign rd_data = (ctrl.load_en) ? dmem_rdata : wb.ex_data;
 
 endmodule
