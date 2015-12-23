@@ -185,6 +185,18 @@ package riscv;
         ALU_XXX = 'x
     } alu_op_t;
 
+    // Jump / Branch operation type
+    typedef enum logic [2:0] {
+        JMP_OP_NONE,
+        JMP_OP_JAL,
+        JMP_OP_BEQ,
+        JMP_OP_BNE,
+        JMP_OP_BLT,
+        JMP_OP_BLTU,
+        JMP_OP_BGE,
+        JMP_OP_BGEU
+    } jmp_op_t;
+
     // Program counter select
     typedef enum logic [1:0] {
         PC_NEXT,
@@ -213,11 +225,10 @@ package riscv;
     // Data path control signals
     typedef struct packed {
         logic     reg_en;
-        logic     load_en;
         mem_op_t  mem_op;
         logic     link_en;
         alu_op_t  alu_op;
-        pc_sel_t  pc_sel;
+        jmp_op_t  jmp_op;
         op1_sel_t op1_sel;
         op2_sel_t op2_sel;
     } ctrl_t;
