@@ -1,5 +1,5 @@
 /*
- * alu.sv
+ * Copyright (c) 2015, C. Brett Witherspoon
  */
 
 import riscv::*;

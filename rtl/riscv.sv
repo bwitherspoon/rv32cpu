@@ -1,5 +1,5 @@
 /**
- * Package: risvc
+ * Copyright (c) 2015, C. Brett Witherspoon
  */
 package riscv;
 

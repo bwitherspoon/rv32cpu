@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015, C. Brett Witherspoon
+ */
+
 /**
  * Module: ram
  *
