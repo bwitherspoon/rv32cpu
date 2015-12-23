@@ -16,6 +16,7 @@ module memory (
     input  word_t   dmem_addr,
     input  word_t   dmem_wdata,
     output word_t   dmem_rdata,
+    output logic    dmem_error,
     input  word_t   imem_addr,
     output word_t   imem_rdata,
     output logic    imem_error
@@ -28,7 +29,10 @@ module memory (
     word_t      ram_dia;
     word_t      ram_doa;
 
-    assign ram_ena = dmem_op != riscv::LOAD_STORE_NONE;
+    // Out of range data address
+    assign dmem_error = | dmem_addr[$bits(dmem_addr)-1:ADDR_WIDTH+2];
+
+    assign ram_ena = dmem_op != riscv::LOAD_STORE_NONE && !dmem_error;
 
     ram #(
         .DATA_WIDTH($bits(word_t)),
