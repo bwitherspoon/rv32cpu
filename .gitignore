@@ -1,7 +1,9 @@
 work
 *.vcd
+*.wdb
 *.top
 xsim.dir
 *.log
+*.jou
 *.pb
 .Xil/
