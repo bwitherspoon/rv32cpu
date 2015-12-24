@@ -31,10 +31,10 @@ gui: $(LIB).$(basename $(TOP)).wdb
 	xsim -gui -view top.wcfg work.top &
 
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
-	xelab -debug wave -L $(LIB) $(LIB).$(basename $(TOP))
+	xelab --timescale "1ns/1ps" -L $(LIB) $(LIB).$(basename $(TOP))
 
 $(LIB).$(basename $(TOP)).wdb: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
-	xelab -debug wave -L $(LIB) $(LIB).$(basename $(TOP))
+	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(LIB).$(basename $(TOP))
 
 #$(addprefix $(LIBDIR)/,$(TOP:.sv=.sdb)): $(addprefix $(LIBDIR)/,$(SRC:.sv=.sdb))
 
