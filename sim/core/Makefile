@@ -25,20 +25,23 @@ ALL = $(PKG) $(SRC) $(TOP)
 
 .PHONY: sim wave clean
 
-sim: $(MEM) xsim.dir/$(LIB).$(basename $(TOP))/xsimk
+sim: xsim.dir/$(LIB).$(basename $(TOP))/xsimk $(MEM)
 	xsim -runall work.top
 
-gui: $(MEM) $(LIB).$(basename $(TOP)).wdb
+gui: $(LIB).$(basename $(TOP)).wdb $(MEM)
 	xsim -gui -view top.wcfg work.top &
 
-xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
+xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb)) $(MEM)
 	xelab --timescale "1ns/1ps" -L $(LIB) $(LIB).$(basename $(TOP))
 
 $(LIB).$(basename $(TOP)).wdb: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(LIB).$(basename $(TOP))
 
+$(LIBDIR)/ram.sdb: $(MEM) ram.sv
+	xvlog --sv --work $(LIB) --define MEM_FILE=\"$<\" -L $(LIB) $(word 2,$^)
+
 $(LIBDIR)/%.sdb: %.sv
-	xvlog --sv --work $(LIB) --define MEM_FILE=\"$(SRCDIR)/$(MEM)\" -L $(LIB) $<
+	xvlog --sv --work $(LIB) -L $(LIB) $<
 
 clean:
 	-$(RM) -rf *.log *.jou *.pb *.vcd *.wdb xsim.dir .Xil
