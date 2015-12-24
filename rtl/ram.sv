@@ -2,6 +2,10 @@
  * Copyright (c) 2015, C. Brett Witherspoon
  */
 
+`ifndef MEM_FILE
+    `define MEM_FILE "boot.mem"
+`endif
+
 /**
  * Module: ram
  *
@@ -26,7 +30,7 @@ module ram #(
 
     logic [DATA_WIDTH-1:0] mem [0:2**ADDR_WIDTH-1];
 
-    initial $readmemh("ram.txt", mem, 0, 2**ADDR_WIDTH-1);
+    initial $readmemh(`MEM_FILE, mem, 0, 2**ADDR_WIDTH-1);
 
     // Port A
     always_ff @(posedge clk)

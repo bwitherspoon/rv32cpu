@@ -6,6 +6,7 @@ SRC = alu.sv     \
       memory.sv  \
       ram.sv     \
       regfile.sv
+MEM = boot.mem
 LIB = work
 
 PRJDIR = ../..
@@ -18,16 +19,16 @@ XILINX_VIVADO ?= /opt/Xilinx/Vivado/2015.4
 
 PATH := $(XILINX_VIVADO)/bin:$(PATH)
 
-VPATH = $(RTLDIR):$(LIBDIR)
+VPATH = $(RTLDIR):$(SRCDIR):$(LIBDIR)
 
 ALL = $(PKG) $(SRC) $(TOP)
 
 .PHONY: sim wave clean
 
-sim: xsim.dir/$(LIB).$(basename $(TOP))/xsimk
+sim: $(MEM) xsim.dir/$(LIB).$(basename $(TOP))/xsimk
 	xsim -runall work.top
 
-gui: $(LIB).$(basename $(TOP)).wdb
+gui: $(MEM) $(LIB).$(basename $(TOP)).wdb
 	xsim -gui -view top.wcfg work.top &
 
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
@@ -36,12 +37,8 @@ xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb)
 $(LIB).$(basename $(TOP)).wdb: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(LIB).$(basename $(TOP))
 
-#$(addprefix $(LIBDIR)/,$(TOP:.sv=.sdb)): $(addprefix $(LIBDIR)/,$(SRC:.sv=.sdb))
-
-#$(addprefix $(LIBDIR)/,$(SRC:.sv=.sdb)): $(addprefix $(LIBDIR)/,$(PKG:.sv=.sdb))
-
 $(LIBDIR)/%.sdb: %.sv
-	xvlog --sv -work $(LIB) -L $(LIB) $<
+	xvlog --sv --work $(LIB) --define MEM_FILE=\"$(SRCDIR)/$(MEM)\" -L $(LIB) $<
 
 clean:
 	-$(RM) -rf *.log *.jou *.pb *.vcd *.wdb xsim.dir .Xil
