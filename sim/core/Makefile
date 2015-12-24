@@ -21,21 +21,27 @@ PATH := $(XILINX_VIVADO)/bin:$(PATH)
 
 VPATH = $(RTLDIR):$(SRCDIR):$(LIBDIR)
 
+SNAP = $(LIB).$(basename $(TOP))
+
 ALL = $(PKG) $(SRC) $(TOP)
 
-.PHONY: sim wave clean
+.PHONY: xsim tcl gui xelab xvlog clean
 
-sim: xsim.dir/$(LIB).$(basename $(TOP))/xsimk $(MEM)
-	xsim -runall work.top
+xsim: xelab $(MEM)
+	xsim -runall $(SNAP)
 
-gui: $(LIB).$(basename $(TOP)).wdb $(MEM)
-	xsim -gui -view top.wcfg work.top &
+tcl: xelab $(MEM)
+	xsim $(SNAP)
 
-xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb)) $(MEM)
-	xelab --timescale "1ns/1ps" -L $(LIB) $(LIB).$(basename $(TOP))
+gui: $(TOP:.sv=.wcfg) xelab $(MEM)
+	xsim -gui -view $< $(SNAP) &
 
-$(LIB).$(basename $(TOP)).wdb: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
-	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(LIB).$(basename $(TOP))
+xelab: xsim.dir/$(SNAP)/xsimk
+
+xvlog: $(ALL:.sv=.sdb)
+
+xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
+	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)
 
 $(LIBDIR)/ram.sdb: $(MEM) ram.sv
 	xvlog --sv --work $(LIB) --define MEM_FILE=\"$<\" -L $(LIB) $(word 2,$^)
@@ -44,5 +50,5 @@ $(LIBDIR)/%.sdb: %.sv
 	xvlog --sv --work $(LIB) -L $(LIB) $<
 
 clean:
-	-$(RM) -rf *.log *.jou *.pb *.vcd *.wdb xsim.dir .Xil
+	-$(RM) -rf *.log *.jou *.pb *.vcd *.wdb *.str xsim.dir .Xil
 
