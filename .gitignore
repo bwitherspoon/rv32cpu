@@ -6,4 +6,5 @@ xsim.dir
 *.log
 *.jou
 *.pb
+*.str
 .Xil/
