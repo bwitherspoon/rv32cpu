@@ -11,8 +11,8 @@ module top;
     bit resetn = 1;
     task reset();
         resetn = 0;
-        repeat (2) @(posedge clk);
-        #1 resetn = 1;
+        @(posedge clk);
+        #(PERIOD/2) resetn = 1;
     endtask
 
     logic [15:0] gpio;
@@ -20,8 +20,8 @@ module top;
     core core(.*);
 
     initial begin
-        reset();
-        repeat (10) @(posedge clk);
+        reset(); // GSR ~100 ns
+        repeat (1000) @(posedge clk);
         $finish;
     end
 
