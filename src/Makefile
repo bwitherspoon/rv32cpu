@@ -1,18 +1,17 @@
-CROSS_COMPILE ?= riscv32-unknown-elf-
-AS            := $(CROSS_COMPILE)as
-OBJCOPY       := $(CROSS_COMPILE)objcopy
+PREFIX  ?= riscv32-unknown-elf-
+AS      = $(PREFIX)as
+OBJCOPY = $(PREFIX)objcopy
+OD      ?= od
 
-OD ?= od
-
-%.o: %.S
+%.elf: %.S
 	$(AS) -m32 -R -o $@ $<
 
-%.bin: %.o
+%.bin: %.elf
 	$(OBJCOPY) -O binary -j .text $< $@
-
-%.txt: %.bin
-	$(OD) -An -tx4 -w4 -v $< > $@
 
 %.vh: %.elf
 	$(OBJCOPY) -O verilog -j .text $< $@
+
+%.mem: %.bin
+	$(OD) -An -tx4 -w4 -v $< > $@
 
