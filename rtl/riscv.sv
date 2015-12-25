@@ -220,17 +220,12 @@ package riscv;
         OP2_XXX = 'x
     } op2_sel_t;
 
-    // First source register select (fowarding)
-    typedef enum logic {
-        RS1_REG,
-        RS1_ALU
-    } rs1_sel_t;
-
-    // Second source register select (fowarding)
-    typedef enum logic {
-        RS2_REG,
-        RS2_ALU
-    } rs2_sel_t;
+    // Source register select (forwarding)
+    typedef enum logic [1:0] {
+        RS_REG,
+        RS_ALU,
+        RS_MEM
+    } rs_sel_t;
 
     // Data path control signals
     typedef struct packed {

@@ -15,8 +15,8 @@ module core (
     // Pipeline control and data signals
     struct packed {
         struct packed {
-            rs1_sel_t rs1_sel;
-            rs2_sel_t rs2_sel;
+            rs_sel_t rs1_sel;
+            rs_sel_t rs2_sel;
         } ctrl;
         struct packed {
             word_t pc;
@@ -174,27 +174,33 @@ module core (
     // Fowarding
     always_comb
         if (rs1_addr == ex.data.rd_addr && rs1_addr != '0 && ex.ctrl.reg_en == 1'b1)
-            id.ctrl.rs1_sel = RS1_ALU;
+            id.ctrl.rs1_sel = RS_ALU;
+        else if (rs1_addr == mem.data.rd_addr && rs1_addr != '0 && mem.ctrl.reg_en == 1'b1 && mem.ctrl.mem_op == LOAD_STORE_NONE)
+            id.ctrl.rs1_sel = RS_MEM;
         else
-            id.ctrl.rs1_sel = RS1_REG;
+            id.ctrl.rs1_sel = RS_REG;
 
     always_comb
         if (rs2_addr == ex.data.rd_addr && rs2_addr != '0 && ex.ctrl.reg_en == 1'b1)
-            id.ctrl.rs2_sel = RS2_ALU;
+            id.ctrl.rs2_sel = RS_ALU;
+        else if (rs2_addr == mem.data.rd_addr && rs2_addr != '0 && mem.ctrl.reg_en == 1'b1 && mem.ctrl.mem_op == LOAD_STORE_NONE)
+            id.ctrl.rs2_sel = RS_MEM;
         else
-            id.ctrl.rs2_sel = RS2_REG;
+            id.ctrl.rs2_sel = RS_REG;
 
     // First source register mux
     always_comb
         unique case (id.ctrl.rs1_sel)
-            RS1_ALU: rs1_data_mux = ex.data.alu_data;
+            RS_ALU: rs1_data_mux  = ex.data.alu_data;
+            RS_MEM: rs1_data_mux  = mem.data.ex_data;
             default: rs1_data_mux = id.data.rs1_data;
         endcase
 
     // Second source register mux
     always_comb
         unique case (id.ctrl.rs2_sel)
-            RS2_ALU: rs2_data_mux = ex.data.alu_data;
+            RS_ALU: rs2_data_mux  = ex.data.alu_data;
+            RS_MEM: rs2_data_mux  = mem.data.ex_data;
             default: rs2_data_mux = id.data.rs2_data;
         endcase
 
