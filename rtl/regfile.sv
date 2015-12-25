@@ -24,9 +24,7 @@ module regfile (
     word_t regs [0:2**$bits(addr_t)-1];
 
 `ifndef SYNTHESIS
-    initial
-        for (int i = 0; i < 2**$bits(addr_t)-1; i++)
-            regs[i] = $random;
+    initial for (int i = 0; i < 2**$bits(addr_t); i++) regs[i] = '0;
 `endif
 
     always @(posedge clk)
