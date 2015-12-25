@@ -3,6 +3,8 @@ AS      = $(PREFIX)as
 OBJCOPY = $(PREFIX)objcopy
 OD      ?= od
 
+.PHONY: clean
+
 %.elf: %.S
 	$(AS) -m32 -R -o $@ $<
 
@@ -15,3 +17,5 @@ OD      ?= od
 %.mem: %.bin
 	$(OD) -An -tx4 -w4 -v $< > $@
 
+clean:
+	-$(RM) *.elf *.bin *.vh *.mem
