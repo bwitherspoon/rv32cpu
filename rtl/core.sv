@@ -236,8 +236,8 @@ module core (
             ex.data.pc       <= id.data.pc;
             ex.data.op1      <= id.data.op1;
             ex.data.op2      <= id.data.op2;
-            ex.data.rs1_data <= id.data.rs1_data;
-            ex.data.rs2_data <= id.data.rs2_data;
+            ex.data.rs1_data <= rs1_data_mux;
+            ex.data.rs2_data <= rs2_data_mux;
             ex.data.rd_addr  <= rd_addr;
         end
     end : decode
