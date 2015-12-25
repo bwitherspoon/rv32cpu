@@ -43,8 +43,8 @@ xvlog: $(ALL:.sv=.sdb)
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)
 
-$(LIBDIR)/ram.sdb: $(MEM) ram.sv
-	xvlog --sv --work $(LIB) --define MEM_FILE=\"$<\" -L $(LIB) $(word 2,$^)
+$(LIBDIR)/memory.sdb: $(MEM) memory.sv
+	xvlog --sv --work $(LIB) --define INIT_FILE=\"$<\" -L $(LIB) $(word 2,$^)
 
 $(LIBDIR)/%.sdb: %.sv
 	xvlog --sv --work $(LIB) -L $(LIB) $<

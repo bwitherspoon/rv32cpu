@@ -292,6 +292,7 @@ module core (
 
     memory memory (
         .clk,
+        .resetn,
         .dmem_op(mem.ctrl.mem_op),
         .dmem_addr(mem.data.ex_data),
         .dmem_wdata(mem.data.rs2_data),

@@ -1,7 +1,10 @@
 module top;
+    // timeunit 1ns;
+    // timeprecision 1ps;
+
     import riscv::*;
 
-    localparam PERIOD = 100;
+    localparam PERIOD = 10;
 
     // Clock
     bit clk = 0;
@@ -21,7 +24,7 @@ module top;
 
     initial begin
         reset(); // GSR ~100 ns
-        repeat (1000) @(posedge clk);
+        repeat (10) @(posedge clk);
         $finish;
     end
 
