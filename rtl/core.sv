@@ -6,7 +6,6 @@ import riscv::*;
 
 /**
  * Module: core
- *
  */
 module core (
     input  logic        clk,
@@ -16,8 +15,16 @@ module core (
     // Pipeline control and data signals
     struct packed {
         struct packed {
+            rs1_sel_t rs1_sel;
+            rs2_sel_t rs2_sel;
+        } ctrl;
+        struct packed {
             word_t pc;
             inst_t ir;
+            word_t op1;
+            word_t op2;
+            word_t rs1_data;
+            word_t rs2_data;
         } data;
     } id;
 
@@ -105,19 +112,17 @@ module core (
 
     addr_t rs1_addr;
     addr_t rs2_addr;
-    word_t rs1_data;
-    word_t rs2_data;
     word_t rd_data;
     word_t rd_addr;
+
+    word_t rs1_data_mux;
+    word_t rs2_data_mux;
 
     imm_t i_imm;
     imm_t s_imm;
     imm_t b_imm;
     imm_t u_imm;
     imm_t j_imm;
-
-    word_t op1;
-    word_t op2;
 
     // Control decoder
     control control (
@@ -134,8 +139,8 @@ module core (
         .clk,
         .rs1_addr,
         .rs2_addr,
-        .rs1_data,
-        .rs2_data,
+        .rs1_data(id.data.rs1_data),
+        .rs2_data(id.data.rs2_data),
         .rd_en(wb.ctrl.reg_en),
         .rd_addr(wb.data.rd_addr),
         .rd_data
@@ -166,24 +171,49 @@ module core (
     assign funct3 = id.data.ir.r.funct3;
     assign funct7 = id.data.ir.r.funct7;
 
+    // Fowarding
+    always_comb
+        if (rs1_addr == ex.data.rd_addr && rs1_addr != '0 && ex.ctrl.reg_en == 1'b1)
+            id.ctrl.rs1_sel = RS1_ALU;
+        else
+            id.ctrl.rs1_sel = RS1_REG;
+
+    always_comb
+        if (rs2_addr == ex.data.rd_addr && rs2_addr != '0 && ex.ctrl.reg_en == 1'b1)
+            id.ctrl.rs2_sel = RS2_ALU;
+        else
+            id.ctrl.rs2_sel = RS2_REG;
+
+    // First source register mux
+    always_comb
+        unique case (id.ctrl.rs1_sel)
+            RS1_ALU: rs1_data_mux = ex.data.alu_data;
+            default: rs1_data_mux = id.data.rs1_data;
+        endcase
+
+    // Second source register mux
+    always_comb
+        unique case (id.ctrl.rs2_sel)
+            RS2_ALU: rs2_data_mux = ex.data.alu_data;
+            default: rs2_data_mux = id.data.rs2_data;
+        endcase
+
     // First operand mux
     always_comb
         unique case (ctrl.op1_sel)
-            OP1_RS1: op1 = rs1_data;
-            OP1_PC:  op1 = id.data.pc;
-            default: op1 = 'x;
+            OP1_PC:  id.data.op1 = id.data.pc;
+            default: id.data.op1 = rs1_data_mux;
         endcase
 
     // Second operand mux
     always_comb
         unique case (ctrl.op2_sel)
-            OP2_RS2:   op2 = rs2_data;
-            OP2_I_IMM: op2 = i_imm;
-            OP2_S_IMM: op2 = s_imm;
-            OP2_B_IMM: op2 = b_imm;
-            OP2_U_IMM: op2 = u_imm;
-            OP2_J_IMM: op2 = j_imm;
-            default:   op2 = 'x;
+            OP2_I_IMM: id.data.op2 = i_imm;
+            OP2_S_IMM: id.data.op2 = s_imm;
+            OP2_B_IMM: id.data.op2 = b_imm;
+            OP2_U_IMM: id.data.op2 = u_imm;
+            OP2_J_IMM: id.data.op2 = j_imm;
+            default:   id.data.op2 = rs2_data_mux;
         endcase
 
     always_ff @(posedge clk) begin : decode
@@ -198,10 +228,10 @@ module core (
             ex.ctrl.alu_op   <= ctrl.alu_op;
             ex.ctrl.jmp_op   <= (flush) ? JMP_OP_NONE : ctrl.jmp_op;
             ex.data.pc       <= id.data.pc;
-            ex.data.op1      <= op1;
-            ex.data.op2      <= op2;
-            ex.data.rs1_data <= rs1_data;
-            ex.data.rs2_data <= rs2_data;
+            ex.data.op1      <= id.data.op1;
+            ex.data.op2      <= id.data.op2;
+            ex.data.rs1_data <= id.data.rs1_data;
+            ex.data.rs2_data <= id.data.rs2_data;
             ex.data.rd_addr  <= rd_addr;
         end
     end : decode
@@ -260,7 +290,7 @@ module core (
 
     word_t mem_data;
 
-    memory local_memory (
+    memory memory (
         .clk,
         .dmem_op(mem.ctrl.mem_op),
         .dmem_addr(mem.data.ex_data),
@@ -278,7 +308,7 @@ module core (
                 mem.ctrl.mem_op == LOAD_HALF_UNSIGNED ||
                 mem.ctrl.mem_op == LOAD_BYTE_UNSIGNED;
 
-    always_ff @(posedge clk) begin : memory
+    always_ff @(posedge clk) begin : writeback
         if (~resetn)
             wb.ctrl.reg_en <= 1'b0;
         else begin
@@ -287,13 +317,13 @@ module core (
             wb.data.rd_addr <= mem.data.rd_addr;
             wb.data.ex_data <= mem.data.ex_data;
         end
-    end : memory
+    end : writeback
 
     // Crude memory mapped external IO
     always_ff @(posedge clk)
         if (~resetn)
             gpio <= '0;
-        else if (mem.ctrl.mem_op == STORE_WORD && | mem.data.ex_data[31:12])
+        else if (mem.ctrl.mem_op == STORE_WORD && |mem.data.ex_data[31:12])
             gpio <= mem.data.rs2_data[15:0];
 
 ///////////////////////////////////////////////////////////////////////////////

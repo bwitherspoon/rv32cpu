@@ -45,8 +45,10 @@ package riscv;
     // Immediate type
     typedef logic signed [31:0] imm_t;
 
+    // Instruction funct7 type
     typedef logic [6:0] funct7_t;
 
+    // Instruction funct3 type
     typedef logic [2:0] funct3_t;
 
     localparam funct3_t FUNCT3_BEQ       = 'b000;
@@ -55,17 +57,14 @@ package riscv;
     localparam funct3_t FUNCT3_BGE       = 'b101;
     localparam funct3_t FUNCT3_BLTU      = 'b110;
     localparam funct3_t FUNCT3_BGEU      = 'b111;
-
     localparam funct3_t FUNCT3_LB        = 'b000;
     localparam funct3_t FUNCT3_LH        = 'b001;
     localparam funct3_t FUNCT3_LW        = 'b010;
     localparam funct3_t FUNCT3_LBU       = 'b100;
     localparam funct3_t FUNCT3_LHU       = 'b101;
-
     localparam funct3_t FUNCT3_SB        = 'b000;
     localparam funct3_t FUNCT3_SH        = 'b001;
     localparam funct3_t FUNCT3_SW        = 'b010;
-
     localparam funct3_t FUNCT3_ADDI      = 'b000;
     localparam funct3_t FUNCT3_SLTI      = 'b010;
     localparam funct3_t FUNCT3_SLTIU     = 'b011;
@@ -74,7 +73,6 @@ package riscv;
     localparam funct3_t FUNCT3_ORI       = 'b110;
     localparam funct3_t FUNCT3_ANDI      = 'b111;
     localparam funct3_t FUNCT3_SLLI      = 'b001;
-
     localparam funct3_t FUNCT3_ADD_SUB   = 'b000;
     localparam funct3_t FUNCT3_SLL       = 'b001;
     localparam funct3_t FUNCT3_SLT       = 'b010;
@@ -221,6 +219,18 @@ package riscv;
         OP2_J_IMM,
         OP2_XXX = 'x
     } op2_sel_t;
+
+    // First source register select (fowarding)
+    typedef enum logic {
+        RS1_REG,
+        RS1_ALU
+    } rs1_sel_t;
+
+    // Second source register select (fowarding)
+    typedef enum logic {
+        RS2_REG,
+        RS2_ALU
+    } rs2_sel_t;
 
     // Data path control signals
     typedef struct packed {
