@@ -15,7 +15,7 @@ module alu (
     input  word_t   op2,
     output word_t   out
 );
-    logic [6:0] shamt = op2[5:0];
+    wire [4:0] shamt = op2[4:0];
 
     always_comb
         unique case (opcode)
