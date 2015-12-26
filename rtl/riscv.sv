@@ -8,33 +8,33 @@ package riscv;
      */
 
     // Opcodes
-    typedef logic [6:0] opcode_t;
-
-    localparam opcode_t OPCODE_LOAD      = 'b0000011;
-    localparam opcode_t OPCODE_LOAD_FP   = 'b0000111;
-    localparam opcode_t OPCODE_CUSTOM_0  = 'b0001011;
-    localparam opcode_t OPCODE_MISC_MEM  = 'b0001111;
-    localparam opcode_t OPCODE_OP_IMM    = 'b0010011;
-    localparam opcode_t OPCODE_AUIPC     = 'b0010111;
-    localparam opcode_t OPCODE_OP_IMM_32 = 'b0011011;
-    localparam opcode_t OPCODE_STORE     = 'b0100011;
-    localparam opcode_t OPCODE_STORE_FP  = 'b0100111;
-    localparam opcode_t OPCODE_CUSTOM_1  = 'b0101011;
-    localparam opcode_t OPCODE_AMO       = 'b0101111;
-    localparam opcode_t OPCODE_OP        = 'b0110011;
-    localparam opcode_t OPCODE_LUI       = 'b0110111;
-    localparam opcode_t OPCODE_OP_32     = 'b0111011;
-    localparam opcode_t OPCODE_MADD      = 'b1000011;
-    localparam opcode_t OPCODE_MSUB      = 'b1000111;
-    localparam opcode_t OPCODE_NMSUB     = 'b1001011;
-    localparam opcode_t OPCODE_NMADD     = 'b1001111;
-    localparam opcode_t OPCODE_OP_FP     = 'b1010011;
-    localparam opcode_t OPCODE_CUSTOM_2  = 'b1011011;
-    localparam opcode_t OPCODE_BRANCH    = 'b1100011;
-    localparam opcode_t OPCODE_JALR      = 'b1100111;
-    localparam opcode_t OPCODE_JAL       = 'b1101111;
-    localparam opcode_t OPCODE_SYSTEM    = 'b1110011;
-    localparam opcode_t OPCODE_CUSTOM_3  = 'b1111011;
+    typedef enum logic [6:0] {
+        OPCODE_LOAD      = 'b0000011,
+        OPCODE_LOAD_FP   = 'b0000111,
+        OPCODE_CUSTOM_0  = 'b0001011,
+        OPCODE_MISC_MEM  = 'b0001111,
+        OPCODE_OP_IMM    = 'b0010011,
+        OPCODE_AUIPC     = 'b0010111,
+        OPCODE_OP_IMM_32 = 'b0011011,
+        OPCODE_STORE     = 'b0100011,
+        OPCODE_STORE_FP  = 'b0100111,
+        OPCODE_CUSTOM_1  = 'b0101011,
+        OPCODE_AMO       = 'b0101111,
+        OPCODE_OP        = 'b0110011,
+        OPCODE_LUI       = 'b0110111,
+        OPCODE_OP_32     = 'b0111011,
+        OPCODE_MADD      = 'b1000011,
+        OPCODE_MSUB      = 'b1000111,
+        OPCODE_NMSUB     = 'b1001011,
+        OPCODE_NMADD     = 'b1001111,
+        OPCODE_OP_FP     = 'b1010011,
+        OPCODE_CUSTOM_2  = 'b1011011,
+        OPCODE_BRANCH    = 'b1100011,
+        OPCODE_JALR      = 'b1100111,
+        OPCODE_JAL       = 'b1101111,
+        OPCODE_SYSTEM    = 'b1110011,
+        OPCODE_CUSTOM_3  = 'b1111011
+    } opcode_t;
 
     // Word type
     typedef logic [31:0] word_t;
