@@ -92,7 +92,7 @@ module control (
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
-        alu_op:  ALU_ADD,
+        alu_op:  ALU_SRL,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
         op2_sel: OP2_I_IMM
@@ -101,7 +101,7 @@ module control (
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
         link_en: 1'b0,
-        alu_op:  ALU_ADD,
+        alu_op:  ALU_SRA,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
         op2_sel: OP2_I_IMM
