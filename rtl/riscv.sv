@@ -141,15 +141,6 @@ package riscv;
         } uj;
     } inst_t;
 
-    // NOP instruction (bubble)
-    localparam inst_t INST_NOP = {
-        funct7_t'(0),
-        addr_t'(0),
-        FUNCT3_ADDI,
-        addr_t'(0),
-        OPCODE_OP_IMM
-    };
-
     /*
      * Control
      */
