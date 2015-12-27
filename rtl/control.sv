@@ -344,7 +344,7 @@ module control (
                     endcase
                 OPCODE_OP:
                     unique case (funct3)
-                        FUNCT3_ADD_SUB: ctrl = (funct7[5]) ? CTRL_ADD : CTRL_SUB;
+                        FUNCT3_ADD_SUB: ctrl = (funct7[5]) ? CTRL_SUB : CTRL_ADD;
                         FUNCT3_SLL:     ctrl = CTRL_SLL;
                         FUNCT3_SLT:     ctrl = CTRL_SLT;
                         FUNCT3_SLTU:    ctrl = CTRL_SLTU;
