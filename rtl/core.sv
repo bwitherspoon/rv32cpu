@@ -32,7 +32,6 @@ module core (
         struct packed {
             logic    reg_en;
             mem_op_t mem_op;
-            logic    link_en;
             pc_sel_t pc_sel;
             alu_op_t alu_op;
             jmp_op_t jmp_op;
@@ -230,7 +229,6 @@ module core (
         end else begin
             ex.ctrl.reg_en   <= (flush) ? 1'b0 : ctrl.reg_en;
             ex.ctrl.mem_op   <= (flush) ? LOAD_STORE_NONE : ctrl.mem_op;
-            ex.ctrl.link_en  <= ctrl.link_en;
             ex.ctrl.alu_op   <= ctrl.alu_op;
             ex.ctrl.jmp_op   <= (flush) ? JMP_OP_NONE : ctrl.jmp_op;
             ex.data.pc       <= id.data.pc;
@@ -264,6 +262,8 @@ module core (
     assign ex.ctrl.jmp    = ex.ctrl.jmp_op == JMP_OP_JAL;
     assign ex.ctrl.pc_sel = (ex.ctrl.jmp | ex.ctrl.br) ? PC_ADDR : PC_NEXT;
 
+    wire link = ex.ctrl.jmp_op == JMP_OP_JAL;
+
     alu alu (
         .opcode(ex.ctrl.alu_op),
         .op1(ex.data.op1),
@@ -284,7 +284,7 @@ module core (
             mem.ctrl.br       <= ex.ctrl.br;
             mem.data.rs2_data <= ex.data.rs2_data;
             mem.data.rd_addr  <= ex.data.rd_addr;
-            mem.data.ex_data  <= (ex.ctrl.link_en) ? ex.data.pc + 4 : ex.data.alu_data;
+            mem.data.ex_data  <= (link) ? ex.data.pc + 4 : ex.data.alu_data;
         end
     end : execute
 

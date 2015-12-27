@@ -19,7 +19,6 @@ module control (
     localparam ctrl_t CTRL_NOP = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'bx,
         alu_op:  ALU_XXX,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_XXX,
@@ -28,7 +27,6 @@ module control (
     localparam ctrl_t CTRL_ADDI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -37,7 +35,6 @@ module control (
     localparam ctrl_t CTRL_SLTI = '{
        reg_en:  1'b1,
        mem_op:  LOAD_STORE_NONE,
-       link_en: 1'b0,
        alu_op:  ALU_SLT,
        jmp_op:  JMP_OP_NONE,
        op1_sel: OP1_RS1,
@@ -46,7 +43,6 @@ module control (
     localparam ctrl_t CTRL_SLTIU = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SLTU,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -55,7 +51,6 @@ module control (
     localparam ctrl_t CTRL_ANDI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_AND,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -64,7 +59,6 @@ module control (
     localparam ctrl_t CTRL_ORI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_OR,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -73,7 +67,6 @@ module control (
     localparam ctrl_t CTRL_XORI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_XOR,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -82,7 +75,6 @@ module control (
     localparam ctrl_t CTRL_SLLI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SLL,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -91,7 +83,6 @@ module control (
     localparam ctrl_t CTRL_SRLI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SRL,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -100,7 +91,6 @@ module control (
     localparam ctrl_t CTRL_SRAI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SRA,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -109,7 +99,6 @@ module control (
     localparam ctrl_t CTRL_LUI = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_OP2,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_XXX,
@@ -118,7 +107,6 @@ module control (
     localparam ctrl_t CTRL_AUIPC = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_PC,
@@ -127,7 +115,6 @@ module control (
     localparam ctrl_t CTRL_ADD = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -136,7 +123,6 @@ module control (
     localparam ctrl_t CTRL_SLT = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SLT,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -145,7 +131,6 @@ module control (
     localparam ctrl_t CTRL_SLTU = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SLTU,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -154,7 +139,6 @@ module control (
     localparam ctrl_t CTRL_AND = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_AND,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -163,7 +147,6 @@ module control (
     localparam ctrl_t CTRL_OR = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_OR,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -172,7 +155,6 @@ module control (
     localparam ctrl_t CTRL_XOR = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_XOR,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -181,7 +163,6 @@ module control (
     localparam ctrl_t CTRL_SLL = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SLL,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -190,7 +171,6 @@ module control (
     localparam ctrl_t CTRL_SRL = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SRL,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -199,7 +179,6 @@ module control (
     localparam ctrl_t CTRL_SUB = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SUB,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -208,7 +187,6 @@ module control (
     localparam ctrl_t CTRL_SRA = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_SRA,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -217,7 +195,6 @@ module control (
     localparam ctrl_t CTRL_JAL = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b1,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_JAL,
         op1_sel: OP1_PC,
@@ -226,7 +203,6 @@ module control (
     localparam ctrl_t CTRL_JALR = '{
         reg_en:  1'b1,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b1,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_JAL,
         op1_sel: OP1_RS1,
@@ -235,7 +211,6 @@ module control (
     localparam ctrl_t CTRL_BEQ = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_BEQ,
         op1_sel: OP1_PC,
@@ -244,7 +219,6 @@ module control (
     localparam ctrl_t CTRL_BNE = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_BNE,
         op1_sel: OP1_PC,
@@ -253,7 +227,6 @@ module control (
     localparam ctrl_t CTRL_BLT = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_BLT,
         op1_sel: OP1_PC,
@@ -262,7 +235,6 @@ module control (
     localparam ctrl_t CTRL_BLTU = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_BLTU,
         op1_sel: OP1_PC,
@@ -271,7 +243,6 @@ module control (
     localparam ctrl_t CTRL_BGE = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_BGE,
         op1_sel: OP1_PC,
@@ -280,7 +251,6 @@ module control (
     localparam ctrl_t CTRL_BGEU = '{
         reg_en:  1'b0,
         mem_op:  LOAD_STORE_NONE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_BGEU,
         op1_sel: OP1_PC,
@@ -289,7 +259,6 @@ module control (
     localparam ctrl_t CTRL_LW = '{
         reg_en:  1'b1,
         mem_op:  LOAD_WORD,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -298,7 +267,6 @@ module control (
     localparam ctrl_t CTRL_LH = '{
         reg_en:  1'b1,
         mem_op:  LOAD_HALF,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -307,7 +275,6 @@ module control (
     localparam ctrl_t CTRL_LHU = '{
         reg_en:  1'b1,
         mem_op:  LOAD_HALF_UNSIGNED,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -316,7 +283,6 @@ module control (
     localparam ctrl_t CTRL_LB = '{
         reg_en:  1'b1,
         mem_op:  LOAD_BYTE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -325,7 +291,6 @@ module control (
     localparam ctrl_t CTRL_LBU = '{
         reg_en:  1'b1,
         mem_op:  LOAD_BYTE_UNSIGNED,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -334,7 +299,6 @@ module control (
     localparam ctrl_t CTRL_SW = '{
         reg_en:  1'b0,
         mem_op:  STORE_WORD,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -343,7 +307,6 @@ module control (
     localparam ctrl_t CTRL_SH = '{
         reg_en:  1'b0,
         mem_op:  STORE_HALF,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,
@@ -352,7 +315,6 @@ module control (
     localparam ctrl_t CTRL_SB = '{
         reg_en:  1'b0,
         mem_op:  STORE_BYTE,
-        link_en: 1'b0,
         alu_op:  ALU_ADD,
         jmp_op:  JMP_OP_NONE,
         op1_sel: OP1_RS1,

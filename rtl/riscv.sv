@@ -231,7 +231,6 @@ package riscv;
     typedef struct packed {
         logic     reg_en;
         mem_op_t  mem_op;
-        logic     link_en;
         alu_op_t  alu_op;
         jmp_op_t  jmp_op;
         op1_sel_t op1_sel;
