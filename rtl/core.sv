@@ -73,9 +73,14 @@ module core (
             word_t ex_data;
         } data;
     } wb;
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Hazards
+     */
 
     wire stall = ex.ctrl.jmp | mem.ctrl.jmp;
-    wire flush = ex.ctrl.br | mem.ctrl.br;
+    wire flush = ex.ctrl.br  | mem.ctrl.br;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -170,23 +175,6 @@ module core (
     assign funct3 = id.data.ir.r.funct3;
     assign funct7 = id.data.ir.r.funct7;
 
-    // Fowarding
-    always_comb
-        if (rs1_addr == ex.data.rd_addr && rs1_addr != '0 && ex.ctrl.reg_en == 1'b1)
-            id.ctrl.rs1_sel = RS_ALU;
-        else if (rs1_addr == mem.data.rd_addr && rs1_addr != '0 && mem.ctrl.reg_en == 1'b1 && mem.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs1_sel = RS_MEM;
-        else
-            id.ctrl.rs1_sel = RS_REG;
-
-    always_comb
-        if (rs2_addr == ex.data.rd_addr && rs2_addr != '0 && ex.ctrl.reg_en == 1'b1)
-            id.ctrl.rs2_sel = RS_ALU;
-        else if (rs2_addr == mem.data.rd_addr && rs2_addr != '0 && mem.ctrl.reg_en == 1'b1 && mem.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs2_sel = RS_MEM;
-        else
-            id.ctrl.rs2_sel = RS_REG;
-
     // First source register mux
     always_comb
         unique case (id.ctrl.rs1_sel)
@@ -239,6 +227,27 @@ module core (
             ex.data.rd_addr  <= rd_addr;
         end
     end : decode
+///////////////////////////////////////////////////////////////////////////////
+
+    /* 
+     * Forwarding
+     */
+
+    always_comb
+        if (rs1_addr == ex.data.rd_addr && rs1_addr != '0 && ex.ctrl.reg_en == 1'b1)
+        id.ctrl.rs1_sel = RS_ALU;
+        else if (rs1_addr == mem.data.rd_addr && rs1_addr != '0 && mem.ctrl.reg_en == 1'b1 && mem.ctrl.mem_op == LOAD_STORE_NONE)
+            id.ctrl.rs1_sel = RS_MEM;
+        else
+            id.ctrl.rs1_sel = RS_REG;
+
+    always_comb
+        if (rs2_addr == ex.data.rd_addr && rs2_addr != '0 && ex.ctrl.reg_en == 1'b1)
+            id.ctrl.rs2_sel = RS_ALU;
+        else if (rs2_addr == mem.data.rd_addr && rs2_addr != '0 && mem.ctrl.reg_en == 1'b1 && mem.ctrl.mem_op == LOAD_STORE_NONE)
+            id.ctrl.rs2_sel = RS_MEM;
+        else
+            id.ctrl.rs2_sel = RS_REG;
 
 ///////////////////////////////////////////////////////////////////////////////
 
