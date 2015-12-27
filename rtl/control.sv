@@ -321,8 +321,6 @@ module control (
         op2_sel: OP2_S_IMM
     };
 
-    initial $timeformat(-9, 0, " ns", 10);
-
     always_comb begin : decode
         invalid = 1'b0;
         if (stall)
@@ -340,7 +338,6 @@ module control (
                         FUNCT3_ANDI:      ctrl = CTRL_ANDI;
                         FUNCT3_SLLI:      ctrl = CTRL_SLLI;
                         default: begin
-                            $display("%t: ERROR: Invalid funct3 in OP_IMM", $time);
                             invalid = 1'b1;
                             ctrl = CTRL_NOP;
                         end
@@ -356,7 +353,6 @@ module control (
                         FUNCT3_OR:      ctrl = CTRL_OR;
                         FUNCT3_AND:     ctrl = CTRL_AND;
                         default: begin
-                            $display("%t: ERROR: Invalid funct3 in OP", $time);
                             invalid = 1'b1;
                             ctrl = CTRL_NOP;
                         end
@@ -374,7 +370,6 @@ module control (
                         FUNCT3_BGE:  ctrl = CTRL_BGE;
                         FUNCT3_BGEU: ctrl = CTRL_BGEU;
                         default: begin
-                            $display("%t: ERROR: Invalid funct3 in BRANCH", $time);
                             invalid = 1'b1;
                             ctrl = CTRL_NOP;
                         end
@@ -387,7 +382,6 @@ module control (
                         FUNCT3_LB:  ctrl = CTRL_LB;
                         FUNCT3_LBU: ctrl = CTRL_LBU;
                         default: begin
-                            $display("%t: ERROR: Invalid width in LOAD", $time);
                             invalid = 1'b1;
                             ctrl = CTRL_NOP;
                         end
@@ -398,13 +392,11 @@ module control (
                         FUNCT3_SH: ctrl = CTRL_SH;
                         FUNCT3_SB: ctrl = CTRL_SB;
                         default: begin
-                            $display("%t: ERROR: Invalid width in STORE", $time);
                             invalid = 1'b1;
                             ctrl = CTRL_NOP;
                         end
                     endcase
                 default: begin
-                    $display("%t: ERROR: Invalid opcode: %b", $time, opcode);
                     invalid = 1'b1;
                     ctrl = CTRL_NOP;
                 end
