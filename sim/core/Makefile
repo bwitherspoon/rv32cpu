@@ -6,8 +6,11 @@ SRC = alu.sv     \
       memory.sv  \
       ram.sv     \
       regfile.sv
-MEM = boot.mem
+ALL = $(PKG) $(SRC) $(TOP)
+
 LIB = work
+MEM ?= boot.mem
+SNAP = $(LIB).$(basename $(TOP))
 
 PRJDIR = ../..
 SIMDIR = $(PRJDIR)/sim
@@ -20,10 +23,6 @@ XILINX_VIVADO ?= /opt/Xilinx/Vivado/2015.4
 PATH := $(XILINX_VIVADO)/bin:$(PATH)
 
 VPATH = $(RTLDIR):$(SRCDIR):$(LIBDIR)
-
-SNAP = $(LIB).$(basename $(TOP))
-
-ALL = $(PKG) $(SRC) $(TOP)
 
 .PHONY: xsim tcl gui xelab xvlog clean
 
@@ -43,8 +42,12 @@ xvlog: $(ALL:.sv=.sdb)
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)
 
-$(LIBDIR)/memory.sdb: $(MEM) memory.sv
-	xvlog --sv --work $(LIB) --define INIT_FILE=\"$<\" -L $(LIB) $(word 2,$^)
+$(LIBDIR)/memory.sdb: memory.sv | $(MEM)
+	xvlog --sv --work $(LIB) --define INIT_FILE=\"$|\" -L $(LIB) $<
+
+$(LIBDIR)/$(SRC:.sv=.sdb): $(PKG:.sv=.sdb)
+
+$(LIBDIR)/$(TOP:.sv=.sdb): $(PKG:.sv=.sdb) $(SRC:.sv=.sdb)
 
 $(LIBDIR)/%.sdb: %.sv
 	xvlog --sv --work $(LIB) -L $(LIB) $<
