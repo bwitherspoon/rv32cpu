@@ -143,7 +143,6 @@ module core (
         .opcode,
         .funct3,
         .funct7,
-        .stall('0), /* FIXME */
         .invalid(/* TODO */),
         .ctrl
     );

@@ -11,7 +11,6 @@ module control (
      input  opcode_t opcode,
      input  funct3_t funct3,
      input  funct7_t funct7,
-     input  logic    stall,
      output logic    invalid,
      output ctrl_t   ctrl
 );
@@ -321,87 +320,83 @@ module control (
         op2_sel: OP2_S_IMM
     };
 
-    always_comb begin : decode
+    always_comb begin : decoder
         invalid = 1'b0;
-        if (stall)
-            ctrl = CTRL_NOP;
-        else begin
-            unique case (opcode)
-                OPCODE_OP_IMM:
-                    unique case (funct3)
-                        FUNCT3_ADDI:      ctrl = CTRL_ADDI;
-                        FUNCT3_SLTI:      ctrl = CTRL_SLTI;
-                        FUNCT3_SLTIU:     ctrl = CTRL_SLTIU;
-                        FUNCT3_XORI:      ctrl = CTRL_XORI;
-                        FUNCT3_SRLI_SRAI: ctrl = (funct7[5]) ? CTRL_SRAI : CTRL_SRLI;
-                        FUNCT3_ORI:       ctrl = CTRL_ORI;
-                        FUNCT3_ANDI:      ctrl = CTRL_ANDI;
-                        FUNCT3_SLLI:      ctrl = CTRL_SLLI;
-                        default: begin
-                            invalid = 1'b1;
-                            ctrl = CTRL_NOP;
-                        end
-                    endcase
-                OPCODE_OP:
-                    unique case (funct3)
-                        FUNCT3_ADD_SUB: ctrl = (funct7[5]) ? CTRL_SUB : CTRL_ADD;
-                        FUNCT3_SLL:     ctrl = CTRL_SLL;
-                        FUNCT3_SLT:     ctrl = CTRL_SLT;
-                        FUNCT3_SLTU:    ctrl = CTRL_SLTU;
-                        FUNCT3_XOR:     ctrl = CTRL_XOR;
-                        FUNCT3_SRL_SRA: ctrl = (funct7[5]) ? CTRL_SRA : CTRL_SRL;
-                        FUNCT3_OR:      ctrl = CTRL_OR;
-                        FUNCT3_AND:     ctrl = CTRL_AND;
-                        default: begin
-                            invalid = 1'b1;
-                            ctrl = CTRL_NOP;
-                        end
-                    endcase
-                OPCODE_LUI:   ctrl = CTRL_LUI;
-                OPCODE_AUIPC: ctrl = CTRL_AUIPC;
-                OPCODE_JAL:   ctrl = CTRL_JAL;
-                OPCODE_JALR:  ctrl = CTRL_JALR;
-                OPCODE_BRANCH:
-                    unique case (funct3)
-                        FUNCT3_BEQ:  ctrl = CTRL_BEQ;
-                        FUNCT3_BNE:  ctrl = CTRL_BNE;
-                        FUNCT3_BLT:  ctrl = CTRL_BLT;
-                        FUNCT3_BLTU: ctrl = CTRL_BLTU;
-                        FUNCT3_BGE:  ctrl = CTRL_BGE;
-                        FUNCT3_BGEU: ctrl = CTRL_BGEU;
-                        default: begin
-                            invalid = 1'b1;
-                            ctrl = CTRL_NOP;
-                        end
-                    endcase
-                OPCODE_LOAD:
-                    unique case (funct3)
-                        FUNCT3_LW:  ctrl = CTRL_LW;
-                        FUNCT3_LH:  ctrl = CTRL_LH;
-                        FUNCT3_LHU: ctrl = CTRL_LHU;
-                        FUNCT3_LB:  ctrl = CTRL_LB;
-                        FUNCT3_LBU: ctrl = CTRL_LBU;
-                        default: begin
-                            invalid = 1'b1;
-                            ctrl = CTRL_NOP;
-                        end
-                    endcase
-                OPCODE_STORE:
-                    unique case (funct3)
-                        FUNCT3_SW: ctrl = CTRL_SW;
-                        FUNCT3_SH: ctrl = CTRL_SH;
-                        FUNCT3_SB: ctrl = CTRL_SB;
-                        default: begin
-                            invalid = 1'b1;
-                            ctrl = CTRL_NOP;
-                        end
-                    endcase
-                default: begin
-                    invalid = 1'b1;
-                    ctrl = CTRL_NOP;
-                end
-            endcase
-        end
-    end : decode
+        unique case (opcode)
+            OPCODE_OP_IMM:
+                unique case (funct3)
+                    FUNCT3_ADDI:      ctrl = CTRL_ADDI;
+                    FUNCT3_SLTI:      ctrl = CTRL_SLTI;
+                    FUNCT3_SLTIU:     ctrl = CTRL_SLTIU;
+                    FUNCT3_XORI:      ctrl = CTRL_XORI;
+                    FUNCT3_SRLI_SRAI: ctrl = (funct7[5]) ? CTRL_SRAI : CTRL_SRLI;
+                    FUNCT3_ORI:       ctrl = CTRL_ORI;
+                    FUNCT3_ANDI:      ctrl = CTRL_ANDI;
+                    FUNCT3_SLLI:      ctrl = CTRL_SLLI;
+                    default: begin
+                        invalid = 1'b1;
+                        ctrl = CTRL_NOP;
+                    end
+                endcase
+            OPCODE_OP:
+                unique case (funct3)
+                    FUNCT3_ADD_SUB: ctrl = (funct7[5]) ? CTRL_SUB : CTRL_ADD;
+                    FUNCT3_SLL:     ctrl = CTRL_SLL;
+                    FUNCT3_SLT:     ctrl = CTRL_SLT;
+                    FUNCT3_SLTU:    ctrl = CTRL_SLTU;
+                    FUNCT3_XOR:     ctrl = CTRL_XOR;
+                    FUNCT3_SRL_SRA: ctrl = (funct7[5]) ? CTRL_SRA : CTRL_SRL;
+                    FUNCT3_OR:      ctrl = CTRL_OR;
+                    FUNCT3_AND:     ctrl = CTRL_AND;
+                    default: begin
+                        invalid = 1'b1;
+                        ctrl = CTRL_NOP;
+                    end
+                endcase
+            OPCODE_LUI:   ctrl = CTRL_LUI;
+            OPCODE_AUIPC: ctrl = CTRL_AUIPC;
+            OPCODE_JAL:   ctrl = CTRL_JAL;
+            OPCODE_JALR:  ctrl = CTRL_JALR;
+            OPCODE_BRANCH:
+                unique case (funct3)
+                    FUNCT3_BEQ:  ctrl = CTRL_BEQ;
+                    FUNCT3_BNE:  ctrl = CTRL_BNE;
+                    FUNCT3_BLT:  ctrl = CTRL_BLT;
+                    FUNCT3_BLTU: ctrl = CTRL_BLTU;
+                    FUNCT3_BGE:  ctrl = CTRL_BGE;
+                    FUNCT3_BGEU: ctrl = CTRL_BGEU;
+                    default: begin
+                        invalid = 1'b1;
+                        ctrl = CTRL_NOP;
+                    end
+                endcase
+            OPCODE_LOAD:
+                unique case (funct3)
+                    FUNCT3_LW:  ctrl = CTRL_LW;
+                    FUNCT3_LH:  ctrl = CTRL_LH;
+                    FUNCT3_LHU: ctrl = CTRL_LHU;
+                    FUNCT3_LB:  ctrl = CTRL_LB;
+                    FUNCT3_LBU: ctrl = CTRL_LBU;
+                    default: begin
+                        invalid = 1'b1;
+                        ctrl = CTRL_NOP;
+                    end
+                endcase
+            OPCODE_STORE:
+                unique case (funct3)
+                    FUNCT3_SW: ctrl = CTRL_SW;
+                    FUNCT3_SH: ctrl = CTRL_SH;
+                    FUNCT3_SB: ctrl = CTRL_SB;
+                    default: begin
+                        invalid = 1'b1;
+                        ctrl = CTRL_NOP;
+                    end
+                endcase
+            default: begin
+                invalid = 1'b1;
+                ctrl = CTRL_NOP;
+            end
+        endcase
+    end : decoder
 
 endmodule
