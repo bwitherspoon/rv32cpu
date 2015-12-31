@@ -25,6 +25,7 @@ module core (
             word_t op2;
             word_t rs1_data;
             word_t rs2_data;
+            word_t rd_addr;
         } data;
     } id;
 
@@ -37,6 +38,7 @@ module core (
             jmp_op_t jmp_op;
             logic    jmp;
             logic    br;
+            logic    load;
         } ctrl;
         struct packed {
             word_t pc;
@@ -55,6 +57,7 @@ module core (
             mem_op_t mem_op;
             logic    jmp;
             logic    br;
+            logic    load;
         } ctrl;
         struct packed {
             word_t rs2_data;
@@ -66,21 +69,29 @@ module core (
     struct packed {
         struct packed {
             logic reg_en;
-            logic load_en;
+            logic load;
         } ctrl;
         struct packed {
             addr_t rd_addr;
+            word_t rd_data;
             word_t ex_data;
         } data;
     } wb;
+
 ///////////////////////////////////////////////////////////////////////////////
 
     /*
      * Hazards
      */
 
-    wire stall = ex.ctrl.jmp | mem.ctrl.jmp;
-    wire flush = ex.ctrl.br  | mem.ctrl.br;
+    wire load = (ex.ctrl.load && id.data.rd_addr == ex.data.rd_addr && id.data.rd_addr != 0)
+                || (mem.ctrl.load && ex.data.rd_addr == mem.data.rd_addr && ex.data.rd_addr != 0);
+
+    wire flush = ex.ctrl.br | mem.ctrl.br | load;
+
+    wire bubble = ctrl.jmp_op == JMP_OP_JAL | ex.ctrl.jmp;
+
+    wire stall = bubble | load;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -97,11 +108,12 @@ module core (
             unique case (ex.ctrl.pc_sel)
                 riscv::PC_ADDR: pc <= ex.data.alu_data;
                 riscv::PC_TRAP: pc <= riscv::TRAP_ADDR;
-                riscv::PC_NEXT: pc <= pc + 4;
+                riscv::PC_NEXT: pc <= (stall) ? pc : pc + 4;
             endcase
 
     always_ff @(posedge clk)
-        id.data.pc <= pc;
+        if (~stall)
+            id.data.pc <= pc;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -112,12 +124,10 @@ module core (
     opcode_t opcode;
     funct3_t funct3;
     funct7_t funct7;
-    ctrl_t ctrl;
+    ctrl_t   ctrl;
 
     addr_t rs1_addr;
     addr_t rs2_addr;
-    word_t rd_data;
-    word_t rd_addr;
 
     word_t rs1_data_mux;
     word_t rs2_data_mux;
@@ -133,7 +143,7 @@ module core (
         .opcode,
         .funct3,
         .funct7,
-        .stall,
+        .stall('0), /* FIXME */
         .invalid(/* TODO */),
         .ctrl
     );
@@ -147,7 +157,7 @@ module core (
         .rs2_data(id.data.rs2_data),
         .rd_en(wb.ctrl.reg_en),
         .rd_addr(wb.data.rd_addr),
-        .rd_data
+        .rd_data(wb.data.rd_data)
     );
 
     // Immediate sign extension
@@ -168,7 +178,8 @@ module core (
     // Register addresses
     assign rs1_addr = id.data.ir.r.rs1;
     assign rs2_addr = id.data.ir.r.rs2;
-    assign rd_addr  = id.data.ir.r.rd;
+
+    assign id.data.rd_addr  = id.data.ir.r.rd;
 
     // Control signals
     assign opcode = id.data.ir.r.opcode;
@@ -224,9 +235,10 @@ module core (
             ex.data.op2      <= id.data.op2;
             ex.data.rs1_data <= rs1_data_mux;
             ex.data.rs2_data <= rs2_data_mux;
-            ex.data.rd_addr  <= rd_addr;
+            ex.data.rd_addr  <= id.data.rd_addr;
         end
     end : decode
+
 ///////////////////////////////////////////////////////////////////////////////
 
     /* 
@@ -273,6 +285,12 @@ module core (
 
     wire link = ex.ctrl.jmp_op == JMP_OP_JAL;
 
+    assign ex.ctrl.load = ex.ctrl.mem_op == LOAD_WORD ||
+                          ex.ctrl.mem_op == LOAD_HALF ||
+                          ex.ctrl.mem_op == LOAD_BYTE ||
+                          ex.ctrl.mem_op == LOAD_HALF_UNSIGNED ||
+                          ex.ctrl.mem_op == LOAD_BYTE_UNSIGNED;
+
     alu alu (
         .opcode(ex.ctrl.alu_op),
         .op1(ex.data.op1),
@@ -313,23 +331,25 @@ module core (
         .dmem_wdata(mem.data.rs2_data),
         .dmem_rdata(mem_data),
         .dmem_error(/* TODO */),
+        .imem_en(~(stall & ~bubble)),
+        .imem_rst(bubble),
         .imem_addr(pc),
         .imem_rdata(id.data.ir),
         .imem_error(/* TODO */)
     );
 
-    wire load = mem.ctrl.mem_op == LOAD_WORD ||
-                mem.ctrl.mem_op == LOAD_HALF ||
-                mem.ctrl.mem_op == LOAD_BYTE ||
-                mem.ctrl.mem_op == LOAD_HALF_UNSIGNED ||
-                mem.ctrl.mem_op == LOAD_BYTE_UNSIGNED;
+    assign mem.ctrl.load = mem.ctrl.mem_op == LOAD_WORD ||
+                           mem.ctrl.mem_op == LOAD_HALF ||
+                           mem.ctrl.mem_op == LOAD_BYTE ||
+                           mem.ctrl.mem_op == LOAD_HALF_UNSIGNED ||
+                           mem.ctrl.mem_op == LOAD_BYTE_UNSIGNED;
 
     always_ff @(posedge clk) begin : writeback
         if (~resetn)
             wb.ctrl.reg_en <= 1'b0;
         else begin
             wb.ctrl.reg_en  <= mem.ctrl.reg_en;
-            wb.ctrl.load_en <= load;
+            wb.ctrl.load    <= mem.ctrl.load;
             wb.data.rd_addr <= mem.data.rd_addr;
             wb.data.ex_data <= mem.data.ex_data;
         end
@@ -348,6 +368,6 @@ module core (
      * Writeback
      */
 
-    assign rd_data = (wb.ctrl.load_en) ? mem_data : wb.data.ex_data;
+    assign wb.data.rd_data = (wb.ctrl.load) ? mem_data : wb.data.ex_data;
 
 endmodule

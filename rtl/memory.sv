@@ -22,6 +22,8 @@ module memory (
     input  word_t   dmem_wdata,
     output word_t   dmem_rdata,
     output logic    dmem_error,
+    input  logic    imem_en,
+    input  logic    imem_rst,
     input  word_t   imem_addr,
     output word_t   imem_rdata,
     output logic    imem_error
@@ -44,11 +46,14 @@ module memory (
         .INIT_FILE(`INIT_FILE)
     ) ram (
         .clk,
-        .resetn,
+        .rsta('0),
+        .ena('1),
         .wea,
         .addra(dmem_addr[ADDR_WIDTH+1:2]),
         .dia,
         .doa,
+        .rstb(imem_rst),
+        .enb(imem_en),
         .web('0),
         .addrb(imem_addr[ADDR_WIDTH+1:2]),
         .dib('0),

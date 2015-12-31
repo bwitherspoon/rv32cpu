@@ -5,7 +5,7 @@
 /**
  * Module: ram
  *
- * Synchronous RAM with byte enable
+ * Synchronous RAM in NO_CHANGE mode and byte write enable
  */
 module ram #(
     WIDTH     = 32,
@@ -15,16 +15,25 @@ module ram #(
     INIT_FILE = ""
 )(
     input  logic                     clk,
-    input  logic                     resetn,
+    input  logic                     rsta,
+    input  logic                     ena,
     input  logic [WIDTH/8-1:0]       wea,
     input  logic [$clog2(DEPTH)-1:0] addra,
     input  logic [WIDTH-1:0]         dia,
     output logic [WIDTH-1:0]         doa,
+    input  logic                     rstb,
+    input  logic                     enb,
     input  logic [WIDTH/8-1:0]       web,
     input  logic [$clog2(DEPTH)-1:0] addrb,
     input  logic [WIDTH-1:0]         dib,
     output logic [WIDTH-1:0]         dob
 );
+    logic [WIDTH-1:0] _doa = INIT_A;
+    logic [WIDTH-1:0] _dob = INIT_B;
+
+    assign doa = _doa;
+    assign dob = _dob;
+
     logic [WIDTH-1:0] mem [0:DEPTH-1];
 
     // Initialization
@@ -35,26 +44,30 @@ module ram #(
 
     // Port A
     always_ff @(posedge clk)
-        for (int i = 0; i < $bits(wea); i++)
-            if (wea[i])
-                mem[addra][8*i +: 8] <= dia[8*i +: 8];
+        if (ena)
+            for (int i = 0; i < $bits(wea); i++)
+                if (wea[i])
+                    mem[addra][8*i +: 8] <= dia[8*i +: 8];
 
     always_ff @(posedge clk)
-        if (~resetn)
-            doa <= INIT_A;
-        else if (~|wea)
-            doa <= mem[addra];
+        if (ena)
+            if (rsta)
+                _doa <= INIT_A;
+            else if (~|wea)
+                _doa <= mem[addra];
 
     // Port B
     always_ff @(posedge clk)
-        for (int i = 0; i < $bits(web); i++)
-            if (web[i])
-                mem[addrb][8*i +: 8] <= dib[8*i +: 8];
+        if (enb)
+            for (int i = 0; i < $bits(web); i++)
+                if (web[i])
+                    mem[addrb][8*i +: 8] <= dib[8*i +: 8];
 
     always_ff @(posedge clk)
-        if (~resetn)
-            dob <= INIT_B;
-        else if (~|web)
-            dob <= mem[addrb];
+        if (enb)
+            if (rstb)
+                _dob <= INIT_B;
+            else if (~|web)
+                _dob <= mem[addrb];
 
 endmodule
