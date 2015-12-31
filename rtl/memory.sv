@@ -31,9 +31,9 @@ module memory (
 
     localparam ADDR_WIDTH = 10;
 
-    logic [3:0] wea;
-    word_t      dia;
-    word_t      doa;
+    logic [3:0]               wea;
+    logic [0:$bits(word_t)-1] dia; // Write little endian
+    word_t                    doa;
 
     // Out of range data address
     assign dmem_error = |dmem_addr[$bits(dmem_addr)-1:ADDR_WIDTH+2];
