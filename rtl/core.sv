@@ -58,6 +58,7 @@ module core (
             logic    jmp;
             logic    br;
             logic    load;
+            logic    store;
         } ctrl;
         struct packed {
             word_t rs2_data;
@@ -86,6 +87,8 @@ module core (
 
     wire load = (ex.ctrl.load && id.data.rd_addr == ex.data.rd_addr && id.data.rd_addr != 0)
                 || (mem.ctrl.load && ex.data.rd_addr == mem.data.rd_addr && ex.data.rd_addr != 0);
+
+    wire copy = (wb.ctrl.load && mem.ctrl.store) && (wb.data.ex_data && mem.data.ex_data);
 
     wire flush = ex.ctrl.br | mem.ctrl.br | load;
 
@@ -320,15 +323,16 @@ module core (
      * Memory
      */
 
-    word_t mem_data;
+    word_t mem_rdata;
+    word_t mem_wdata;
 
     memory memory (
         .clk,
         .resetn,
         .dmem_op(mem.ctrl.mem_op),
         .dmem_addr(mem.data.ex_data),
-        .dmem_wdata(mem.data.rs2_data),
-        .dmem_rdata(mem_data),
+        .dmem_wdata(mem_wdata),
+        .dmem_rdata(mem_rdata),
         .dmem_error(/* TODO */),
         .imem_en(~(stall & ~bubble)),
         .imem_rst(bubble),
@@ -342,6 +346,12 @@ module core (
                            mem.ctrl.mem_op == LOAD_BYTE ||
                            mem.ctrl.mem_op == LOAD_HALF_UNSIGNED ||
                            mem.ctrl.mem_op == LOAD_BYTE_UNSIGNED;
+
+    assign mem.ctrl.store = mem.ctrl.mem_op == STORE_WORD ||
+                            mem.ctrl.mem_op == STORE_HALF ||
+                            mem.ctrl.mem_op == STORE_BYTE;
+
+    assign mem_wdata = (copy) ? mem_rdata : mem.data.rs2_data;
 
     always_ff @(posedge clk) begin : writeback
         if (~resetn)
@@ -367,6 +377,6 @@ module core (
      * Writeback
      */
 
-    assign wb.data.rd_data = (wb.ctrl.load) ? mem_data : wb.data.ex_data;
+    assign wb.data.rd_data = (wb.ctrl.load) ? mem_rdata : wb.data.ex_data;
 
 endmodule
