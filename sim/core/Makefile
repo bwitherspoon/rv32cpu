@@ -45,9 +45,9 @@ xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb)
 $(LIBDIR)/memory.sdb: memory.sv | $(MEM)
 	xvlog --sv --work $(LIB) --define INIT_FILE=\"$|\" -L $(LIB) $<
 
-$(LIBDIR)/$(SRC:.sv=.sdb): $(PKG:.sv=.sdb)
+$(LIBDIR)/$(SRC:.sv=.sdb): | $(PKG:.sv=.sdb)
 
-$(LIBDIR)/$(TOP:.sv=.sdb): $(PKG:.sv=.sdb) $(SRC:.sv=.sdb)
+$(LIBDIR)/$(TOP:.sv=.sdb): | $(PKG:.sv=.sdb) $(SRC:.sv=.sdb)
 
 $(LIBDIR)/%.sdb: %.sv
 	xvlog --sv --work $(LIB) -L $(LIB) $<
