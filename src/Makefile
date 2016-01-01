@@ -7,20 +7,23 @@ OD      ?= od
 
 .PHONY: clean
 
+boot.elf: init.o trap.o
+	$(LD) -nostdlibs -r -e 0x40 --section-start=.ktext=0x0 -Ttext 0x40 -o $@ $^
+
 %.o: %.c
 	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $<
 
-%.elf: %.o
-	$(LD) -e 0x100 -Ttext 0x00000000 -o $@ $<
+%.o: %.S
+	$(AS) -m32 -o $@ $<
 
-%.elf: %.S
-	$(AS) -m32 -R -o $@ $<
+%.elf: %.o
+	$(LD) -nostdlibs -r -e 0x40 --section-start=.ktext=0x0 -Ttext 0x40 -o $@ $^
 
 %.bin: %.elf
-	$(OBJCOPY) -O binary -j .text $< $@
+	$(OBJCOPY) -O binary $< $@
 
 %.vh: %.elf
-	$(OBJCOPY) -O verilog -j .text $< $@
+	$(OBJCOPY) -O verilog $< $@
 
 %.mem: %.bin
 	$(OD) -An -tx4 -w4 -v $< > $@
