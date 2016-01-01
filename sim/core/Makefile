@@ -3,6 +3,7 @@ PKG = riscv.sv
 SRC = alu.sv     \
       control.sv \
       core.sv    \
+      io.sv      \
       memory.sv  \
       ram.sv     \
       regfile.sv

@@ -18,13 +18,13 @@ module top;
         #(PERIOD/2) resetn = 1;
     endtask
 
-    logic [15:0] gpio;
+    wire [31:0] gpio;
 
     core core(.*);
 
     initial begin
         reset(); // GSR ~100 ns
-        repeat (10) @(posedge clk);
+        repeat (100) @(posedge clk);
         $finish;
     end
 

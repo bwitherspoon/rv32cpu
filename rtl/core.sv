@@ -10,7 +10,7 @@ import riscv::*;
 module core (
     input  logic        clk,
     input  logic        resetn,
-    output logic [15:0] gpio
+    inout  wire  [31:0] gpio
 );
     // Pipeline control and data signals
     struct packed {
@@ -365,11 +365,17 @@ module core (
     end : writeback
 
     // Crude memory mapped external IO
+    logic [31:0] in = '0;
+    logic [31:0] dir = 32'hFFFF0000;
+    logic [31:0] out;
+
+    io #(.WIDTH(32)) io (.T(dir), .I(in), .O(out), .IO(gpio));
+
     always_ff @(posedge clk)
         if (~resetn)
-            gpio <= '0;
-        else if (mem.ctrl.mem_op == STORE_WORD && |mem.data.ex_data[31:12])
-            gpio <= mem.data.rs2_data[15:0];
+            in <= '0;
+        else if (mem.ctrl.store && |mem.data.ex_data[31:12])
+            in <= mem.data.rs2_data;
 
 ///////////////////////////////////////////////////////////////////////////////
 
