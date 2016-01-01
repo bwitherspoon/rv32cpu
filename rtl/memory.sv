@@ -44,7 +44,7 @@ module memory (
     ) ram (
         .clk,
         .rsta('0),
-        .ena('1),
+        .ena(~dmem_error),
         .wea,
         .addra(dmem_addr[ADDR_WIDTH+1:2]),
         .dia,
