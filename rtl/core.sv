@@ -85,8 +85,10 @@ module core (
      */
 
     wire invalid;
+    wire dmem_error;
+    wire imem_error;
 
-    wire trap = invalid;
+    wire trap = invalid | dmem_error | imem_error;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -356,12 +358,12 @@ module core (
         .dmem_addr(mem.data.ex_data),
         .dmem_wdata,
         .dmem_rdata,
-        .dmem_error(/* TODO */),
+        .dmem_error,
         .imem_en(~(stall & ~bubble)),
         .imem_rst(bubble),
         .imem_addr(pc),
         .imem_rdata(id.data.ir),
-        .imem_error(/* TODO */)
+        .imem_error
     );
 
     assign mem.ctrl.load = mem.ctrl.mem_op == LOAD_WORD ||

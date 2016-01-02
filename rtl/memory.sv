@@ -31,6 +31,10 @@ module memory (
 
     localparam ADDR_WIDTH = 10;
 
+    // Misaligned and out of range memory access
+    wire out_of_range = |dmem_addr[$bits(dmem_addr)-1:ADDR_WIDTH+2];
+    logic misaligned;
+
     logic [3:0]               wea;
     logic [0:$bits(word_t)-1] dia; // Write little endian
     word_t                    doa;
@@ -44,7 +48,7 @@ module memory (
     ) ram (
         .clk,
         .rsta('0),
-        .ena(~dmem_error),
+        .ena(~(misaligned | out_of_range)),
         .wea,
         .addra(dmem_addr[ADDR_WIDTH+1:2]),
         .dia,
@@ -57,28 +61,18 @@ module memory (
         .dob(imem_rdata)
     );
 
-    // Misaligned and out of range memory access
-    logic misaligned;
-    logic out_of_range;
-
     always_comb begin : error
         unique case (dmem_op)
-            riscv::STORE_WORD, riscv::LOAD_WORD: begin
+            riscv::STORE_WORD, riscv::LOAD_WORD:
                 misaligned = |dmem_addr[1:0];
-                out_of_range = |dmem_addr[$bits(dmem_addr)-1:ADDR_WIDTH+2];
-            end
-            riscv::STORE_HALF, riscv::LOAD_HALF, riscv::LOAD_HALF_UNSIGNED: begin
+            riscv::STORE_HALF, riscv::LOAD_HALF, riscv::LOAD_HALF_UNSIGNED:
                 misaligned = dmem_addr[0];
-                out_of_range = |dmem_addr[$bits(dmem_addr)-1:ADDR_WIDTH+2];
-            end
-            default: begin
+            default:
                 misaligned = '0;
-                out_of_range = '0;
-            end
         endcase
     end : error
 
-    assign dmem_error = out_of_range | misaligned;
+    assign dmem_error = misaligned;
 
     // Misaligned instruction address
     assign imem_error = |imem_addr[1:0];
