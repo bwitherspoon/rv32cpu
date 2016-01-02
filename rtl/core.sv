@@ -78,6 +78,15 @@ module core (
             word_t ex_data;
         } data;
     } wb;
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Exceptions / Traps
+     */
+
+    wire invalid;
+
+    wire trap = invalid;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -90,9 +99,15 @@ module core (
 
     wire copy = (wb.ctrl.load && mem.ctrl.store) && (wb.data.ex_data && mem.data.ex_data);
 
-    wire flush = ex.ctrl.br | mem.ctrl.br | load;
+    wire branch = ex.ctrl.br | mem.ctrl.br;
 
-    wire bubble = ctrl.jmp_op == JMP_OP_JAL | ex.ctrl.jmp;
+    wire jump = ctrl.jmp_op == JMP_OP_JAL | ex.ctrl.jmp;
+
+///////////////////////////////////////////////////////////////////////////////
+
+    wire flush = branch | load;
+
+    wire bubble = jump | trap;
 
     wire stall = bubble | load;
 
@@ -109,14 +124,22 @@ module core (
             pc <= riscv::TEXT_ADDR;
         else
             unique case (ex.ctrl.pc_sel)
-                riscv::PC_ADDR: pc <= ex.data.alu_data;
-                riscv::PC_TRAP: pc <= riscv::TRAP_ADDR;
-                riscv::PC_NEXT: pc <= (stall) ? pc : pc + 4;
+                PC_TRAP: pc <= TRAP_ADDR;
+                PC_ADDR: pc <= ex.data.alu_data;
+                PC_NEXT: pc <= (stall) ? pc : pc + 4;
             endcase
 
     always_ff @(posedge clk)
         if (~stall)
             id.data.pc <= pc;
+
+    always_comb
+        priority if (trap)
+            ex.ctrl.pc_sel = PC_TRAP;
+        else if (ex.ctrl.jmp | ex.ctrl.br)
+            ex.ctrl.pc_sel = PC_ADDR;
+        else
+            ex.ctrl.pc_sel = PC_NEXT;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -146,7 +169,7 @@ module core (
         .opcode,
         .funct3,
         .funct7,
-        .invalid(/* TODO */),
+        .invalid,
         .ctrl
     );
 
@@ -283,7 +306,6 @@ module core (
 
     assign ex.ctrl.br     = beq | bne | blt | bltu | bge | bgeu;
     assign ex.ctrl.jmp    = ex.ctrl.jmp_op == JMP_OP_JAL;
-    assign ex.ctrl.pc_sel = (ex.ctrl.jmp | ex.ctrl.br) ? PC_ADDR : PC_NEXT;
 
     wire link = ex.ctrl.jmp_op == JMP_OP_JAL;
 
@@ -323,16 +345,17 @@ module core (
      * Memory
      */
 
-    word_t mem_rdata;
-    word_t mem_wdata;
+    word_t dmem_rdata;
+    word_t dmem_wdata;
+    word_t mem_data;
 
     memory memory (
         .clk,
         .resetn,
         .dmem_op(mem.ctrl.mem_op),
         .dmem_addr(mem.data.ex_data),
-        .dmem_wdata(mem_wdata),
-        .dmem_rdata(mem_rdata),
+        .dmem_wdata,
+        .dmem_rdata,
         .dmem_error(/* TODO */),
         .imem_en(~(stall & ~bubble)),
         .imem_rst(bubble),
@@ -351,7 +374,7 @@ module core (
                             mem.ctrl.mem_op == STORE_HALF ||
                             mem.ctrl.mem_op == STORE_BYTE;
 
-    assign mem_wdata = (copy) ? mem_rdata : mem.data.rs2_data;
+    assign dmem_wdata = (copy) ? dmem_rdata : mem.data.rs2_data;
 
     always_ff @(posedge clk) begin : writeback
         if (~resetn)
@@ -365,17 +388,23 @@ module core (
     end : writeback
 
     // Crude memory mapped external IO
-    logic [31:0] in = '0;
-    logic [31:0] dir = 32'hFFFF0000;
-    logic [31:0] out;
+    logic [31:0] io_data = '0;
+    logic [31:0] out = '0;
+    wire  [31:0] in;
 
-    io #(.WIDTH(32)) io (.T(dir), .I(in), .O(out), .IO(gpio));
+    io #(.WIDTH(32)) io (.T(32'hFFFF0000), .I(out), .O(in), .IO(gpio));
 
     always_ff @(posedge clk)
         if (~resetn)
-            in <= '0;
+            out <= '0;
         else if (mem.ctrl.store && |mem.data.ex_data[31:12])
-            in <= mem.data.rs2_data;
+            out <= mem.data.rs2_data;
+
+    always_ff @(posedge clk)
+        if (~resetn)
+            io_data <= '0;
+        else if (mem.ctrl.load && |mem.data.ex_data[31:12])
+            io_data <= in;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -383,6 +412,8 @@ module core (
      * Writeback
      */
 
-    assign wb.data.rd_data = (wb.ctrl.load) ? mem_rdata : wb.data.ex_data;
+    assign mem_data = (wb.ctrl.load && |wb.data.ex_data[31:12]) ? io_data : dmem_rdata;
+
+    assign wb.data.rd_data = (wb.ctrl.load) ? mem_data : wb.data.ex_data;
 
 endmodule
