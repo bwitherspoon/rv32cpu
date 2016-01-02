@@ -103,7 +103,7 @@ module core (
 
     wire branch = ex.ctrl.br | mem.ctrl.br;
 
-    wire jump = ctrl.jmp_op == JMP_OP_JAL | ex.ctrl.jmp;
+    wire jump = (ctrl.jmp_op == JMP_OP_JAL & ~mem.ctrl.br) | ex.ctrl.jmp;
 
 ///////////////////////////////////////////////////////////////////////////////
 
