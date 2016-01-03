@@ -4,7 +4,7 @@ module top;
 
     import riscv::*;
 
-    localparam PERIOD = 10;
+    localparam PERIOD = 20; // 50 MHz
 
     // Clock
     bit clk = 0;
