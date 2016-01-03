@@ -10,7 +10,8 @@ import riscv::*;
 module core (
     input  logic        clk,
     input  logic        resetn,
-    inout  wire  [31:0] gpio
+    inout  wire  [31:0] gpio,
+    input  logic        interrupt
 );
     // Pipeline control and data signals
     struct packed {
@@ -88,7 +89,7 @@ module core (
     wire dmem_error;
     wire imem_error;
 
-    wire trap = invalid | dmem_error | imem_error;
+    wire trap = invalid | dmem_error | imem_error | interrupt;
 
 ///////////////////////////////////////////////////////////////////////////////
 
