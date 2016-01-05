@@ -11,7 +11,9 @@ TEXT    ?= 0x40
 
 .PHONY: clean
 
-boot.mem: trap.o
+boot.mem:
+
+boot.elf: trap.o
 
 %.o: %.c
 	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $<
