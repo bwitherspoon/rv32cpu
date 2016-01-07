@@ -5,24 +5,27 @@ LD	= $(PREFIX)ld
 OBJCOPY = $(PREFIX)objcopy
 OD      ?= od
 
-ENTRY   ?= 0x40
-KTEXT   ?= 0x00
-TEXT    ?= 0x40
+KTEXT   ?= 0x000
+ENTRY   ?= 0x040
+TEXT    ?= 0x040
+DATA    ?= 0xC00
+BSS     ?= 0x800
 
 .PHONY: clean
+.INTERMEDIATE: boot.o
 
 boot.mem:
 
-boot.elf: trap.o
+boot.o: main.S trap.S
 
 %.o: %.c
-	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $<
+	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $^
 
 %.o: %.S
-	$(AS) -m32 -o $@ $<
+	$(AS) -m32 -o $@ $^
 
 %.elf: %.o
-	$(LD) -nostdlibs -r -e $(ENTRY) --section-start=.ktext=$(KTEXT) -Ttext $(TEXT) -o $@ $^
+	$(LD) -nostdlib -e $(ENTRY) --section-start=.ktext=$(KTEXT) -Ttext=$(TEXT) -Tdata=$(DATA) -Tbss=$(BSS) -o $@ $^
 
 #%.mem: %.elf
 #	$(OBJCOPY) -O verilog $< $@

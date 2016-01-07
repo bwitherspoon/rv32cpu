@@ -1,7 +1,7 @@
         .section .ktext, "ax"
-        .align  2
+        .align 5
 
-trap:   lui  t0,1
+trap:   lui  t0,0x40000
         li   t1,0x8
         li   t3,4
 loop:   addi t3,t3,-1
@@ -11,4 +11,4 @@ spin:   addi t4,t4,-1
         slli t1,t1,3
         sw   t1,0(t0)
         bne  t3,zero,loop
-        j trap
+        j    trap

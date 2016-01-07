@@ -1,16 +1,27 @@
-TOP = top.sv
-PKG = riscv.sv
-SRC = alu.sv     \
+#
+# Copyright 2015, 2016 C. Brett Witherspoon
+#
+# See LICENSE for more details.
+#
+
+TOP = testbench.sv
+INF = axi.sv
+PKG = axi4.sv    \
+      riscv.sv
+RTL = alu.sv     \
+      bram.sv    \
       control.sv \
       core.sv    \
-      io.sv      \
+      fetch.sv   \
       memory.sv  \
+      mem2reg.sv \
       ram.sv     \
+      reg2mem.sv \
       regfile.sv
-ALL = $(PKG) $(SRC) $(TOP)
-
 LIB = work
-MEM ?= boot.mem
+ALL = $(PKG) $(INF) $(RTL) $(TOP)
+
+INIT ?= boot.mem
 SNAP = $(LIB).$(basename $(TOP))
 
 PRJDIR = ../..
@@ -27,10 +38,10 @@ VPATH = $(RTLDIR):$(SRCDIR):$(LIBDIR)
 
 .PHONY: xsim tcl gui xelab xvlog clean
 
-xsim: xelab $(MEM)
+xsim: xelab $(INIT)
 	xsim -runall $(SNAP)
 
-tcl: xelab $(MEM)
+tcl: xelab $(INIT)
 	xsim $(SNAP)
 
 gui: $(TOP:.sv=.wcfg) xelab $(MEM)
@@ -40,19 +51,25 @@ xelab: xsim.dir/$(SNAP)/xsimk
 
 xvlog: $(ALL:.sv=.sdb)
 
+$(TOP:.sv=.wcfg):
+	touch $@
+
+$(INIT):
+	for i in $$(seq 0 1023); do printf '%08X\n' $$i >> $@; done
+
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)
 
-$(LIBDIR)/memory.sdb: memory.sv | $(MEM)
-	xvlog --sv --work $(LIB) --define INIT_FILE=\"$|\" -L $(LIB) $<
+$(LIBDIR)/$(INF:.sv=.sdb): | $(PKG:.sv=.sdb)
 
-$(LIBDIR)/$(SRC:.sv=.sdb): | $(PKG:.sv=.sdb)
+$(LIBDIR)/$(RTL:.sv=.sdb): | $(PKG:.sv=.sdb) $(INF:.sv=.sdb)
 
-$(LIBDIR)/$(TOP:.sv=.sdb): | $(PKG:.sv=.sdb) $(SRC:.sv=.sdb)
+$(LIBDIR)/$(TOP:.sv=.sdb): $(TOP) | $(INIT) $(PKG:.sv=.sdb) $(INF:.sv=.sdb) $(RTL:.sv=.sdb)
+	xvlog --sv --work $(LIB) --define INIT_FILE=\"$(word 1,$|)\" -L $(LIB) $<
 
 $(LIBDIR)/%.sdb: %.sv
 	xvlog --sv --work $(LIB) -L $(LIB) $<
 
 clean:
-	-$(RM) -rf *.log *.jou *.pb *.vcd *.wdb *.str xsim.dir .Xil
+	-$(RM) -rf *.log *.jou *.pb *.vcd *.wdb *.str xsim.dir .Xil $(INIT)
 

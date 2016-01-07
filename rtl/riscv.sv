@@ -42,6 +42,9 @@ package riscv;
     // Register address type
     typedef logic [4:0] addr_t;
 
+    // Byte strobe type
+    typedef logic [$bits(word_t)/8-1:0] strb_t;
+
     // Immediate type
     typedef logic signed [31:0] imm_t;
 
@@ -83,13 +86,22 @@ package riscv;
     localparam funct3_t FUNCT3_AND       = 'b111;
 
     // Trap base address
-    localparam word_t TRAP_ADDR = '0;
+    localparam word_t TRAP_BASE = 32'h00000000;
 
-    // Instruction base address
-    localparam word_t TEXT_ADDR = 32'h40;
+    // Instruction section base address
+    localparam word_t TEXT_BASE = 32'h00000040;
 
-    // Memory base address
-    localparam word_t DATA_ADDR = 32'h400;
+    // Instruction section size
+    localparam word_t TEXT_SIZE = 32'h00001000;
+
+    // Data section base address
+    localparam word_t DATA_BASE = 32'hC0000000;
+
+    // Data section size
+    localparam word_t DATA_SIZE = 32'h00001000;
+
+    // BSS section base address
+    localparam word_t BSS_BASE = 32'h80000000;
 
     // Instruction type
     typedef union packed {
@@ -141,6 +153,8 @@ package riscv;
         } uj;
     } inst_t;
 
+    localparam word_t NOP = 32'h00000013;
+
     /*
      * Control
      */
@@ -171,7 +185,7 @@ package riscv;
         ALU_SUB,
         ALU_SRA,
         ALU_OP2,
-        ALU_XXX = 'x
+        ALU_XXX = 4'bxxxx
     } alu_op_t;
 
     // Jump / Branch operation type
@@ -197,7 +211,7 @@ package riscv;
     typedef enum logic {
         OP1_RS1,
         OP1_PC,
-        OP1_XXX = 'x
+        OP1_XXX = 1'bx
     } op1_sel_t;
 
     // Second operand select
@@ -208,14 +222,15 @@ package riscv;
         OP2_B_IMM,
         OP2_U_IMM,
         OP2_J_IMM,
-        OP2_XXX = 'x
+        OP2_XXX = 3'bxxx
     } op2_sel_t;
 
     // Source register select (forwarding)
     typedef enum logic [1:0] {
         RS_REG,
         RS_ALU,
-        RS_MEM
+        RS_MEM,
+        RS_RAM
     } rs_sel_t;
 
     // Data path control signals
@@ -227,5 +242,19 @@ package riscv;
         op1_sel_t op1_sel;
         op2_sel_t op2_sel;
     } ctrl_t;
+
+    /*
+     * Helper functions (synthesizable)
+     */
+
+    function logic is_load (input mem_op_t op);
+        return op == LOAD_WORD || op == LOAD_HALF || op == LOAD_BYTE ||
+               op == LOAD_HALF_UNSIGNED || op == LOAD_BYTE_UNSIGNED;
+    endfunction
+
+    function logic is_store (input mem_op_t op);
+        return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
+    endfunction
+
 
 endpackage
