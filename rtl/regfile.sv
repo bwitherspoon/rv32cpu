@@ -2,15 +2,15 @@
  * Copyright (c) 2015, C. Brett Witherspoon
  */
 
-import riscv::addr_t;
-import riscv::word_t;
-
 /**
  * Module: regfile
  *
- * A register file.
+ * A 32 width and 32 depth register file with two read and one write port..
  */
-module regfile (
+module regfile
+    import riscv::addr_t;
+    import riscv::word_t;
+(
     input  logic  clk,
     input  addr_t rs1_addr,
     input  addr_t rs2_addr,
@@ -21,10 +21,10 @@ module regfile (
     input  word_t rd_data
 );
 
-    word_t regs [0:2**$bits(addr_t)-1];
+    word_t regs [1:2**$bits(addr_t)-1];
 
 `ifndef SYNTHESIS
-    initial for (int i = 0; i < 2**$bits(addr_t); i++) regs[i] = '0;
+    initial for (int i = 1; i < 2**$bits(addr_t); i++) regs[i] = '0;
 `endif
 
     always @(negedge clk)
