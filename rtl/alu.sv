@@ -2,14 +2,14 @@
  * Copyright (c) 2015, C. Brett Witherspoon
  */
 
-import riscv::*;
-
 /**
  * Module: alu
  *
  * An arithmetic and logic unit (ALU) for RISC-V
  */
-module alu (
+module alu
+    import riscv::*;
+(
     input  alu_op_t opcode,
     input  word_t   op1,
     input  word_t   op2,
@@ -22,8 +22,8 @@ module alu (
             ALU_ADD:  out = op1 + op2;
             ALU_SUB:  out = op1 - op2;
             ALU_SLL:  out = op1 << shamt;
-            ALU_SLT:  out = signed'(op1) < signed'(op2);
-            ALU_SLTU: out = op1 < op2;
+            ALU_SLT:  out = word_t'(signed'(op1) < signed'(op2));
+            ALU_SLTU: out = word_t'(op1 < op2);
             ALU_XOR:  out = op1 ^ op2;
             ALU_SRL:  out = op1 >> shamt;
             ALU_SRA:  out = signed'(op1) >>> shamt;
