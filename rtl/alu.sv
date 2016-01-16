@@ -8,7 +8,7 @@
  * An arithmetic and logic unit (ALU) for RISC-V
  */
 module alu
-    import riscv::*;
+    import core::*;
 (
     input  alu_op_t opcode,
     input  word_t   op1,

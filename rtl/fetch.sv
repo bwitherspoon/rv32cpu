@@ -10,8 +10,8 @@
  * Instruction fetch module.
  */
  module fetch
-    import riscv::word_t;
-    import riscv::inst_t;
+    import core::word_t;
+    import core::inst_t;
 (
     input  logic  clk,
     input  logic  reset,
@@ -32,7 +32,7 @@
     always_ff @(posedge clk)
         if (reset) begin
             pc <= '0;
-            code.araddr <= riscv::TEXT_BASE;
+            code.araddr <= core::TEXT_BASE;
         end else if (addr) begin
             pc <= code.araddr;
             if (trap)

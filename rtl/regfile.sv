@@ -8,8 +8,8 @@
  * A 32 width and 32 depth register file with two read and one write port..
  */
 module regfile
-    import riscv::addr_t;
-    import riscv::word_t;
+    import core::addr_t;
+    import core::word_t;
 (
     input  logic  clk,
     input  addr_t rs1_addr,

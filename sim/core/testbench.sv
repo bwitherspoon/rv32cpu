@@ -28,7 +28,7 @@ module testbench;
 
     axi code (.aclk(clk), .aresetn(~_reset));
 
-    ram #(.INIT_DATA(riscv::NOP), .INIT_FILE(`INIT_FILE)) rom (.data(code));
+    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.data(code));
 
     axi data (.aclk(clk), .aresetn(~_reset));
 
@@ -36,7 +36,7 @@ module testbench;
 
     axi peripheral (.aclk(clk), .aresetn(~_reset));
 
-    core dut (
+    cpu cpu (
         .clk,
         .reset(_reset),
         .interrupt,

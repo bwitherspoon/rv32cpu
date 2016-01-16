@@ -1,400 +1,260 @@
-/*
- * Copyright (c) 2015, 2016 C. Brett Witherspoon
- */
-
 /**
- * Module: core
+ * Copyright (c) 2015, C. Brett Witherspoon
  */
-module core
-    import riscv::*;
-(
-    input  logic clk,
-    input  logic reset,
-    input  logic interrupt,
-    axi.master   code,
-    axi.master   data,
-    axi.master   peripheral
-);
-    wire resetn = ~reset;
-
-    struct packed {
-        struct packed {
-            rs_sel_t rs1_sel;
-            rs_sel_t rs2_sel;
-        } ctrl;
-        struct packed {
-            word_t pc;
-            inst_t ir;
-            word_t op1;
-            word_t op2;
-            addr_t reg_addr;
-            addr_t rs1_addr;
-            addr_t rs2_addr;
-            word_t rs1_data;
-            word_t rs2_data;
-        } data;
-    } id;
-
-    struct packed {
-        struct packed {
-            logic    reg_en;
-            mem_op_t mem_op;
-            alu_op_t alu_op;
-            jmp_op_t jmp_op;
-            logic    jump;
-            logic    branch;
-            logic    load;
-            logic    store;
-        } ctrl;
-        struct packed {
-            word_t pc;
-            word_t op1;
-            word_t op2;
-            word_t rs1_data;
-            word_t rs2_data;
-            addr_t reg_addr;
-            word_t alu_data;
-        } data;
-    } ex;
-
-    struct packed {
-        struct packed {
-            logic    reg_en;
-            mem_op_t mem_op;
-            logic    load;
-            logic    store;
-        } ctrl;
-        struct packed {
-            addr_t reg_addr;
-            word_t alu_data;
-            word_t mem_data;
-        } data;
-    } mem;
-
-    struct packed {
-        struct packed {
-            logic reg_en;
-            logic load;
-        } ctrl;
-        struct packed {
-            addr_t reg_addr;
-            word_t reg_data;
-            word_t alu_data;
-            word_t mem_data;
-        } data;
-    } wb;
-
-///////////////////////////////////////////////////////////////////////////////
+package core;
 
     /*
-     * Exceptions / Traps / Interrupts
+     * Data
      */
 
-    wire invalid;
+    // Opcodes
+    typedef enum logic [6:0] {
+        OPCODE_LOAD      = 'b0000011,
+        OPCODE_LOAD_FP   = 'b0000111,
+        OPCODE_CUSTOM_0  = 'b0001011,
+        OPCODE_MISC_MEM  = 'b0001111,
+        OPCODE_OP_IMM    = 'b0010011,
+        OPCODE_AUIPC     = 'b0010111,
+        OPCODE_OP_IMM_32 = 'b0011011,
+        OPCODE_STORE     = 'b0100011,
+        OPCODE_STORE_FP  = 'b0100111,
+        OPCODE_CUSTOM_1  = 'b0101011,
+        OPCODE_AMO       = 'b0101111,
+        OPCODE_OP        = 'b0110011,
+        OPCODE_LUI       = 'b0110111,
+        OPCODE_OP_32     = 'b0111011,
+        OPCODE_MADD      = 'b1000011,
+        OPCODE_MSUB      = 'b1000111,
+        OPCODE_NMSUB     = 'b1001011,
+        OPCODE_NMADD     = 'b1001111,
+        OPCODE_OP_FP     = 'b1010011,
+        OPCODE_CUSTOM_2  = 'b1011011,
+        OPCODE_BRANCH    = 'b1100011,
+        OPCODE_JALR      = 'b1100111,
+        OPCODE_JAL       = 'b1101111,
+        OPCODE_SYSTEM    = 'b1110011,
+        OPCODE_CUSTOM_3  = 'b1111011
+    } opcode_t;
 
-    wire trap = ~reset & interrupt;
+    // Word type
+    typedef logic [31:0] word_t;
 
+    // Register address type
+    typedef logic [4:0] addr_t;
 
-///////////////////////////////////////////////////////////////////////////////
+    // Byte strobe type
+    typedef logic [$bits(word_t)/8-1:0] strb_t;
+
+    // Immediate type
+    typedef logic signed [31:0] imm_t;
+
+    // Instruction funct7 type
+    typedef logic [6:0] funct7_t;
+
+    // Instruction funct3 type
+    typedef logic [2:0] funct3_t;
+
+    localparam funct3_t FUNCT3_BEQ       = 'b000;
+    localparam funct3_t FUNCT3_BNE       = 'b001;
+    localparam funct3_t FUNCT3_BLT       = 'b100;
+    localparam funct3_t FUNCT3_BGE       = 'b101;
+    localparam funct3_t FUNCT3_BLTU      = 'b110;
+    localparam funct3_t FUNCT3_BGEU      = 'b111;
+    localparam funct3_t FUNCT3_LB        = 'b000;
+    localparam funct3_t FUNCT3_LH        = 'b001;
+    localparam funct3_t FUNCT3_LW        = 'b010;
+    localparam funct3_t FUNCT3_LBU       = 'b100;
+    localparam funct3_t FUNCT3_LHU       = 'b101;
+    localparam funct3_t FUNCT3_SB        = 'b000;
+    localparam funct3_t FUNCT3_SH        = 'b001;
+    localparam funct3_t FUNCT3_SW        = 'b010;
+    localparam funct3_t FUNCT3_ADDI      = 'b000;
+    localparam funct3_t FUNCT3_SLTI      = 'b010;
+    localparam funct3_t FUNCT3_SLTIU     = 'b011;
+    localparam funct3_t FUNCT3_XORI      = 'b100;
+    localparam funct3_t FUNCT3_SRLI_SRAI = 'b101;
+    localparam funct3_t FUNCT3_ORI       = 'b110;
+    localparam funct3_t FUNCT3_ANDI      = 'b111;
+    localparam funct3_t FUNCT3_SLLI      = 'b001;
+    localparam funct3_t FUNCT3_ADD_SUB   = 'b000;
+    localparam funct3_t FUNCT3_SLL       = 'b001;
+    localparam funct3_t FUNCT3_SLT       = 'b010;
+    localparam funct3_t FUNCT3_SLTU      = 'b011;
+    localparam funct3_t FUNCT3_XOR       = 'b100;
+    localparam funct3_t FUNCT3_SRL_SRA   = 'b101;
+    localparam funct3_t FUNCT3_OR        = 'b110;
+    localparam funct3_t FUNCT3_AND       = 'b111;
+
+    // Trap base address
+    localparam word_t TRAP_BASE = 32'h00000000;
+
+    // Instruction section base address
+    localparam word_t TEXT_BASE = 32'h00000040;
+
+    // Instruction section size
+    localparam word_t TEXT_SIZE = 32'h00001000;
+
+    // Data section base address
+    localparam word_t DATA_BASE = 32'hC0000000;
+
+    // Data section size
+    localparam word_t DATA_SIZE = 32'h00001000;
+
+    // BSS section base address
+    localparam word_t BSS_BASE = 32'h80000000;
+
+    // Instruction type
+    typedef union packed {
+        struct packed {
+            funct7_t funct7;
+            addr_t   rs2;
+            addr_t   rs1;
+            funct3_t funct3;
+            addr_t   rd;
+            opcode_t opcode;
+        } r;
+       struct packed {
+            logic [11:0] imm_11_0;
+            addr_t       rs1;
+            funct3_t     funct3;
+            addr_t       rd;
+            opcode_t     opcode;
+        } i;
+        struct packed {
+            logic [6:0] imm_11_5;
+            addr_t      rs2;
+            addr_t      rs1;
+            funct3_t    funct3;
+            logic [4:0] imm_4_0;
+            opcode_t    opcode;
+        } s;
+        struct packed {
+            logic       imm_12;
+            logic [5:0] imm_10_5;
+            addr_t      rs2;
+            addr_t      rs1;
+            funct3_t    funct3;
+            logic [3:0] imm_4_1;
+            logic       imm_11;
+            opcode_t    opcode;
+        } sb;
+        struct packed {
+            logic [19:0] imm_31_12;
+            addr_t       rd;
+            opcode_t     opcode;
+        } u;
+        struct packed {
+            logic       imm_20;
+            logic [9:0] imm_10_1;
+            logic       imm_11;
+            logic [7:0] imm_19_12;
+            addr_t      rd;
+            opcode_t    opcode;
+        } uj;
+    } inst_t;
+
+    localparam word_t NOP = 32'h00000013;
 
     /*
-     * Hazards
+     * Control
      */
 
-    // TODO store -> load
+    // Memory operation type
+    typedef enum logic [3:0] {
+        LOAD_STORE_NONE,
+        LOAD_WORD,
+        LOAD_HALF,
+        LOAD_BYTE,
+        LOAD_HALF_UNSIGNED,
+        LOAD_BYTE_UNSIGNED,
+        STORE_WORD,
+        STORE_HALF,
+        STORE_BYTE
+    } mem_op_t;
 
-    wire branch = ex.ctrl.branch | ex.ctrl.jump;
+    // ALU operation type
+    typedef enum logic [3:0] {
+        ALU_ADD,
+        ALU_SLL,
+        ALU_SLT,
+        ALU_SLTU,
+        ALU_XOR,
+        ALU_SRL,
+        ALU_OR,
+        ALU_AND,
+        ALU_SUB,
+        ALU_SRA,
+        ALU_OP2,
+        ALU_XXX = 4'bxxxx
+    } alu_op_t;
 
-    // Bubble after jump to wait for address
-    wire jump = ctrl.jmp_op == JMP_OP_JAL;
+    // Jump / Branch operation type
+    typedef enum logic [2:0] {
+        JMP_OP_NONE,
+        JMP_OP_JAL,
+        JMP_OP_BEQ,
+        JMP_OP_BNE,
+        JMP_OP_BLT,
+        JMP_OP_BLTU,
+        JMP_OP_BGE,
+        JMP_OP_BGEU
+    } jmp_op_t;
 
-    // Bubble after load to account for load latency
-    wire load = riscv::is_load(ctrl.mem_op);
+    // Program counter select
+    typedef enum logic [1:0] {
+        PC_NEXT,
+        PC_ADDR,
+        PC_TRAP
+    } pc_sel_t;
 
-    // A bubble prevents the PC from advancing and inserts NOPs
-    wire bubble = load | jump;
+    // First operand select
+    typedef enum logic {
+        OP1_RS1,
+        OP1_PC,
+        OP1_XXX = 1'bx
+    } op1_sel_t;
 
-    wire idle;
+    // Second operand select
+    typedef enum logic [2:0] {
+        OP2_RS2,
+        OP2_I_IMM,
+        OP2_S_IMM,
+        OP2_B_IMM,
+        OP2_U_IMM,
+        OP2_J_IMM,
+        OP2_XXX = 3'bxxx
+    } op2_sel_t;
 
-    // A stall locks the entier pipeline and bubbles
-    wire stall = ~idle;
+    // Source register select (forwarding)
+    typedef enum logic [1:0] {
+        RS_REG,
+        RS_ALU,
+        RS_MEM,
+        RS_RAM
+    } rs_sel_t;
 
-///////////////////////////////////////////////////////////////////////////////
+    // Data path control signals
+    typedef struct packed {
+        logic     reg_en;
+        mem_op_t  mem_op;
+        alu_op_t  alu_op;
+        jmp_op_t  jmp_op;
+        op1_sel_t op1_sel;
+        op2_sel_t op2_sel;
+    } ctrl_t;
 
     /*
-     * Forwarding
+     * Helper functions (synthesizable)
      */
 
-    // FIXME clean up this mess
-    always_comb
-        if (id.data.rs1_addr == ex.data.reg_addr
-            && id.data.rs1_addr != '0
-            && ex.ctrl.reg_en == '1
-            && ex.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs1_sel = RS_ALU;
-        else if (id.data.rs1_addr == mem.data.reg_addr
-                 && id.data.rs1_addr != '0
-                 && mem.ctrl.reg_en == '1
-                 && mem.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs1_sel = RS_MEM;
-        else if (id.data.rs1_addr == mem.data.reg_addr
-                 && id.data.rs1_addr != '0
-                 && mem.ctrl.reg_en == '1
-                 && mem.ctrl.load == '1)
-            id.ctrl.rs1_sel = RS_RAM;
-        else
-            id.ctrl.rs1_sel = RS_REG;
+    function logic is_load (input mem_op_t op);
+        return op == LOAD_WORD || op == LOAD_HALF || op == LOAD_BYTE ||
+               op == LOAD_HALF_UNSIGNED || op == LOAD_BYTE_UNSIGNED;
+    endfunction
 
-    always_comb
-        if (id.data.rs2_addr == ex.data.reg_addr
-            && id.data.rs2_addr != '0
-            && ex.ctrl.reg_en == '1
-            && ex.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs2_sel = RS_ALU;
-        else if (id.data.rs2_addr == mem.data.reg_addr
-                 && id.data.rs2_addr != '0
-                 && mem.ctrl.reg_en == '1
-                 && mem.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs2_sel = RS_MEM;
-        else if (id.data.rs2_addr == mem.data.reg_addr
-                 && id.data.rs2_addr != '0
-                 && mem.ctrl.reg_en == '1
-                 && mem.ctrl.load == '1)
-            id.ctrl.rs2_sel = RS_RAM;
-        else
-            id.ctrl.rs2_sel = RS_REG;
+    function logic is_store (input mem_op_t op);
+        return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
+    endfunction
 
-///////////////////////////////////////////////////////////////////////////////
 
-    /*
-     * Fetch
-     */
-
-    word_t target;
-
-    logic valid;
-
-    // stall, load, jump
-    wire ready = ~stall & ~bubble;
-
-    fetch fetch (
-        .clk,
-        .reset(~resetn),
-        .branch,
-        .target,
-        .trap,
-        .handler(TRAP_BASE),
-        .ready,
-        .pc(id.data.pc),
-        .ir(id.data.ir),
-        .valid,
-        .code(code)
-    );
-
-///////////////////////////////////////////////////////////////////////////////
-
-    /*
-     * Decode
-     */
-
-    opcode_t opcode;
-    funct3_t funct3;
-    funct7_t funct7;
-    ctrl_t   ctrl;
-
-    word_t rs1_data_mux;
-    word_t rs2_data_mux;
-
-    imm_t i_imm;
-    imm_t s_imm;
-    imm_t b_imm;
-    imm_t u_imm;
-    imm_t j_imm;
-
-    // Control decoder
-    control control (
-        .opcode,
-        .funct3,
-        .funct7,
-        .valid,
-        .invalid,
-        .ctrl
-    );
-
-    // Register file
-    regfile regfile (
-        .clk,
-        .rs1_addr(id.data.rs1_addr),
-        .rs2_addr(id.data.rs2_addr),
-        .rs1_data(id.data.rs1_data),
-        .rs2_data(id.data.rs2_data),
-        .rd_en(wb.ctrl.reg_en),
-        .rd_addr(wb.data.reg_addr),
-        .rd_data(wb.data.reg_data)
-    );
-
-    // Immediate sign extension
-    assign i_imm = imm_t'(signed'(id.data.ir.i.imm_11_0));
-
-    assign s_imm = imm_t'(signed'({id.data.ir.s.imm_11_5, id.data.ir.s.imm_4_0}));
-
-    assign b_imm = imm_t'(signed'({id.data.ir.sb.imm_12, id.data.ir.sb.imm_11, id.data.ir.sb.imm_10_5, id.data.ir.sb.imm_4_1, 1'b0}));
-
-    assign u_imm = (signed'({id.data.ir.u.imm_31_12, 12'd0}));
-
-    assign j_imm = imm_t'(signed'({id.data.ir.uj.imm_20, id.data.ir.uj.imm_19_12, id.data.ir.uj.imm_11, id.data.ir.uj.imm_10_1, 1'b0}));
-
-    // Register addresses
-    assign id.data.rs1_addr = id.data.ir.r.rs1;
-    assign id.data.rs2_addr = id.data.ir.r.rs2;
-    assign id.data.reg_addr = id.data.ir.r.rd;
-
-    // Control signals
-    assign opcode = id.data.ir.r.opcode;
-    assign funct3 = id.data.ir.r.funct3;
-    assign funct7 = id.data.ir.r.funct7;
-
-    // First source register mux
-    always_comb
-        unique case (id.ctrl.rs1_sel)
-            RS_ALU:  rs1_data_mux = ex.data.alu_data;
-            RS_MEM:  rs1_data_mux = mem.data.alu_data;
-            RS_RAM:  rs1_data_mux = mem.data.mem_data;
-            default: rs1_data_mux = id.data.rs1_data;
-        endcase
-
-    // Second source register mux
-    always_comb
-        unique case (id.ctrl.rs2_sel)
-            RS_ALU:  rs2_data_mux = ex.data.alu_data;
-            RS_MEM:  rs2_data_mux = mem.data.alu_data;
-            RS_RAM:  rs2_data_mux = mem.data.mem_data;
-            default: rs2_data_mux = id.data.rs2_data;
-        endcase
-
-    // First operand mux
-    always_comb
-        unique case (ctrl.op1_sel)
-            OP1_PC:  id.data.op1 = id.data.pc;
-            default: id.data.op1 = rs1_data_mux;
-        endcase
-
-    // Second operand mux
-    always_comb
-        unique case (ctrl.op2_sel)
-            OP2_I_IMM: id.data.op2 = i_imm;
-            OP2_S_IMM: id.data.op2 = s_imm;
-            OP2_B_IMM: id.data.op2 = b_imm;
-            OP2_U_IMM: id.data.op2 = u_imm;
-            OP2_J_IMM: id.data.op2 = j_imm;
-            default:   id.data.op2 = rs2_data_mux;
-        endcase
-
-    always_ff @(posedge clk) begin : decode
-        if (reset) begin
-            ex.ctrl.reg_en   <= 1'b0;
-            ex.ctrl.mem_op   <= LOAD_STORE_NONE;
-            ex.ctrl.jmp_op   <= JMP_OP_NONE;
-        end else begin
-            ex.ctrl.reg_en   <= ctrl.reg_en;
-            ex.ctrl.mem_op   <= ctrl.mem_op;
-            ex.ctrl.alu_op   <= ctrl.alu_op;
-            ex.ctrl.jmp_op   <= ctrl.jmp_op;
-            ex.data.pc       <= id.data.pc;
-            ex.data.op1      <= id.data.op1;
-            ex.data.op2      <= id.data.op2;
-            ex.data.rs1_data <= rs1_data_mux;
-            ex.data.rs2_data <= rs2_data_mux;
-            ex.data.reg_addr <= id.data.reg_addr;
-        end
-    end : decode
-
-///////////////////////////////////////////////////////////////////////////////
-
-    /*
-     * Execute
-     */
-
-    // Comparators
-    wire eq  = ex.data.rs1_data == ex.data.rs2_data;
-    wire lt  = signed'(ex.data.rs1_data) < signed'(ex.data.rs2_data);
-    wire ltu = ex.data.rs1_data < ex.data.rs2_data;
-
-    wire beq  = ex.ctrl.jmp_op == JMP_OP_BEQ  & eq;
-    wire bne  = ex.ctrl.jmp_op == JMP_OP_BNE  & ~eq;
-    wire blt  = ex.ctrl.jmp_op == JMP_OP_BLT  & lt;
-    wire bltu = ex.ctrl.jmp_op == JMP_OP_BLTU & ltu;
-    wire bge  = ex.ctrl.jmp_op == JMP_OP_BGE  & (eq | ~lt);
-    wire bgeu = ex.ctrl.jmp_op == JMP_OP_BGEU & (eq | ~ltu);
-
-    assign ex.ctrl.branch = beq | bne | blt | bltu | bge | bgeu;
-    assign ex.ctrl.jump = ex.ctrl.jmp_op == JMP_OP_JAL;
-
-    assign target = (ex.ctrl.branch | ex.ctrl.jump) ? ex.data.alu_data : ex.data.pc + 4;
-
-    assign ex.ctrl.load = riscv::is_load(ex.ctrl.mem_op);
-    assign ex.ctrl.store = riscv::is_store(ex.ctrl.mem_op);
-
-    alu alu (
-        .opcode(ex.ctrl.alu_op),
-        .op1(ex.data.op1),
-        .op2(ex.data.op2),
-        .out(ex.data.alu_data)
-    );
-
-    always_ff @(posedge clk) begin : execute
-        if (reset) begin
-            mem.ctrl.reg_en <= 1'b0;
-            mem.ctrl.mem_op <= LOAD_STORE_NONE;
-        end else begin
-            mem.ctrl.reg_en   <= ex.ctrl.reg_en;
-            mem.ctrl.mem_op   <= ex.ctrl.mem_op;
-            mem.data.reg_addr <= ex.data.reg_addr;
-            mem.data.alu_data <= (ex.ctrl.jump) ? ex.data.pc + 4 : ex.data.alu_data;
-        end
-    end : execute
-
-///////////////////////////////////////////////////////////////////////////////
-
-    /*
-     * Memory
-     */
-
-    wire strb;
-
-    memory #(.ADDR_WIDTH(10)) memory (
-        .clk,
-        .resetn,
-        .op(ex.ctrl.mem_op),
-        .addr(ex.data.alu_data),
-        .din(ex.data.rs2_data),
-        .dout(mem.data.mem_data),
-        .strb,
-        .idle,
-        .data(data)
-    );
-
-    assign mem.ctrl.load = riscv::is_load(mem.ctrl.mem_op);
-    assign mem.ctrl.store = riscv::is_store(mem.ctrl.mem_op);
-
-    always_ff @(posedge clk) begin : writeback
-        if (reset)
-            wb.ctrl.reg_en <= 1'b0;
-        else begin
-            wb.ctrl.reg_en <= mem.ctrl.reg_en;
-            wb.ctrl.load <= mem.ctrl.load;
-            wb.data.reg_addr <= mem.data.reg_addr;
-            wb.data.alu_data <= mem.data.alu_data;
-            if (strb) wb.data.mem_data <= mem.data.mem_data;
-        end
-    end : writeback
-
-///////////////////////////////////////////////////////////////////////////////
-
-    /*
-     * Writeback
-     */
-
-    assign wb.data.reg_data = (wb.ctrl.load) ? wb.data.mem_data : wb.data.alu_data;
-
-endmodule
+endpackage

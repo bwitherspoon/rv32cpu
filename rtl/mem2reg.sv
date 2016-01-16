@@ -8,7 +8,7 @@
  * Module: mem2reg
  */
 module mem2reg
-    import riscv::*;
+    import core::*;
 (
     input  logic       clk,
     input  logic       strb,
@@ -17,7 +17,7 @@ module mem2reg
     input  word_t      din,
     output word_t      dout
 );
-    mem_op_t    _op   = riscv::LOAD_STORE_NONE;
+    mem_op_t    _op   = core::LOAD_STORE_NONE;
     logic [1:0] _addr = '0;
 
     always_ff @(posedge clk)
@@ -28,22 +28,22 @@ module mem2reg
 
     always_comb
         unique case (_op)
-            riscv::LOAD_WORD:
+            core::LOAD_WORD:
                 dout = din;
-            riscv::LOAD_HALF:
+            core::LOAD_HALF:
                 if (_addr[1]) dout = {{16{din[31]}}, din[31:16]};
                 else          dout = {{16{din[15]}}, din[15:0]};
-            riscv::LOAD_BYTE:
+            core::LOAD_BYTE:
                 unique case (_addr)
                     2'b00: dout = {{24{din[7]}},  din[7:0]};
                     2'b01: dout = {{24{din[15]}}, din[15:8]};
                     2'b10: dout = {{24{din[23]}}, din[23:16]};
                     2'b11: dout = {{24{din[31]}}, din[31:24]};
                 endcase
-            riscv::LOAD_HALF_UNSIGNED:
+            core::LOAD_HALF_UNSIGNED:
                 if (_addr[1]) dout = {16'h0000, din[31:16]};
                 else          dout = {16'h0000, din[15:0]};
-            riscv::LOAD_BYTE_UNSIGNED:
+            core::LOAD_BYTE_UNSIGNED:
                 unique case (_addr)
                     2'b00: dout = {24'h000000, din[7:0]};
                     2'b01: dout = {24'h000000, din[15:8]};

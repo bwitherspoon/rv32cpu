@@ -7,11 +7,11 @@
 TOP = testbench.sv
 INF = axi.sv
 PKG = axi4.sv    \
-      riscv.sv
+      core.sv
 RTL = alu.sv     \
       bram.sv    \
       control.sv \
-      core.sv    \
+      cpu.sv    \
       fetch.sv   \
       memory.sv  \
       mem2reg.sv \

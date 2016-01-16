@@ -8,7 +8,7 @@
  * Data MUST be naturally aligned.
  */
 module memory
-    import riscv::*;
+    import core::*;
 #(
     ADDR_WIDTH = 10
 )(
@@ -35,12 +35,12 @@ module memory
     assign idle = (wstate == IDLE || wstate == RESP && wnext == IDLE) &&
                   (rstate == IDLE || rstate == RESP && rnext == IDLE);
 
-    wire store = op == riscv::STORE_WORD || op == riscv::STORE_HALF ||
-                 op == riscv::STORE_BYTE;
+    wire store = op == core::STORE_WORD || op == core::STORE_HALF ||
+                 op == core::STORE_BYTE;
 
-    wire load = op == riscv::LOAD_WORD || op == riscv::LOAD_HALF ||
-                op == riscv::LOAD_BYTE || op == riscv::LOAD_HALF_UNSIGNED ||
-                op == riscv::LOAD_BYTE_UNSIGNED;
+    wire load = op == core::LOAD_WORD || op == core::LOAD_HALF ||
+                op == core::LOAD_BYTE || op == core::LOAD_HALF_UNSIGNED ||
+                op == core::LOAD_BYTE_UNSIGNED;
 
     // FIXME Vivado synthesis grounds wdata and wstrb when initialized to zero
     logic awvalid;

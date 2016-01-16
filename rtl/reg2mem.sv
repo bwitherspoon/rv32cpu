@@ -10,7 +10,7 @@
  * Register to memory alignment
  */
 module reg2mem
-    import riscv::*;
+    import core::*;
 (
     input  mem_op_t    op,
     input  word_t      addr,
@@ -21,11 +21,11 @@ module reg2mem
 
     always_comb
         unique case (op)
-            riscv::STORE_WORD: begin
+            core::STORE_WORD: begin
                 dout = din;
                 strb = '1;
             end
-            riscv::STORE_HALF: begin
+            core::STORE_HALF: begin
                 if (addr[1]) begin
                     dout = din << 16;
                     strb = 4'b1100;
@@ -34,7 +34,7 @@ module reg2mem
                     strb = 4'b0011;
                 end
             end
-            riscv::STORE_BYTE:
+            core::STORE_BYTE:
                 unique case (addr[1:0])
                     2'b00: begin
                         dout = din;

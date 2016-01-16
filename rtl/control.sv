@@ -2,7 +2,7 @@
  * Copyright (c) 2015, C. Brett Witherspoon
  */
 
-import riscv::*;
+import core::*;
 
 /**
  * Module: control
