@@ -8,7 +8,6 @@
  * Module: ram
  */
 module ram #(
-    ADDR_DEPTH = 16,
     DATA_DEPTH = 1024,
     RESP_DEPTH = 4,
     INIT_DATA  = 32'h00000000,
@@ -23,8 +22,6 @@ module ram #(
     wire wresp = data.bvalid & data.bready;
     wire raddr = data.arvalid & data.arready;
     wire rdata = data.rvalid & data.rready;
-
-    logic [$clog2(DATA_DEPTH)-1:0] addrb;
 
     wire [$clog2(DATA_DEPTH)-1:0] awaddr = data.awaddr[$clog2(DATA_DEPTH)-1+2:2];
     wire [$clog2(DATA_DEPTH)-1:0] araddr = data.araddr[$clog2(DATA_DEPTH)-1+2:2];
