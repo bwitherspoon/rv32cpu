@@ -14,9 +14,7 @@ RTL = alu.sv     \
       cpu.sv    \
       fetch.sv   \
       memory.sv  \
-      mem2reg.sv \
       ram.sv     \
-      reg2mem.sv \
       regfile.sv
 LIB = work
 ALL = $(PKG) $(INF) $(RTL) $(TOP)
@@ -53,9 +51,6 @@ xvlog: $(ALL:.sv=.sdb)
 
 $(TOP:.sv=.wcfg):
 	touch $@
-
-$(INIT):
-	for i in $$(seq 0 1023); do printf '%08X\n' $$i >> $@; done
 
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)

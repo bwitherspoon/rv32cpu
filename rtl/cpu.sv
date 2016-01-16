@@ -368,8 +368,8 @@ module cpu
         .op(ex.ctrl.mem_op),
         .addr(ex.data.alu_data),
         .din(ex.data.rs2_data),
-        .dout(mem.data.mem_data),
-        .strb,
+        .dout(wb.data.mem_data),
+        .bypass(mem.data.mem_data),
         .idle,
         .data(data)
     );
@@ -385,7 +385,6 @@ module cpu
             wb.ctrl.load <= mem.ctrl.load;
             wb.data.reg_addr <= mem.data.reg_addr;
             wb.data.alu_data <= mem.data.alu_data;
-            if (strb) wb.data.mem_data <= mem.data.mem_data;
         end
     end : writeback
 

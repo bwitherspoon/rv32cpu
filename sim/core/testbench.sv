@@ -36,6 +36,8 @@ module testbench;
 
     axi peripheral (.aclk(clk), .aresetn(~_reset));
 
+    ram ext (.data(peripheral));
+
     cpu cpu (
         .clk,
         .reset(_reset),

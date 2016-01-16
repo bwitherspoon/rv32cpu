@@ -3,6 +3,103 @@
  */
 
 /**
+ * Module: reg2mem
+ *
+ * A private module for register to memory alignment.
+ */
+module reg2mem
+    import core::*;
+(
+    input  mem_op_t    op,
+    input  word_t      addr,
+    input  word_t      din,
+    output word_t      dout,
+    output strb_t      strb
+);
+    always_comb
+        unique case (op)
+            core::STORE_WORD: begin
+                dout = din;
+                strb = '1;
+            end
+            core::STORE_HALF: begin
+                if (addr[1]) begin
+                    dout = din << 16;
+                    strb = 4'b1100;
+                end else begin
+                    dout = din;
+                    strb = 4'b0011;
+                end
+            end
+            core::STORE_BYTE:
+                unique case (addr[1:0])
+                    2'b00: begin
+                        dout = din;
+                        strb = 4'b0001;
+                    end
+                    2'b01: begin
+                        dout = din << 8;
+                        strb = 4'b0010;
+                    end
+                    2'b10: begin
+                        dout = din << 16;
+                        strb = 4'b0100;
+                    end
+                    2'b11: begin
+                        dout = din << 24;
+                        strb = 4'b1000;
+                    end
+                endcase
+            default: begin
+                dout = 'x;
+                strb = '0;
+            end
+        endcase
+endmodule : reg2mem
+
+/**
+ * Module: mem2reg
+ *
+ * A private module for memory to register alignment.
+ */
+module mem2reg
+    import core::*;
+(
+    input  mem_op_t    op,
+    input  logic [1:0] addr,
+    input  word_t      din,
+    output word_t      dout
+);
+    always_comb
+        unique case (op)
+            core::LOAD_WORD:
+                dout = din;
+            core::LOAD_HALF:
+                if (addr[1]) dout = {{16{din[31]}}, din[31:16]};
+                else         dout = {{16{din[15]}}, din[15:0]};
+            core::LOAD_BYTE:
+                unique case (addr)
+                    2'b00: dout = {{24{din[7]}},  din[7:0]};
+                    2'b01: dout = {{24{din[15]}}, din[15:8]};
+                    2'b10: dout = {{24{din[23]}}, din[23:16]};
+                    2'b11: dout = {{24{din[31]}}, din[31:24]};
+                endcase
+            core::LOAD_HALF_UNSIGNED:
+                if (addr[1]) dout = {16'h0000, din[31:16]};
+                else         dout = {16'h0000, din[15:0]};
+            core::LOAD_BYTE_UNSIGNED:
+                unique case (addr)
+                    2'b00: dout = {24'h000000, din[7:0]};
+                    2'b01: dout = {24'h000000, din[15:8]};
+                    2'b10: dout = {24'h000000, din[23:16]};
+                    2'b11: dout = {24'h000000, din[31:24]};
+                endcase
+            default:
+                dout = 'x;
+        endcase
+endmodule : mem2reg
+
+/**
  * Module: memory
  *
  * Data MUST be naturally aligned.
@@ -18,7 +115,7 @@ module memory
     input  word_t   addr,
     input  word_t   din,
     output word_t   dout,
-    output logic    strb,
+    output word_t   bypass,
     output logic    idle,
     axi.master      data
 );
@@ -30,30 +127,28 @@ module memory
     state_t rstate = IDLE;
     state_t rnext;
 
-    assign strb = rstate == RESP && rnext == IDLE;
+    wire wstart = wstate == IDLE && wnext == ADDR;
+    wire wstop  = wstate == RESP && wnext == IDLE;
 
-    assign idle = (wstate == IDLE || wstate == RESP && wnext == IDLE) &&
-                  (rstate == IDLE || rstate == RESP && rnext == IDLE);
+    wire rstart = rstate == IDLE && rnext == ADDR;
+    wire rstop  = rstate == RESP && rnext == IDLE;
 
-    wire store = op == core::STORE_WORD || op == core::STORE_HALF ||
-                 op == core::STORE_BYTE;
+    assign idle = wstate == IDLE && rstate == IDLE;
 
-    wire load = op == core::LOAD_WORD || op == core::LOAD_HALF ||
-                op == core::LOAD_BYTE || op == core::LOAD_HALF_UNSIGNED ||
-                op == core::LOAD_BYTE_UNSIGNED;
-
-    // FIXME Vivado synthesis grounds wdata and wstrb when initialized to zero
-    logic awvalid;
-    logic wvalid;
-    word_t wdata;
-    strb_t wstrb;
-    logic bready;
-    logic arvalid;
-    logic rready;
+    wire range = ~|addr[$bits(addr)-1:$clog2(core::PERIPH_BASE)];
+    wire store = core::is_store(op) & range;
+    wire load = core::is_load(op) & range;
 
     /*
      * Write
      */
+
+    // NOTE Vivado synthesis grounds wdata and wstrb when initialized to zero
+    logic awvalid;
+    logic wvalid;
+    logic bready;
+    word_t wdata;
+    strb_t wstrb;
 
     reg2mem reg2mem (.op, .addr, .din, .strb(wstrb), .dout(wdata));
 
@@ -63,11 +158,11 @@ module memory
     always_comb
         unique case (wstate)
             IDLE: begin
+                if (store) wnext = ADDR;
+                else       wnext = IDLE;
                 awvalid = store;
                 wvalid  = store;
                 bready  = store;
-                if (store) wnext = ADDR;
-                else       wnext = IDLE;
             end
             ADDR: begin
                 if (data.awready & data.wready & data.bvalid) begin
@@ -136,7 +231,7 @@ module memory
             data.awvalid <= awvalid;
             data.wvalid <= wvalid;
             data.bready <= bready;
-            if (wstate == IDLE || wstate == RESP && wnext == IDLE) begin
+            if (wstart) begin
                 data.awaddr <= addr;
                 data.wdata <= wdata;
                 data.wstrb <= wstrb;
@@ -147,7 +242,11 @@ module memory
      * Read
      */
 
+    logic arvalid;
+    logic rready;
+
     assign data.arprot = axi4::AXI4;
+
 
     // TODO reduce logic
     always_comb
@@ -195,17 +294,29 @@ module memory
             rstate <= rnext;
             data.arvalid <= arvalid;
             data.rready <= rready;
-            if (rstate == IDLE || rstate == RESP && rnext == IDLE)
+            if (rstart) begin
                 data.araddr <= addr;
+            end
+        end
+
+    mem_op_t rop = core::LOAD_STORE_NONE;
+    logic [1:0] raddr = '0;
+
+    always_ff @(posedge clk)
+        if (rstart) begin
+            rop   <= op;
+            raddr <= addr[1:0];
         end
 
     mem2reg mem2reg (
-        .clk,
-        .strb(rstate == IDLE || rnext == IDLE),
-        .op,
-        .addr,
+        .op(rop),
+        .addr(raddr),
         .din(data.rdata),
-        .dout
+        .dout(bypass)
     );
 
-endmodule
+    always_ff @(posedge clk)
+        if (rstop)
+            dout <= bypass;
+
+endmodule : memory

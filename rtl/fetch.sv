@@ -32,7 +32,7 @@
     always_ff @(posedge clk)
         if (reset) begin
             pc <= '0;
-            code.araddr <= core::TEXT_BASE;
+            code.araddr <= core::CODE_BASE;
         end else if (addr) begin
             pc <= code.araddr;
             if (trap)

@@ -89,10 +89,10 @@ package core;
     localparam word_t TRAP_BASE = 32'h00000000;
 
     // Instruction section base address
-    localparam word_t TEXT_BASE = 32'h00000040;
+    localparam word_t CODE_BASE = 32'h00000040;
 
     // Instruction section size
-    localparam word_t TEXT_SIZE = 32'h00001000;
+    localparam word_t CODE_SIZE = 32'h00001000;
 
     // Data section base address
     localparam word_t DATA_BASE = 32'hC0000000;
@@ -100,8 +100,8 @@ package core;
     // Data section size
     localparam word_t DATA_SIZE = 32'h00001000;
 
-    // BSS section base address
-    localparam word_t BSS_BASE = 32'h80000000;
+    // Peripheral section  address
+    localparam word_t PERIPH_BASE = 32'h40000000;
 
     // Instruction type
     typedef union packed {
