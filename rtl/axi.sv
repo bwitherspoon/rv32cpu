@@ -110,6 +110,8 @@ interface axi #(
         input  rready
     );
 
+`ifndef VERILATOR
+
     task automatic timeout(
         input string msg = "timeout",
         input int unsigned arg = 100
@@ -168,5 +170,7 @@ interface axi #(
 
         disable timeout;
     endtask : read
+
+`endif
 
 endinterface : axi
