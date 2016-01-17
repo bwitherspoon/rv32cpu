@@ -64,31 +64,31 @@ package core;
     } funct3_t;
 
     // Instruction address space base
-    localparam word_t CODE_BASE = 32'h00002000;
+    localparam word_t CODE_BASE = 32'h00000000;
 
     // Instruction address space size
     localparam word_t CODE_SIZE = 32'h00000200;
 
     // Kernal address space
-    localparam word_t KERN_BASE = 32'h00002200;
+    localparam word_t KERN_BASE = 32'h00000200;
 
     // Kernal address space
     localparam word_t KERN_SIZE = 32'h00000200;
 
     // Data address space base
-    localparam word_t DATA_BASE = 32'h00004000;
+    localparam word_t DATA_BASE = 32'h00000000;
 
     // Data address space size
     localparam word_t DATA_SIZE = 32'h00000200;
 
     // BSS address space base
-    localparam word_t BSS_BASE = 32'h00004200;
+    localparam word_t BSS_BASE = 32'h00000200;
 
     // BAA address space size
     localparam word_t BSS_SIZE = 32'h00000100;
 
     // Stack base address
-    localparam word_t STACK_BASE = 32'h00004FFF;
+    localparam word_t STACK_BASE = 32'h00000FFF;
 
     // Stack size
     localparam word_t STACK_SIZE = 32'h00000100;
