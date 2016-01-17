@@ -174,7 +174,6 @@ module cpu
 
     logic valid;
 
-    // stall, load, jump
     wire ready = ~stall & ~bubble;
 
     fetch fetch (
@@ -183,7 +182,7 @@ module cpu
         .branch,
         .target,
         .trap,
-        .handler(core::TRAP_BASE),
+        .handler(core::KERN_BASE),
         .ready,
         .pc(id.data.pc),
         .ir(id.data.ir),
@@ -350,7 +349,7 @@ module cpu
 
     wire strb;
 
-    memory #(.ADDR_WIDTH(10)) memory (
+    memory #(.BASE(core::CODE_BASE), .SIZE(core::CODE_SIZE)) memory (
         .clk,
         .resetn,
         .fun(ex.ctrl.fun),

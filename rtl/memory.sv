@@ -108,9 +108,12 @@ endmodule : mem2reg
  * Data MUST be naturally aligned.
  */
 module memory
-    import core::*;
+    import core::fun_t;
+    import core::strb_t;
+    import core::word_t;
 #(
-    ADDR_WIDTH = 10
+    BASE = 32'h00000000,
+    SIZE = 32'h00001000
 )(
     input  logic    clk,
     input  logic    resetn,
@@ -138,9 +141,11 @@ module memory
 
     assign idle = wstate == IDLE && rstate == IDLE;
 
-    wire range = ~|addr[$bits(addr)-1:$clog2(core::PERIPH_BASE)];
-    wire store = core::is_store(fun) & range;
-    wire load = core::is_load(fun) & range;
+    wire space = addr >= BASE && addr < BASE + SIZE;
+
+    wire store = core::is_store(fun);
+
+    wire load = core::is_load(fun);
 
     /*
      * Write
@@ -235,7 +240,7 @@ module memory
             data.wvalid <= wvalid;
             data.bready <= bready;
             if (wstart) begin
-                data.awaddr <= addr;
+                data.awaddr <= addr & (BASE-1);
                 data.wdata <= wdata;
                 data.wstrb <= wstrb;
             end
@@ -297,7 +302,7 @@ module memory
             data.arvalid <= arvalid;
             data.rready <= rready;
             if (rstart) begin
-                data.araddr <= addr;
+                data.araddr <= addr & (BASE-1);
             end
         end
 

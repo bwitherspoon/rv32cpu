@@ -63,23 +63,39 @@ package core;
         BGEU_AND          = 'b111
     } funct3_t;
 
-    // Trap base address
-    localparam word_t TRAP_BASE = 32'h00000000;
+    // Instruction address space base
+    localparam word_t CODE_BASE = 32'h00002000;
 
-    // Instruction section base address
-    localparam word_t CODE_BASE = 32'h00000040;
+    // Instruction address space size
+    localparam word_t CODE_SIZE = 32'h00000200;
 
-    // Instruction section size
-    localparam word_t CODE_SIZE = 32'h00001000;
+    // Kernal address space
+    localparam word_t KERN_BASE = 32'h00002200;
 
-    // Data section base address
-    localparam word_t DATA_BASE = 32'hC0000000;
+    // Kernal address space
+    localparam word_t KERN_SIZE = 32'h00000200;
 
-    // Data section size
-    localparam word_t DATA_SIZE = 32'h00001000;
+    // Data address space base
+    localparam word_t DATA_BASE = 32'h00004000;
 
-    // Peripheral section  address
-    localparam word_t PERIPH_BASE = 32'h40000000;
+    // Data address space size
+    localparam word_t DATA_SIZE = 32'h00000200;
+
+    // BSS address space base
+    localparam word_t BSS_BASE = 32'h00004200;
+
+    // BAA address space size
+    localparam word_t BSS_SIZE = 32'h00000100;
+
+    // Stack base address
+    localparam word_t STACK_BASE = 32'h00004FFF;
+
+    // Stack size
+    localparam word_t STACK_SIZE = 32'h00000100;
+
+    // Memory mapped peripheral address space
+    localparam word_t MMIO_BASE = 32'h40000000;
+
 
     // Instruction type
     typedef union packed {
