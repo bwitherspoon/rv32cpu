@@ -1,5 +1,6 @@
         .text
         .align  5
+        .globl _start
 
 _start: lui  t0,0x40000
         li   t1,-1

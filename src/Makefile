@@ -16,7 +16,7 @@ BSS     ?= 0x800
 
 boot.mem:
 
-boot.o: main.S trap.S
+boot.o: main.S handler.S
 
 %.o: %.c
 	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $^
@@ -25,10 +25,7 @@ boot.o: main.S trap.S
 	$(AS) -m32 -o $@ $^
 
 %.elf: %.o
-	$(LD) -nostdlib -e $(ENTRY) --section-start=.ktext=$(KTEXT) -Ttext=$(TEXT) -Tdata=$(DATA) -Tbss=$(BSS) -o $@ $^
-
-#%.mem: %.elf
-#	$(OBJCOPY) -O verilog $< $@
+	$(LD) -nostdlib -T $(@:.elf=.ld) -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
