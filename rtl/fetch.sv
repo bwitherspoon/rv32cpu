@@ -10,8 +10,9 @@
  * Instruction fetch module.
  */
  module fetch
-    import core::word_t;
+    import core::fi_t;
     import core::inst_t;
+    import core::word_t;
 (
     input  logic  clk,
     input  logic  reset,
@@ -19,16 +20,24 @@
     input  word_t target,
     input  logic  trap,
     input  word_t handler,
-    input  logic  ready,
-    output logic  valid,
-    output word_t pc,
-    output inst_t ir,
+    axis.master   pipe,
     axi.master    code
 );
+    // Handshake signals
     wire addr = code.arvalid & code.arready;
     wire data = code.rvalid & code.rready;
 
+    // Fetch structure
+    fi_t tdata;
+    assign pipe.tdata = tdata;
+
+    // IR
+    assign tdata.data.ir = code.rdata;
+
     // PC
+    word_t pc;
+    assign tdata.data.pc = pc;
+
     always_ff @(posedge clk)
         if (reset) begin
             pc <= '0;
@@ -39,11 +48,11 @@
                 code.araddr <= handler;
             else if (branch)
                 code.araddr <= target;
-            else if (ready)
+            else if (pipe.tready)
                 code.araddr <= code.araddr + 4;
         end
 
-    // AXI
+    // AXI MM
     assign code.arprot = axi4::AXI4;
 
     always_ff @(posedge clk)
@@ -63,17 +72,10 @@
     // AXI Stream
     always_ff @(posedge clk)
         if (reset)
-            valid <= '0;
-        else if (branch | trap | ~ready | ~code.arready)
-            valid <= '0;
+            pipe.tvalid <= '0;
+        else if (branch | trap | ~pipe.tready | ~code.arready)
+            pipe.tvalid <= '0;
         else
-            valid <= '1;
-
-    // IR
-    assign ir = code.rdata;
-
-    // Unused exceptions
-    wire error = code.rready & code.rvalid & code.rresp != axi4::OKAY;
-    wire align = |code.araddr[1:0];
+            pipe.tvalid <= '1;
 
 endmodule : fetch

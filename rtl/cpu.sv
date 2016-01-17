@@ -8,6 +8,7 @@
 module cpu
     import core::addr_t;
     import core::ctrl_t;
+    import core::fi_t;
     import core::fun_t;
     import core::imm_t;
     import core::inst_t;
@@ -174,7 +175,16 @@ module cpu
 
     logic valid;
 
-    wire ready = ~stall & ~bubble;
+    fi_t _fi;
+
+    axis fi ();
+
+    // FIXME For backward compatability
+    assign _fi = fi.slave.tdata;
+    assign valid = fi.slave.tvalid;
+    assign fi.slave.tready = ~stall & ~bubble;
+    assign id.data.pc = _fi.data.pc;
+    assign id.data.ir = _fi.data.ir;
 
     fetch fetch (
         .clk,
@@ -183,10 +193,7 @@ module cpu
         .target,
         .trap,
         .handler(core::KERN_BASE),
-        .ready,
-        .pc(id.data.pc),
-        .ir(id.data.ir),
-        .valid,
+        .pipe(fi),
         .code(code)
     );
 

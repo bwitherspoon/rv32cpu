@@ -239,6 +239,79 @@ package core;
     } ctrl_t;
 
     /*
+     * Pipeline structures
+     */
+
+    // Fetch instruction data type (64-bits)
+    typedef struct packed {
+        struct packed {
+            word_t pc;
+            inst_t ir;
+        } data;
+    } fi_t;
+
+    // Decode instruction structure
+    typedef struct packed {
+        ctrl_t ctrl;
+        logic pad;
+        struct packed {
+            word_t pc;
+            inst_t ir;
+            word_t op1;
+            word_t op2;
+            word_t rs1;
+            word_t rs2;
+            addr_t rd;
+            logic [2:0] reserve;
+        } data;
+    } di_t;
+
+    // Execute instruction structure
+    typedef struct packed {
+        struct packed {
+            fun_t fun;
+            op_t  op;
+            jmp_t jmp;
+            logic [4:0] reserve;
+        } ctrl;
+        struct packed {
+            word_t pc;
+            word_t op1;
+            word_t op2;
+            word_t rs1;
+            word_t rs2;
+            addr_t rd;
+            logic [2:0] reserve;
+        } data;
+    } ex_t;
+
+    // Memory map structure
+    typedef struct packed {
+        struct packed {
+            fun_t fun;
+            logic [3:0] reserve;
+        } ctrl;
+        struct packed {
+            addr_t rd;
+            word_t alu;
+            logic [2:0] reserve;
+        } data;
+    } mm_t;
+
+    // Writeback structure
+    typedef struct packed {
+        struct packed {
+            fun_t fun;
+            logic [3:0] reserve;
+        } ctrl;
+        struct packed {
+            addr_t rd;
+            word_t alu;
+            logic [2:0] reserve;
+       } data;
+    } wb_t;
+
+    /*
      * Helper functions (synthesizable)
      */
 

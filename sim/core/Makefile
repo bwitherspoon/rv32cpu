@@ -7,7 +7,8 @@
 TOP = testbench.sv
 PKG = axi4.sv    \
       core.sv
-INT = axi.sv
+INT = axi.sv     \
+      axis.sv
 RTL = alu.sv     \
       bram.sv    \
       control.sv \
