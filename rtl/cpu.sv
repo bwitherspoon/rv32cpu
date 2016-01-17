@@ -6,7 +6,15 @@
  * Module: cpu
  */
 module cpu
-    import core::*;
+    import core::addr_t;
+    import core::ctrl_t;
+    import core::fun_t;
+    import core::imm_t;
+    import core::inst_t;
+    import core::jmp_t;
+    import core::op_t;
+    import core::rs_t;
+    import core::word_t;
 (
     input  logic clk,
     input  logic reset,
@@ -19,8 +27,8 @@ module cpu
 
     struct packed {
         struct packed {
-            rs_sel_t rs1_sel;
-            rs_sel_t rs2_sel;
+            rs_t rs1;
+            rs_t rs2;
         } ctrl;
         struct packed {
             word_t pc;
@@ -37,10 +45,9 @@ module cpu
 
     struct packed {
         struct packed {
-            logic    reg_en;
-            mem_op_t mem_op;
-            alu_op_t alu_op;
-            jmp_op_t jmp_op;
+            fun_t    fun;
+            op_t     op;
+            jmp_t    jmp;
             logic    jump;
             logic    branch;
             logic    load;
@@ -59,10 +66,9 @@ module cpu
 
     struct packed {
         struct packed {
-            logic    reg_en;
-            mem_op_t mem_op;
-            logic    load;
-            logic    store;
+            fun_t fun;
+            logic load;
+            logic store;
         } ctrl;
         struct packed {
             addr_t reg_addr;
@@ -73,7 +79,7 @@ module cpu
 
     struct packed {
         struct packed {
-            logic reg_en;
+            logic register;
             logic load;
         } ctrl;
         struct packed {
@@ -106,10 +112,10 @@ module cpu
     wire branch = ex.ctrl.branch | ex.ctrl.jump;
 
     // Bubble after jump to wait for address
-    wire jump = ctrl.jmp_op == JMP_OP_JAL;
+    wire jump = ctrl.jmp == core::JAL_OR_JALR;
 
     // Bubble after load to account for load latency
-    wire load = core::is_load(ctrl.mem_op);
+    wire load = core::is_load(ctrl.fun);
 
     // A bubble prevents the PC from advancing and inserts NOPs
     wire bubble = load | jump;
@@ -129,40 +135,34 @@ module cpu
     always_comb
         if (id.data.rs1_addr == ex.data.reg_addr
             && id.data.rs1_addr != '0
-            && ex.ctrl.reg_en == '1
-            && ex.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs1_sel = RS_ALU;
+            && ex.ctrl.fun == core::REGISTER)
+            id.ctrl.rs1 = core::ALU;
         else if (id.data.rs1_addr == mem.data.reg_addr
                  && id.data.rs1_addr != '0
-                 && mem.ctrl.reg_en == '1
-                 && mem.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs1_sel = RS_MEM;
+                 && mem.ctrl.fun == core::REGISTER)
+            id.ctrl.rs1 = core::MEM;
         else if (id.data.rs1_addr == mem.data.reg_addr
                  && id.data.rs1_addr != '0
-                 && mem.ctrl.reg_en == '1
                  && mem.ctrl.load == '1)
-            id.ctrl.rs1_sel = RS_RAM;
+            id.ctrl.rs1 = core::RAM;
         else
-            id.ctrl.rs1_sel = RS_REG;
+            id.ctrl.rs1 = core::REG;
 
     always_comb
         if (id.data.rs2_addr == ex.data.reg_addr
             && id.data.rs2_addr != '0
-            && ex.ctrl.reg_en == '1
-            && ex.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs2_sel = RS_ALU;
+            && ex.ctrl.fun == core::REGISTER)
+            id.ctrl.rs2 = core::ALU;
         else if (id.data.rs2_addr == mem.data.reg_addr
                  && id.data.rs2_addr != '0
-                 && mem.ctrl.reg_en == '1
-                 && mem.ctrl.mem_op == LOAD_STORE_NONE)
-            id.ctrl.rs2_sel = RS_MEM;
+                 && mem.ctrl.fun == core::REGISTER)
+            id.ctrl.rs2 = core::MEM;
         else if (id.data.rs2_addr == mem.data.reg_addr
                  && id.data.rs2_addr != '0
-                 && mem.ctrl.reg_en == '1
                  && mem.ctrl.load == '1)
-            id.ctrl.rs2_sel = RS_RAM;
+            id.ctrl.rs2 = core::RAM;
         else
-            id.ctrl.rs2_sel = RS_REG;
+            id.ctrl.rs2 = core::REG;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -183,7 +183,7 @@ module cpu
         .branch,
         .target,
         .trap,
-        .handler(TRAP_BASE),
+        .handler(core::TRAP_BASE),
         .ready,
         .pc(id.data.pc),
         .ir(id.data.ir),
@@ -197,13 +197,10 @@ module cpu
      * Decode
      */
 
-    opcode_t opcode;
-    funct3_t funct3;
-    funct7_t funct7;
     ctrl_t   ctrl;
 
-    word_t rs1_data_mux;
-    word_t rs2_data_mux;
+    word_t rs1_data;
+    word_t rs2_data;
 
     imm_t i_imm;
     imm_t s_imm;
@@ -213,9 +210,9 @@ module cpu
 
     // Control decoder
     control control (
-        .opcode,
-        .funct3,
-        .funct7,
+        .opcode(id.data.ir.r.opcode),
+        .funct3(id.data.ir.r.funct3),
+        .funct7(id.data.ir.r.funct7),
         .valid,
         .invalid,
         .ctrl
@@ -228,7 +225,7 @@ module cpu
         .rs2_addr(id.data.rs2_addr),
         .rs1_data(id.data.rs1_data),
         .rs2_data(id.data.rs2_data),
-        .rd_en(wb.ctrl.reg_en),
+        .rd_en(wb.ctrl.register),
         .rd_addr(wb.data.reg_addr),
         .rd_data(wb.data.reg_data)
     );
@@ -249,62 +246,55 @@ module cpu
     assign id.data.rs2_addr = id.data.ir.r.rs2;
     assign id.data.reg_addr = id.data.ir.r.rd;
 
-    // Control signals
-    assign opcode = id.data.ir.r.opcode;
-    assign funct3 = id.data.ir.r.funct3;
-    assign funct7 = id.data.ir.r.funct7;
-
     // First source register mux
     always_comb
-        unique case (id.ctrl.rs1_sel)
-            RS_ALU:  rs1_data_mux = ex.data.alu_data;
-            RS_MEM:  rs1_data_mux = mem.data.alu_data;
-            RS_RAM:  rs1_data_mux = mem.data.mem_data;
-            default: rs1_data_mux = id.data.rs1_data;
+        unique case (id.ctrl.rs1)
+            core::ALU: rs1_data = ex.data.alu_data;
+            core::MEM: rs1_data = mem.data.alu_data;
+            core::RAM: rs1_data = mem.data.mem_data;
+            default:   rs1_data = id.data.rs1_data;
         endcase
 
     // Second source register mux
     always_comb
-        unique case (id.ctrl.rs2_sel)
-            RS_ALU:  rs2_data_mux = ex.data.alu_data;
-            RS_MEM:  rs2_data_mux = mem.data.alu_data;
-            RS_RAM:  rs2_data_mux = mem.data.mem_data;
-            default: rs2_data_mux = id.data.rs2_data;
+        unique case (id.ctrl.rs2)
+            core::ALU: rs2_data = ex.data.alu_data;
+            core::MEM: rs2_data = mem.data.alu_data;
+            core::RAM: rs2_data = mem.data.mem_data;
+            default:   rs2_data = id.data.rs2_data;
         endcase
 
     // First operand mux
     always_comb
-        unique case (ctrl.op1_sel)
-            OP1_PC:  id.data.op1 = id.data.pc;
-            default: id.data.op1 = rs1_data_mux;
+        unique case (ctrl.op1)
+            core::PC: id.data.op1 = id.data.pc;
+            default:  id.data.op1 = rs1_data;
         endcase
 
     // Second operand mux
     always_comb
-        unique case (ctrl.op2_sel)
-            OP2_I_IMM: id.data.op2 = i_imm;
-            OP2_S_IMM: id.data.op2 = s_imm;
-            OP2_B_IMM: id.data.op2 = b_imm;
-            OP2_U_IMM: id.data.op2 = u_imm;
-            OP2_J_IMM: id.data.op2 = j_imm;
-            default:   id.data.op2 = rs2_data_mux;
+        unique case (ctrl.op2)
+            core::I_IMM: id.data.op2 = i_imm;
+            core::S_IMM: id.data.op2 = s_imm;
+            core::B_IMM: id.data.op2 = b_imm;
+            core::U_IMM: id.data.op2 = u_imm;
+            core::J_IMM: id.data.op2 = j_imm;
+            default:     id.data.op2 = rs2_data;
         endcase
 
     always_ff @(posedge clk) begin : decode
         if (reset) begin
-            ex.ctrl.reg_en   <= 1'b0;
-            ex.ctrl.mem_op   <= LOAD_STORE_NONE;
-            ex.ctrl.jmp_op   <= JMP_OP_NONE;
+            ex.ctrl.fun <= core::NULL;
+            ex.ctrl.jmp <= core::NONE;
         end else begin
-            ex.ctrl.reg_en   <= ctrl.reg_en;
-            ex.ctrl.mem_op   <= ctrl.mem_op;
-            ex.ctrl.alu_op   <= ctrl.alu_op;
-            ex.ctrl.jmp_op   <= ctrl.jmp_op;
+            ex.ctrl.fun      <= ctrl.fun;
+            ex.ctrl.op       <= ctrl.op;
+            ex.ctrl.jmp      <= ctrl.jmp;
             ex.data.pc       <= id.data.pc;
             ex.data.op1      <= id.data.op1;
             ex.data.op2      <= id.data.op2;
-            ex.data.rs1_data <= rs1_data_mux;
-            ex.data.rs2_data <= rs2_data_mux;
+            ex.data.rs1_data <= rs1_data;
+            ex.data.rs2_data <= rs2_data;
             ex.data.reg_addr <= id.data.reg_addr;
         end
     end : decode
@@ -320,23 +310,23 @@ module cpu
     wire lt  = signed'(ex.data.rs1_data) < signed'(ex.data.rs2_data);
     wire ltu = ex.data.rs1_data < ex.data.rs2_data;
 
-    wire beq  = ex.ctrl.jmp_op == JMP_OP_BEQ  & eq;
-    wire bne  = ex.ctrl.jmp_op == JMP_OP_BNE  & ~eq;
-    wire blt  = ex.ctrl.jmp_op == JMP_OP_BLT  & lt;
-    wire bltu = ex.ctrl.jmp_op == JMP_OP_BLTU & ltu;
-    wire bge  = ex.ctrl.jmp_op == JMP_OP_BGE  & (eq | ~lt);
-    wire bgeu = ex.ctrl.jmp_op == JMP_OP_BGEU & (eq | ~ltu);
+    wire beq  = ex.ctrl.jmp == core::BEQ  & eq;
+    wire bne  = ex.ctrl.jmp == core::BNE  & ~eq;
+    wire blt  = ex.ctrl.jmp == core::BLT  & lt;
+    wire bltu = ex.ctrl.jmp == core::BLTU & ltu;
+    wire bge  = ex.ctrl.jmp == core::BGE  & (eq | ~lt);
+    wire bgeu = ex.ctrl.jmp == core::BGEU & (eq | ~ltu);
 
     assign ex.ctrl.branch = beq | bne | blt | bltu | bge | bgeu;
-    assign ex.ctrl.jump = ex.ctrl.jmp_op == JMP_OP_JAL;
+    assign ex.ctrl.jump = ex.ctrl.jmp == core::JAL_OR_JALR;
 
     assign target = (ex.ctrl.branch | ex.ctrl.jump) ? ex.data.alu_data : ex.data.pc + 4;
 
-    assign ex.ctrl.load = core::is_load(ex.ctrl.mem_op);
-    assign ex.ctrl.store = core::is_store(ex.ctrl.mem_op);
+    assign ex.ctrl.load = core::is_load(ex.ctrl.fun);
+    assign ex.ctrl.store = core::is_store(ex.ctrl.fun);
 
     alu alu (
-        .opcode(ex.ctrl.alu_op),
+        .opcode(ex.ctrl.op),
         .op1(ex.data.op1),
         .op2(ex.data.op2),
         .out(ex.data.alu_data)
@@ -344,11 +334,9 @@ module cpu
 
     always_ff @(posedge clk) begin : execute
         if (reset) begin
-            mem.ctrl.reg_en <= 1'b0;
-            mem.ctrl.mem_op <= LOAD_STORE_NONE;
+            mem.ctrl.fun <= core::NULL;
         end else begin
-            mem.ctrl.reg_en   <= ex.ctrl.reg_en;
-            mem.ctrl.mem_op   <= ex.ctrl.mem_op;
+            mem.ctrl.fun      <= ex.ctrl.fun;
             mem.data.reg_addr <= ex.data.reg_addr;
             mem.data.alu_data <= (ex.ctrl.jump) ? ex.data.pc + 4 : ex.data.alu_data;
         end
@@ -365,7 +353,7 @@ module cpu
     memory #(.ADDR_WIDTH(10)) memory (
         .clk,
         .resetn,
-        .op(ex.ctrl.mem_op),
+        .fun(ex.ctrl.fun),
         .addr(ex.data.alu_data),
         .din(ex.data.rs2_data),
         .dout(wb.data.mem_data),
@@ -374,15 +362,15 @@ module cpu
         .data(data)
     );
 
-    assign mem.ctrl.load = core::is_load(mem.ctrl.mem_op);
-    assign mem.ctrl.store = core::is_store(mem.ctrl.mem_op);
+    assign mem.ctrl.load = core::is_load(mem.ctrl.fun);
+    assign mem.ctrl.store = core::is_store(mem.ctrl.fun);
 
     always_ff @(posedge clk) begin : writeback
         if (reset)
-            wb.ctrl.reg_en <= 1'b0;
+            wb.ctrl.register <= 1'b0;
         else begin
-            wb.ctrl.reg_en <= mem.ctrl.reg_en;
-            wb.ctrl.load <= mem.ctrl.load;
+            wb.ctrl.register <= mem.ctrl.fun == core::REGISTER;
+            wb.ctrl.load     <= mem.ctrl.load;
             wb.data.reg_addr <= mem.data.reg_addr;
             wb.data.alu_data <= mem.data.alu_data;
         end

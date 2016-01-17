@@ -9,31 +9,31 @@ package core;
 
     // Opcodes
     typedef enum logic [6:0] {
-        OPCODE_LOAD      = 'b0000011,
-        OPCODE_LOAD_FP   = 'b0000111,
-        OPCODE_CUSTOM_0  = 'b0001011,
-        OPCODE_MISC_MEM  = 'b0001111,
-        OPCODE_OP_IMM    = 'b0010011,
-        OPCODE_AUIPC     = 'b0010111,
-        OPCODE_OP_IMM_32 = 'b0011011,
-        OPCODE_STORE     = 'b0100011,
-        OPCODE_STORE_FP  = 'b0100111,
-        OPCODE_CUSTOM_1  = 'b0101011,
-        OPCODE_AMO       = 'b0101111,
-        OPCODE_OP        = 'b0110011,
-        OPCODE_LUI       = 'b0110111,
-        OPCODE_OP_32     = 'b0111011,
-        OPCODE_MADD      = 'b1000011,
-        OPCODE_MSUB      = 'b1000111,
-        OPCODE_NMSUB     = 'b1001011,
-        OPCODE_NMADD     = 'b1001111,
-        OPCODE_OP_FP     = 'b1010011,
-        OPCODE_CUSTOM_2  = 'b1011011,
-        OPCODE_BRANCH    = 'b1100011,
-        OPCODE_JALR      = 'b1100111,
-        OPCODE_JAL       = 'b1101111,
-        OPCODE_SYSTEM    = 'b1110011,
-        OPCODE_CUSTOM_3  = 'b1111011
+        LOAD      = 'b0000011,
+        LOAD_FP   = 'b0000111,
+        CUSTOM_0  = 'b0001011,
+        MISC_MEM  = 'b0001111,
+        OP_IMM    = 'b0010011,
+        AUIPC     = 'b0010111,
+        OP_IMM_32 = 'b0011011,
+        STORE     = 'b0100011,
+        STORE_FP  = 'b0100111,
+        CUSTOM_1  = 'b0101011,
+        AMO       = 'b0101111,
+        OP        = 'b0110011,
+        LUI       = 'b0110111,
+        OP_32     = 'b0111011,
+        MADD      = 'b1000011,
+        MSUB      = 'b1000111,
+        NMSUB     = 'b1001011,
+        NMADD     = 'b1001111,
+        OP_FP     = 'b1010011,
+        CUSTOM_2  = 'b1011011,
+        BRANCH    = 'b1100011,
+        JALR      = 'b1100111,
+        JAL       = 'b1101111,
+        SYSTEM    = 'b1110011,
+        CUSTOM_3  = 'b1111011
     } opcode_t;
 
     // Word type
@@ -52,38 +52,16 @@ package core;
     typedef logic [6:0] funct7_t;
 
     // Instruction funct3 type
-    typedef logic [2:0] funct3_t;
-
-    localparam funct3_t FUNCT3_BEQ       = 'b000;
-    localparam funct3_t FUNCT3_BNE       = 'b001;
-    localparam funct3_t FUNCT3_BLT       = 'b100;
-    localparam funct3_t FUNCT3_BGE       = 'b101;
-    localparam funct3_t FUNCT3_BLTU      = 'b110;
-    localparam funct3_t FUNCT3_BGEU      = 'b111;
-    localparam funct3_t FUNCT3_LB        = 'b000;
-    localparam funct3_t FUNCT3_LH        = 'b001;
-    localparam funct3_t FUNCT3_LW        = 'b010;
-    localparam funct3_t FUNCT3_LBU       = 'b100;
-    localparam funct3_t FUNCT3_LHU       = 'b101;
-    localparam funct3_t FUNCT3_SB        = 'b000;
-    localparam funct3_t FUNCT3_SH        = 'b001;
-    localparam funct3_t FUNCT3_SW        = 'b010;
-    localparam funct3_t FUNCT3_ADDI      = 'b000;
-    localparam funct3_t FUNCT3_SLTI      = 'b010;
-    localparam funct3_t FUNCT3_SLTIU     = 'b011;
-    localparam funct3_t FUNCT3_XORI      = 'b100;
-    localparam funct3_t FUNCT3_SRLI_SRAI = 'b101;
-    localparam funct3_t FUNCT3_ORI       = 'b110;
-    localparam funct3_t FUNCT3_ANDI      = 'b111;
-    localparam funct3_t FUNCT3_SLLI      = 'b001;
-    localparam funct3_t FUNCT3_ADD_SUB   = 'b000;
-    localparam funct3_t FUNCT3_SLL       = 'b001;
-    localparam funct3_t FUNCT3_SLT       = 'b010;
-    localparam funct3_t FUNCT3_SLTU      = 'b011;
-    localparam funct3_t FUNCT3_XOR       = 'b100;
-    localparam funct3_t FUNCT3_SRL_SRA   = 'b101;
-    localparam funct3_t FUNCT3_OR        = 'b110;
-    localparam funct3_t FUNCT3_AND       = 'b111;
+    typedef enum logic [2:0] {
+        BEQ_LB_SB_ADD_SUB = 'b000,
+        BNE_LH_SH_SLL     = 'b001,
+        LW_SW_SLT         = 'b010,
+        SLTU_SLTIU        = 'b011,
+        BLT_LBU_XOR       = 'b100,
+        BGE_LHU_SRL_SRA   = 'b101,
+        BLTU_OR           = 'b110,
+        BGEU_AND          = 'b111
+    } funct3_t;
 
     // Trap base address
     localparam word_t TRAP_BASE = 32'h00000000;
@@ -159,9 +137,11 @@ package core;
      * Control
      */
 
-    // Memory operation type
+    // CPU function type
     typedef enum logic [3:0] {
-        LOAD_STORE_NONE,
+        NULL,
+        REGISTER,
+        JUMP_OR_BRANCH,
         LOAD_WORD,
         LOAD_HALF,
         LOAD_BYTE,
@@ -170,90 +150,89 @@ package core;
         STORE_WORD,
         STORE_HALF,
         STORE_BYTE
-    } mem_op_t;
+    } fun_t;
 
     // ALU operation type
     typedef enum logic [3:0] {
-        ALU_ADD,
-        ALU_SLL,
-        ALU_SLT,
-        ALU_SLTU,
-        ALU_XOR,
-        ALU_SRL,
-        ALU_OR,
-        ALU_AND,
-        ALU_SUB,
-        ALU_SRA,
-        ALU_OP2,
-        ALU_XXX = 4'bxxxx
-    } alu_op_t;
+        ADD,
+        SLL,
+        SLT,
+        SLTU,
+        XOR,
+        SRL,
+        OR,
+        AND,
+        SUB,
+        SRA,
+        OP2,
+        ANY = 4'bxxxx
+    } op_t;
 
     // Jump / Branch operation type
     typedef enum logic [2:0] {
-        JMP_OP_NONE,
-        JMP_OP_JAL,
-        JMP_OP_BEQ,
-        JMP_OP_BNE,
-        JMP_OP_BLT,
-        JMP_OP_BLTU,
-        JMP_OP_BGE,
-        JMP_OP_BGEU
-    } jmp_op_t;
+        NONE,
+        JAL_OR_JALR,
+        BEQ,
+        BNE,
+        BLT,
+        BLTU,
+        BGE,
+        BGEU
+    } jmp_t;
 
     // Program counter select
     typedef enum logic [1:0] {
-        PC_NEXT,
-        PC_ADDR,
-        PC_TRAP
-    } pc_sel_t;
+        NEXT,
+        ADDR,
+        TRAP
+    } pc_t;
 
     // First operand select
     typedef enum logic {
-        OP1_RS1,
-        OP1_PC,
-        OP1_XXX = 1'bx
-    } op1_sel_t;
+        RS1,
+        PC,
+        XX = 1'bx
+    } op1_t;
 
     // Second operand select
     typedef enum logic [2:0] {
-        OP2_RS2,
-        OP2_I_IMM,
-        OP2_S_IMM,
-        OP2_B_IMM,
-        OP2_U_IMM,
-        OP2_J_IMM,
-        OP2_XXX = 3'bxxx
-    } op2_sel_t;
+        RS2,
+        I_IMM,
+        S_IMM,
+        B_IMM,
+        U_IMM,
+        J_IMM,
+        XXX = 3'bxxx
+    } op2_t;
 
     // Source register select (forwarding)
     typedef enum logic [1:0] {
-        RS_REG,
-        RS_ALU,
-        RS_MEM,
-        RS_RAM
-    } rs_sel_t;
+        REG,
+        ALU,
+        MEM,
+        RAM
+    } rs_t;
 
     // Data path control signals
     typedef struct packed {
-        logic     reg_en;
-        mem_op_t  mem_op;
-        alu_op_t  alu_op;
-        jmp_op_t  jmp_op;
-        op1_sel_t op1_sel;
-        op2_sel_t op2_sel;
+        fun_t fun;
+        op_t  op;
+        jmp_t jmp;
+        op1_t op1;
+        op2_t op2;
     } ctrl_t;
 
     /*
      * Helper functions (synthesizable)
      */
 
-    function logic is_load (input mem_op_t op);
-        return op == LOAD_WORD || op == LOAD_HALF || op == LOAD_BYTE ||
-               op == LOAD_HALF_UNSIGNED || op == LOAD_BYTE_UNSIGNED;
+    function logic is_load (input fun_t fun);
+        return fun == LOAD_WORD || fun == LOAD_HALF || fun == LOAD_BYTE ||
+               fun == LOAD_HALF_UNSIGNED || fun == LOAD_BYTE_UNSIGNED;
     endfunction
 
-    function logic is_store (input mem_op_t op);
-        return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
+    function logic is_store (input fun_t fun);
+        return fun == STORE_WORD || fun == STORE_HALF || fun == STORE_BYTE;
     endfunction
 
 

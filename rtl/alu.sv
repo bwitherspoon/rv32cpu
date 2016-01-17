@@ -8,9 +8,10 @@
  * An arithmetic and logic unit (ALU) for RISC-V
  */
 module alu
-    import core::*;
+    import core::op_t;
+    import core::word_t;
 (
-    input  alu_op_t opcode,
+    input  op_t     opcode,
     input  word_t   op1,
     input  word_t   op2,
     output word_t   out
@@ -19,17 +20,17 @@ module alu
 
     always_comb
         unique case (opcode)
-            ALU_ADD:  out = op1 + op2;
-            ALU_SUB:  out = op1 - op2;
-            ALU_SLL:  out = op1 << shamt;
-            ALU_SLT:  out = word_t'(signed'(op1) < signed'(op2));
-            ALU_SLTU: out = word_t'(op1 < op2);
-            ALU_XOR:  out = op1 ^ op2;
-            ALU_SRL:  out = op1 >> shamt;
-            ALU_SRA:  out = signed'(op1) >>> shamt;
-            ALU_OR:   out = op1 | op2;
-            ALU_AND:  out = op1 & op2;
-            ALU_OP2:  out = op2;
+            core::ADD:  out = op1 + op2;
+            core::SUB:  out = op1 - op2;
+            core::SLL:  out = op1 << shamt;
+            core::SLT:  out = word_t'(signed'(op1) < signed'(op2));
+            core::SLTU: out = word_t'(op1 < op2);
+            core::XOR:  out = op1 ^ op2;
+            core::SRL:  out = op1 >> shamt;
+            core::SRA:  out = signed'(op1) >>> shamt;
+            core::OR:   out = op1 | op2;
+            core::AND:  out = op1 & op2;
+            core::OP2:  out = op2;
             default:  out = 'x;
         endcase
 endmodule

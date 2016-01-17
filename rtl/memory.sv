@@ -8,16 +8,18 @@
  * A private module for register to memory alignment.
  */
 module reg2mem
-    import core::*;
+    import core::fun_t;
+    import core::word_t;
+    import core::strb_t;
 (
-    input  mem_op_t    op,
+    input  fun_t       fun,
     input  word_t      addr,
     input  word_t      din,
     output word_t      dout,
     output strb_t      strb
 );
     always_comb
-        unique case (op)
+        unique case (fun)
             core::STORE_WORD: begin
                 dout = din;
                 strb = '1;
@@ -63,15 +65,16 @@ endmodule : reg2mem
  * A private module for memory to register alignment.
  */
 module mem2reg
-    import core::*;
+    import core::fun_t;
+    import core::word_t;
 (
-    input  mem_op_t    op,
+    input  fun_t       fun,
     input  logic [1:0] addr,
     input  word_t      din,
     output word_t      dout
 );
     always_comb
-        unique case (op)
+        unique case (fun)
             core::LOAD_WORD:
                 dout = din;
             core::LOAD_HALF:
@@ -111,7 +114,7 @@ module memory
 )(
     input  logic    clk,
     input  logic    resetn,
-    input  mem_op_t op,
+    input  fun_t    fun,
     input  word_t   addr,
     input  word_t   din,
     output word_t   dout,
@@ -136,8 +139,8 @@ module memory
     assign idle = wstate == IDLE && rstate == IDLE;
 
     wire range = ~|addr[$bits(addr)-1:$clog2(core::PERIPH_BASE)];
-    wire store = core::is_store(op) & range;
-    wire load = core::is_load(op) & range;
+    wire store = core::is_store(fun) & range;
+    wire load = core::is_load(fun) & range;
 
     /*
      * Write
@@ -150,7 +153,7 @@ module memory
     word_t wdata;
     strb_t wstrb;
 
-    reg2mem reg2mem (.op, .addr, .din, .strb(wstrb), .dout(wdata));
+    reg2mem reg2mem (.fun, .addr, .din, .strb(wstrb), .dout(wdata));
 
     assign data.awprot = axi4::AXI4;
 
@@ -247,7 +250,6 @@ module memory
 
     assign data.arprot = axi4::AXI4;
 
-
     // TODO reduce logic
     always_comb
         unique case (rstate)
@@ -299,17 +301,17 @@ module memory
             end
         end
 
-    mem_op_t rop = core::LOAD_STORE_NONE;
+    fun_t rfun = core::NULL;
     logic [1:0] raddr = '0;
 
     always_ff @(posedge clk)
         if (rstart) begin
-            rop   <= op;
+            rfun  <= fun;
             raddr <= addr[1:0];
         end
 
     mem2reg mem2reg (
-        .op(rop),
+        .fun(rfun),
         .addr(raddr),
         .din(data.rdata),
         .dout(bypass)

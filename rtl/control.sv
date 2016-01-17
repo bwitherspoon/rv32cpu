@@ -2,12 +2,15 @@
  * Copyright (c) 2015, C. Brett Witherspoon
  */
 
-import core::*;
-
 /**
  * Module: control
  */
-module control (
+module control
+    import core::opcode_t;
+    import core::funct3_t;
+    import core::funct7_t;
+    import core::ctrl_t;
+(
      input  opcode_t opcode,
      input  funct3_t funct3,
      input  funct7_t funct7,
@@ -15,390 +18,351 @@ module control (
      output logic    invalid,
      output ctrl_t   ctrl
 );
-
-    localparam ctrl_t CTRL_NOP = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_XXX,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_XXX,
-        op2_sel: OP2_XXX
+    localparam ctrl_t NOP = '{
+        fun: core::NULL,
+        op:  core::ANY,
+        jmp: core::NONE,
+        op1: core::XX,
+        op2: core::XXX
     };
-    localparam ctrl_t CTRL_ADDI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t ADDI = '{
+        fun: core::REGISTER,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_SLTI = '{
-       reg_en:  1'b1,
-       mem_op:  LOAD_STORE_NONE,
-       alu_op:  ALU_SLT,
-       jmp_op:  JMP_OP_NONE,
-       op1_sel: OP1_RS1,
-       op2_sel: OP2_I_IMM
+    localparam ctrl_t SLTI = '{
+       fun: core::REGISTER,
+       op:  core::SLT,
+       jmp: core::NONE,
+       op1: core::RS1,
+       op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_SLTIU = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SLTU,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t SLTIU = '{
+        fun: core::REGISTER,
+        op:  core::SLTU,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_ANDI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_AND,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t ANDI = '{
+        fun: core::REGISTER,
+        op:  core::AND,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_ORI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_OR,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t ORI = '{
+        fun: core::REGISTER,
+        op:  core::OR,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_XORI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_XOR,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t XORI = '{
+        fun: core::REGISTER,
+        op:  core::XOR,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_SLLI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SLL,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t SLLI = '{
+        fun: core::REGISTER,
+        op:  core::SLL,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_SRLI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SRL,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t SRLI = '{
+        fun: core::REGISTER,
+        op:  core::SRL,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_SRAI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SRA,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t SRAI = '{
+        fun: core::REGISTER,
+        op:  core::SRA,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_LUI = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_OP2,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_XXX,
-        op2_sel: OP2_U_IMM
+    localparam ctrl_t LUI = '{
+        fun: core::REGISTER,
+        op:  core::OP2,
+        jmp: core::NONE,
+        op1: core::XX,
+        op2: core::U_IMM
     };
-    localparam ctrl_t CTRL_AUIPC = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_U_IMM
+    localparam ctrl_t AUIPC = '{
+        fun: core::REGISTER,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::PC,
+        op2: core::U_IMM
     };
-    localparam ctrl_t CTRL_ADD = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t ADD = '{
+        fun: core::REGISTER,
+        op:  core::AND,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_SLT = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SLT,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t SLT = '{
+        fun: core::REGISTER,
+        op:  core::SLT,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_SLTU = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SLTU,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t SLTU = '{
+        fun: core::REGISTER,
+        op:  core::SLTU,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_AND = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_AND,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t AND = '{
+        fun: core::REGISTER,
+        op:  core::AND,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_OR = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_OR,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t OR = '{
+        fun: core::REGISTER,
+        op:  core::OR,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_XOR = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_XOR,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t XOR = '{
+        fun: core::REGISTER,
+        op:  core::XOR,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_SLL = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SLL,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t SLL = '{
+        fun: core::REGISTER,
+        op:  core::SLL,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_SRL = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SRL,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t SRL = '{
+        fun: core::REGISTER,
+        op:  core::SRL,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_SUB = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SUB,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t SUB = '{
+        fun: core::REGISTER,
+        op:  core::SUB,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_SRA = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_SRA,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_RS2
+    localparam ctrl_t SRA = '{
+        fun: core::REGISTER,
+        op:  core::SRA,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::RS2
     };
-    localparam ctrl_t CTRL_JAL = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_JAL,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_J_IMM
+    localparam ctrl_t JAL = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::JAL_OR_JALR,
+        op1: core::PC,
+        op2: core::J_IMM
     };
-    localparam ctrl_t CTRL_JALR = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_JAL,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t JALR = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::JAL_OR_JALR,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_BEQ = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_BEQ,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_B_IMM
+    localparam ctrl_t BEQ = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::BEQ,
+        op1: core::PC,
+        op2: core::B_IMM
     };
-    localparam ctrl_t CTRL_BNE = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_BNE,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_B_IMM
+    localparam ctrl_t BNE = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::BNE,
+        op1: core::PC,
+        op2: core::B_IMM
     };
-    localparam ctrl_t CTRL_BLT = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_BLT,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_B_IMM
+    localparam ctrl_t BLT = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::BLT,
+        op1: core::PC,
+        op2: core::B_IMM
     };
-    localparam ctrl_t CTRL_BLTU = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_BLTU,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_B_IMM
+    localparam ctrl_t BLTU = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::BLTU,
+        op1: core::PC,
+        op2: core::B_IMM
     };
-    localparam ctrl_t CTRL_BGE = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_BGE,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_B_IMM
+    localparam ctrl_t BGE = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::BGE,
+        op1: core::PC,
+        op2: core::B_IMM
     };
-    localparam ctrl_t CTRL_BGEU = '{
-        reg_en:  1'b0,
-        mem_op:  LOAD_STORE_NONE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_BGEU,
-        op1_sel: OP1_PC,
-        op2_sel: OP2_B_IMM
+    localparam ctrl_t BGEU = '{
+        fun: core::JUMP_OR_BRANCH,
+        op:  core::ADD,
+        jmp: core::BGEU,
+        op1: core::PC,
+        op2: core::B_IMM
     };
-    localparam ctrl_t CTRL_LW = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_WORD,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t LW = '{
+        fun: core::LOAD_WORD,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_LH = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_HALF,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t LH = '{
+        fun: core::LOAD_HALF,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_LHU = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_HALF_UNSIGNED,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t LHU = '{
+        fun: core::LOAD_HALF_UNSIGNED,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_LB = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_BYTE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t LB = '{
+        fun: core::LOAD_BYTE,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_LBU = '{
-        reg_en:  1'b1,
-        mem_op:  LOAD_BYTE_UNSIGNED,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_I_IMM
+    localparam ctrl_t LBU = '{
+        fun: core::LOAD_BYTE_UNSIGNED,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::I_IMM
     };
-    localparam ctrl_t CTRL_SW = '{
-        reg_en:  1'b0,
-        mem_op:  STORE_WORD,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_S_IMM
+    localparam ctrl_t SW = '{
+        fun: core::STORE_WORD,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::S_IMM
     };
-    localparam ctrl_t CTRL_SH = '{
-        reg_en:  1'b0,
-        mem_op:  STORE_HALF,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_S_IMM
+    localparam ctrl_t SH = '{
+        fun: core::STORE_HALF,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::S_IMM
     };
-    localparam ctrl_t CTRL_SB = '{
-        reg_en:  1'b0,
-        mem_op:  STORE_BYTE,
-        alu_op:  ALU_ADD,
-        jmp_op:  JMP_OP_NONE,
-        op1_sel: OP1_RS1,
-        op2_sel: OP2_S_IMM
+    localparam ctrl_t SB = '{
+        fun: core::STORE_BYTE,
+        op:  core::ADD,
+        jmp: core::NONE,
+        op1: core::RS1,
+        op2: core::S_IMM
     };
 
     always_comb begin : decoder
         invalid = 1'b0;
         if (~valid)
-            ctrl = CTRL_NOP;
+            ctrl = NOP;
         else
             unique case (opcode)
-                OPCODE_OP_IMM:
+                core::OP_IMM:
                     unique case (funct3)
-                        FUNCT3_ADDI:      ctrl = CTRL_ADDI;
-                        FUNCT3_SLTI:      ctrl = CTRL_SLTI;
-                        FUNCT3_SLTIU:     ctrl = CTRL_SLTIU;
-                        FUNCT3_XORI:      ctrl = CTRL_XORI;
-                        FUNCT3_SRLI_SRAI: ctrl = (funct7[5]) ? CTRL_SRAI : CTRL_SRLI;
-                        FUNCT3_ORI:       ctrl = CTRL_ORI;
-                        FUNCT3_ANDI:      ctrl = CTRL_ANDI;
-                        FUNCT3_SLLI:      ctrl = CTRL_SLLI;
+                        core::BEQ_LB_SB_ADD_SUB: ctrl = ADDI;
+                        core::BNE_LH_SH_SLL:     ctrl = SLLI;
+                        core::LW_SW_SLT:         ctrl = SLTI;
+                        core::SLTU_SLTIU:        ctrl = SLTIU;
+                        core::BLT_LBU_XOR:       ctrl = XORI;
+                        core::BGE_LHU_SRL_SRA:   ctrl = (funct7[5]) ? SRAI : SRLI;
+                        core::BLTU_OR:           ctrl = ORI;
+                        core::BGEU_AND:          ctrl = ANDI;
                         default: begin
                             invalid = 1'b1;
-                            ctrl = CTRL_NOP;
+                            ctrl = NOP;
                         end
                     endcase
-                OPCODE_OP:
+                core::OP:
                     unique case (funct3)
-                        FUNCT3_ADD_SUB: ctrl = (funct7[5]) ? CTRL_SUB : CTRL_ADD;
-                        FUNCT3_SLL:     ctrl = CTRL_SLL;
-                        FUNCT3_SLT:     ctrl = CTRL_SLT;
-                        FUNCT3_SLTU:    ctrl = CTRL_SLTU;
-                        FUNCT3_XOR:     ctrl = CTRL_XOR;
-                        FUNCT3_SRL_SRA: ctrl = (funct7[5]) ? CTRL_SRA : CTRL_SRL;
-                        FUNCT3_OR:      ctrl = CTRL_OR;
-                        FUNCT3_AND:     ctrl = CTRL_AND;
+                        core::BEQ_LB_SB_ADD_SUB: ctrl = (funct7[5]) ? SUB : ADD;
+                        core::BNE_LH_SH_SLL:     ctrl = SLL;
+                        core::LW_SW_SLT:         ctrl = SLT;
+                        core::SLTU:              ctrl = SLTU;
+                        core::BLT_LBU_XOR:       ctrl = XOR;
+                        core::BGE_LHU_SRL_SRA:   ctrl = (funct7[5]) ? SRA : SRL;
+                        core::BLTU_OR:           ctrl = OR;
+                        core::BGEU_AND:          ctrl = AND;
                         default: begin
                             invalid = 1'b1;
-                            ctrl = CTRL_NOP;
+                            ctrl = NOP;
                         end
                     endcase
-                OPCODE_LUI:   ctrl = CTRL_LUI;
-                OPCODE_AUIPC: ctrl = CTRL_AUIPC;
-                OPCODE_JAL:   ctrl = CTRL_JAL;
-                OPCODE_JALR:  ctrl = CTRL_JALR;
-                OPCODE_BRANCH:
+                core::LUI:   ctrl = LUI;
+                core::AUIPC: ctrl = AUIPC;
+                core::JAL:   ctrl = JAL;
+                core::JALR:  ctrl = JALR;
+                core::BRANCH:
                     unique case (funct3)
-                        FUNCT3_BEQ:  ctrl = CTRL_BEQ;
-                        FUNCT3_BNE:  ctrl = CTRL_BNE;
-                        FUNCT3_BLT:  ctrl = CTRL_BLT;
-                        FUNCT3_BLTU: ctrl = CTRL_BLTU;
-                        FUNCT3_BGE:  ctrl = CTRL_BGE;
-                        FUNCT3_BGEU: ctrl = CTRL_BGEU;
+                        core::BEQ_LB_SB_ADD_SUB: ctrl = BEQ;
+                        core::BNE_LH_SH_SLL:     ctrl = BNE;
+                        core::BLT_LBU_XOR :      ctrl = BLT;
+                        core::BLTU_OR:           ctrl = BLTU;
+                        core::BGE_LHU_SRL_SRA:   ctrl = BGE;
+                        core::BGEU_AND:          ctrl = BGEU;
                         default: begin
                             invalid = 1'b1;
-                            ctrl = CTRL_NOP;
+                            ctrl = NOP;
                         end
                     endcase
-                OPCODE_LOAD:
+                core::LOAD:
                     unique case (funct3)
-                        FUNCT3_LW:  ctrl = CTRL_LW;
-                        FUNCT3_LH:  ctrl = CTRL_LH;
-                        FUNCT3_LHU: ctrl = CTRL_LHU;
-                        FUNCT3_LB:  ctrl = CTRL_LB;
-                        FUNCT3_LBU: ctrl = CTRL_LBU;
+                        core::LW_SW_SLT:         ctrl = LW;
+                        core::BNE_LH_SH_SLL:     ctrl = LH;
+                        core::BGE_LHU_SRL_SRA:   ctrl = LHU;
+                        core::BEQ_LB_SB_ADD_SUB: ctrl = LB;
+                        core::BLT_LBU_XOR:       ctrl = LBU;
                         default: begin
                             invalid = 1'b1;
-                            ctrl = CTRL_NOP;
+                            ctrl = NOP;
                         end
                     endcase
-                OPCODE_STORE:
+                core::STORE:
                     unique case (funct3)
-                        FUNCT3_SW: ctrl = CTRL_SW;
-                        FUNCT3_SH: ctrl = CTRL_SH;
-                        FUNCT3_SB: ctrl = CTRL_SB;
+                        core::BEQ_LB_SB_ADD_SUB: ctrl = SB;
+                        core::BNE_LH_SH_SLL:     ctrl = SH;
+                        core::LW_SW_SLT:         ctrl = SW;
                         default: begin
                             invalid = 1'b1;
-                            ctrl = CTRL_NOP;
+                            ctrl = NOP;
                         end
                     endcase
                 default: begin
                     invalid = 1'b1;
-                    ctrl = CTRL_NOP;
+                    ctrl = NOP;
                 end
             endcase
     end : decoder
