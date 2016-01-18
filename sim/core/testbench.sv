@@ -18,34 +18,26 @@ module testbench;
     always #10ns clk <= ~clk;
 
     // Reset
-    bit _reset;
+    bit rst;
     task reset();
-        _reset = 1;
-        #100ns _reset = 0;
+        rst = 1;
+        #100ns rst = 0;
     endtask : reset
 
-    logic interrupt = 1'b0;
+    wire aclk = clk;
+    wire aresetn = ~rst;
 
-    axi code (.aclk(clk), .aresetn(~_reset));
+    logic irq = 1'b0;
+
+    axi code (.*);
+    axi data (.*);
+    axi mmio (.*);
 
     ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.data(code));
-
-    axi data (.aclk(clk), .aresetn(~_reset));
-
     ram ram (.data(data));
+    ram io (.data(mmio));
 
-    axi peripheral (.aclk(clk), .aresetn(~_reset));
-
-    ram ext (.data(peripheral));
-
-    cpu cpu (
-        .clk,
-        .reset(_reset),
-        .interrupt,
-        .code,
-        .data,
-        .peripheral
-    );
+    cpu cpu (.*);
 
     initial begin
         reset(); // GSR ~100 ns
