@@ -23,14 +23,14 @@ module cpu
     import core::word_t;
 (
     input  logic clk,
-    input  logic reset,
-    input  logic interrupt,
+    input  logic rst,
+    input  logic irq,
     axi.master   code,
     axi.master   data,
-    axi.master   peripheral
+    axi.master   mmio
 );
-    wire resetn = ~reset;
-    wire aresetn = ~reset;
+    wire resetn = ~rst;
+    wire aresetn = ~rst;
     wire aclk = clk;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,33 +39,13 @@ module cpu
      * Interfaces
      */
 
-    axis #(
-        .DATA_WIDTH($bits(id_t)),
-        .ID_WIDTH(0),
-        .DEST_WIDTH(0),
-        .USER_WIDTH(0)
-    ) id (.*);
+    axis #(.DATA_WIDTH($bits(id_t))) id (.*);
 
-    axis #(
-        .DATA_WIDTH($bits(ex_t)),
-        .ID_WIDTH(0),
-        .DEST_WIDTH(0),
-        .USER_WIDTH(0)
-    ) ex (.*);
+    axis #(.DATA_WIDTH($bits(ex_t))) ex (.*);
 
-    axis #(
-        .DATA_WIDTH($bits(mm_t)),
-        .ID_WIDTH(0),
-        .DEST_WIDTH(0),
-        .USER_WIDTH(0)
-    ) mm (.*);
+    axis #(.DATA_WIDTH($bits(mm_t))) mm (.*);
 
-    axis #(
-        .DATA_WIDTH($bits(wb_t)),
-        .ID_WIDTH(0),
-        .DEST_WIDTH(0),
-        .USER_WIDTH(0)
-    ) wb (.*);
+    axis #(.DATA_WIDTH($bits(wb_t))) wb (.*);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -138,7 +118,7 @@ module cpu
 
     wire invalid;
 
-    wire trap = ~reset & (interrupt | invalid);
+    wire trap = ~rst & (irq | invalid);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,14 +131,12 @@ module cpu
     word_t target;
 
     fetch fetch (
-        .clk,
-        .reset(~resetn),
         .branch,
         .target,
         .trap,
         .handler(core::KERN_BASE),
-        .pipe(id),
-        .code(code)
+        .cache(code),
+        .down(id)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,7 +159,7 @@ module cpu
 
     // The output of the execute stage is available on the memory stream interface.
     mm_t exe;
-    assign exe = mm_t'(mm.monitor.tdata); 
+    assign exe = mm_t'(mm.monitor.tdata);
     assign exe_data = exe.data.alu;
 
     regfile regfile (
@@ -205,8 +183,9 @@ module cpu
         .rs2_data,
         .rs1_addr,
         .rs2_addr,
-        .slave(id),
-        .master(ex)
+        .invalid,
+        .down(id),
+        .up(ex)
     );
 
 
@@ -220,8 +199,8 @@ module cpu
         .branch,
         .target,
         .bypass(alu_data),
-        .slave(ex),
-        .master(mm)
+        .down(ex),
+        .up(mm)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -236,8 +215,8 @@ module cpu
     ) memory (
         .bypass(mem_data),
         .cache(data),
-        .slave(mm),
-        .master(wb)
+        .down(mm),
+        .up(wb)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -251,7 +230,7 @@ module cpu
         .rd(rd_en),
         .rd_addr(rd_addr ),
         .rd_data(rd_data ),
-        .slave(wb)
+        .down(wb)
     );
 
 endmodule

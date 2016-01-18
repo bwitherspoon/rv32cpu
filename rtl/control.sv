@@ -14,7 +14,7 @@ module control
      input  opcode_t opcode,
      input  funct3_t funct3,
      input  funct7_t funct7,
-     output logic    invalid,
+     output logic    bad,
      output ctrl_t   ctrl
 );
     localparam ctrl_t KILL = '{
@@ -172,56 +172,56 @@ module control
         op2: core::RS2
     };
     localparam ctrl_t JAL = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::REGISTER,
         fun: core::ADD,
         jmp: core::JAL_OR_JALR,
         op1: core::PC,
         op2: core::J_IMM
     };
     localparam ctrl_t JALR = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::REGISTER,
         fun: core::ADD,
         jmp: core::JAL_OR_JALR,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t BEQ = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::NULL,
         fun: core::ADD,
         jmp: core::BEQ,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BNE = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::NULL,
         fun: core::ADD,
         jmp: core::BNE,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BLT = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::NULL,
         fun: core::ADD,
         jmp: core::BLT,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BLTU = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::NULL,
         fun: core::ADD,
         jmp: core::BLTU,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BGE = '{
-        op:  core::JUMP_OR_BRANCH,
+        op:  core::NULL,
         fun: core::ADD,
         jmp: core::BGE,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BGEU = '{
-        op: core::JUMP_OR_BRANCH,
+        op:  core::NULL,
         fun: core::ADD,
         jmp: core::BGEU,
         op1: core::PC,
@@ -285,7 +285,7 @@ module control
     };
 
     always_comb begin : decoder
-        invalid = 1'b0;
+        bad = 1'b0;
         unique case (opcode)
             core::OP_IMM:
                 unique case (funct3)
@@ -298,7 +298,7 @@ module control
                     core::BLTU_OR:           ctrl = ORI;
                     core::BGEU_AND:          ctrl = ANDI;
                     default: begin
-                        invalid = 1'b1;
+                        bad = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -313,7 +313,7 @@ module control
                     core::BLTU_OR:           ctrl = OR;
                     core::BGEU_AND:          ctrl = AND;
                     default: begin
-                        invalid = 1'b1;
+                        bad = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -330,7 +330,7 @@ module control
                     core::BGE_LHU_SRL_SRA:   ctrl = BGE;
                     core::BGEU_AND:          ctrl = BGEU;
                     default: begin
-                        invalid = 1'b1;
+                        bad = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -342,7 +342,7 @@ module control
                     core::BEQ_LB_SB_ADD_SUB: ctrl = LB;
                     core::BLT_LBU_XOR:       ctrl = LBU;
                     default: begin
-                        invalid = 1'b1;
+                        bad = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -352,12 +352,12 @@ module control
                     core::BNE_LH_SH_SLL:     ctrl = SH;
                     core::LW_SW_SLT:         ctrl = SW;
                     default: begin
-                        invalid = 1'b1;
+                        bad = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
             default: begin
-                invalid = 1'b1;
+                bad = 1'b1;
                 ctrl = KILL;
             end
         endcase

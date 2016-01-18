@@ -14,68 +14,72 @@
     import core::inst_t;
     import core::word_t;
 (
-    input  logic  clk,
-    input  logic  reset,
     input  logic  branch,
     input  word_t target,
     input  logic  trap,
     input  word_t handler,
-    axis.master   pipe,
-    axi.master    code
+    axi.master    cache,
+    axis.master   down
 );
     // Handshake signals
-    wire addr = code.arvalid & code.arready;
-    wire data = code.rvalid & code.rready;
+    wire raddr = cache.arvalid & cache.arready;
+    wire rdata = cache.rvalid & cache.rready;
+    wire tdata = down.tvalid & down.tready;
 
     // Fetch structure
-    id_t tdata;
-    assign pipe.tdata = tdata;
+    id_t id;
+    assign down.tdata  = id;
 
     // IR
-    assign tdata.data.ir = code.rdata;
+    assign id.data.ir = cache.rdata;
 
-    // PC
-    word_t pc;
-    assign tdata.data.pc = pc;
-
-    always_ff @(posedge clk)
-        if (reset) begin
-            pc <= '0;
-            code.araddr <= core::CODE_BASE;
-        end else if (addr) begin
-            pc <= code.araddr;
-            if (trap)
-                code.araddr <= handler;
-            else if (branch)
-                code.araddr <= target;
-            else if (pipe.tready)
-                code.araddr <= code.araddr + 4;
+    // PC and AXI
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn) begin
+            id.data.pc <= core::CODE_BASE;
+            cache.araddr <= core::CODE_BASE;
+        end else begin
+            if (raddr & rdata) begin
+                id.data.pc <= cache.araddr;
+                if (trap)
+                    cache.araddr <= handler;
+                else if (branch)
+                    cache.araddr <= target;
+                else
+                    cache.araddr <= cache.araddr + 4;
+            end
         end
 
-    // AXI MM
-    assign code.arprot = axi4::AXI4;
+    assign cache.arprot = axi4::AXI4;
 
-    always_ff @(posedge clk)
-        if (reset)
-            code.arvalid <= '0;
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn)
+            cache.arvalid <= '0;
         else
-            code.arvalid <= '1;
+            cache.arvalid <= '1;
 
-    always_ff @(posedge clk)
-        if (reset)
-            code.rready <= '0;
-        else if (addr)
-            code.rready <= '1;
-        else if (data)
-            code.rready <= '0;
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn)
+            cache.rready <= '0;
+        else if (raddr)
+            cache.rready <= '1;
+        else if (rdata)
+            cache.rready <= '0;
 
-    // AXI Stream
-    always_ff @(posedge clk)
-        if (reset)
-            pipe.tvalid <= '0;
-        else if (branch | trap | ~pipe.tready | ~code.arready)
-            pipe.tvalid <= '0;
-        else
-            pipe.tvalid <= '1;
+    // Stream
+    logic branched;
+
+    always_ff @(posedge down.aclk)
+        branched <= branch;
+
+    logic tvalid;
+
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            tvalid <= '0;
+        else if (rdata)
+            tvalid <= '1;
+
+    assign down.tvalid = (branch | branched) ? '0: tvalid;
 
 endmodule : fetch

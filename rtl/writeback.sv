@@ -6,7 +6,7 @@
 
 /**
  * Module: writeback
- * 
+ *
  * TODO: Add module documentation
  */
 module writeback
@@ -17,21 +17,19 @@ module writeback
     output logic  rd,
     output addr_t rd_addr,
     output word_t rd_data,
-    axis.slave    slave
+    axis.slave    down
 );
     wb_t wb;
 
-    assign wb = slave.tdata;
+    assign wb = down.tdata;
 
     assign rd_addr = wb.data.rd.addr;
 
     assign rd_data = wb.data.rd.data;
 
-    wire write = core::is_load(wb.ctrl.op) || wb.ctrl.op == core::REGISTER || wb.ctrl.op == core::JAL_OR_JALR;
+    assign rd = down.tvalid & wb.ctrl.rd;
 
-    assign rd = slave.tvalid & write;
-
-    assign slave.tready = '1; 
+    assign down.tready = '1;
 
 endmodule
 

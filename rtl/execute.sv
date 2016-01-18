@@ -6,7 +6,7 @@
 
 /**
  * Module: execute
- * 
+ *
  * TODO: Add module documentation
  */
 module execute
@@ -17,14 +17,20 @@ module execute
     output logic  branch,
     output word_t target,
     output word_t bypass,
-    axis.slave  slave,
-    axis.master master
+    axis.slave    down,
+    axis.master   up
 );
     ex_t ex;
-    assign ex = slave.tdata;
-
     mm_t mm;
-    assign master.tdata = mm;
+    word_t out;
+
+    assign ex = down.tdata;
+
+    assign up.tdata = mm;
+
+    assign down.tready = up.tready;
+
+    assign target = out;
 
     // Comparators
     wire eq  = ex.data.rs1 == ex.data.rs2;
@@ -42,26 +48,22 @@ module execute
 
     assign branch = jmp | beq | bne | blt | bltu | bge | bgeu;
 
-    // FIXME is this still needed?
-    assign target = (branch) ? mm.data.alu : ex.data.pc + 4;
-
     alu alu (
         .fun(ex.ctrl.fun),
         .op1(ex.data.op1),
         .op2(ex.data.op2),
-        .out(mm.data.alu)
+        .out
     );
 
-    always_ff @(posedge master.aclk) begin : registers
-        if (~master.aresetn) begin
+    always_ff @(posedge up.aclk) begin : registers
+        if (~up.aresetn) begin
             mm.ctrl.op  <= core::NULL;
         end else begin
             mm.ctrl.op  <= ex.ctrl.op;
             mm.data.rd  <= ex.data.rd;
-            mm.data.alu <= (jmp) ? ex.data.pc + 4 : mm.data.alu;
+            mm.data.alu <= (jmp) ? ex.data.pc + 4 : out;
         end
     end : registers
 
 endmodule
-
 

@@ -6,10 +6,10 @@
 
 /**
  * Module: decode
- * 
+ *
  * Instruction decode module.
- * 
- * AXI interfaces must by synchronous with the processor. 
+ *
+ * AXI interfaces must by synchronous with the processor.
  */
 module decode
     import core::addr_t;
@@ -30,11 +30,12 @@ module decode
     input  word_t rs2_data,
     output addr_t rs1_addr,
     output addr_t rs2_addr,
-    axis.slave    slave,
-    axis.master   master
+    output logic  invalid,
+    axis.slave    down,
+    axis.master   up
 );
     id_t id;
-    assign id = slave.tdata;
+    assign id = up.tdata;
 
     word_t pc;
     assign pc = id.data.pc;
@@ -43,7 +44,7 @@ module decode
     assign ir = id.data.ir;
 
     ex_t ex;
-    assign master.tdata = ex;
+    assign down.tdata = ex;
 
     assign rs1_addr = ir.r.rs1;
     assign rs2_addr = ir.r.rs2;
@@ -65,7 +66,7 @@ module decode
     word_t op1;
     word_t op2;
 
-    logic invalid;
+    logic bad;
 
     ctrl_t ctrl;
 
@@ -74,7 +75,7 @@ module decode
         .opcode(ir.r.opcode),
         .funct3(ir.r.funct3),
         .funct7(ir.r.funct7),
-        .invalid,
+        .bad,
         .ctrl
     );
 
@@ -115,16 +116,16 @@ module decode
         endcase
 
     // Streams
-    assign slave.tready = master.tready;
+    assign up.tready = down.tready;
 
-    always_ff @(posedge master.aclk)
-        if (~master.aresetn) begin
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn) begin
             ex.ctrl.op <= core::NULL;
             ex.ctrl.jmp <= core::NONE;
-        end else if (master.tready) begin
-            ex.ctrl.op  <= (slave.tvalid) ? ctrl.op : core::NULL;
+        end else if (down.tready) begin
+            ex.ctrl.op  <= (up.tvalid) ? ctrl.op : core::NULL;
             ex.ctrl.fun <= ctrl.fun;
-            ex.ctrl.jmp <= (slave.tvalid) ? ctrl.jmp : core::NONE;
+            ex.ctrl.jmp <= (up.tvalid) ? ctrl.jmp : core::NONE;
             ex.data.pc  <= pc;
             ex.data.op1 <= op1;
             ex.data.op2 <= op2;
@@ -133,14 +134,18 @@ module decode
             ex.data.rd  <= ir.r.rd;
         end
 
-    always_ff @(posedge master.aclk)
-        if (~master.aresetn)
-            master.tvalid <= '0;
-        else if (slave.tvalid)
-            master.tvalid <= '1;
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            down.tvalid <= '0;
+        else if (up.tvalid)
+            down.tvalid <= '1;
         else
-            master.tvalid <= '0;
+            down.tvalid <= '0;
+
+    assign up.tready = down.tready;
+
+    // Error
+    assign invalid = bad & up.tvalid;
 
 endmodule : decode
-
 

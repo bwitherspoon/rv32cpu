@@ -157,7 +157,6 @@ package core;
     typedef enum logic [3:0] {
         NULL,
         REGISTER,
-        JUMP_OR_BRANCH,
         LOAD_WORD,
         LOAD_HALF,
         LOAD_BYTE,
@@ -239,8 +238,8 @@ package core;
     } ctrl_t;
 
     localparam ctrl_t KILL = '{
-        op: NULL,
-        fun:  ANY,
+        op:  NULL,
+        fun: ANY,
         jmp: NONE,
         op1: XX,
         op2: XXX
@@ -290,7 +289,7 @@ package core;
     // Write-back structure
     typedef struct packed {
         struct packed {
-            op_t op;
+            logic rd;
         } ctrl;
         struct packed {
             struct packed {

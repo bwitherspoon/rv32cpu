@@ -1,24 +1,40 @@
-/*  
+/*
  * Copyright (c) 2015, C. Brett Witherspoon
  */
 
 /**
- * Module: reg2mem
+ * Module: memory
  *
- * A private module for register to memory alignment.
+ * A memory unit. Data MUST be naturally aligned.
  */
-module reg2mem
+module memory
+    import core::addr_t;
     import core::op_t;
-    import core::word_t;
+    import core::mm_t;
     import core::strb_t;
-(
-    input  op_t   op,
-    input  word_t addr,
-    input  word_t din,
-    output word_t dout,
-    output strb_t strb
+    import core::wb_t;
+    import core::word_t;
+#(
+    BASE = 32'h00000000,
+    SIZE = 32'h00001000
+)(
+    output word_t bypass,
+    axi.master    cache,
+    axis.slave    down,
+    axis.master   up
 );
-    always_comb
+    /**
+     * Module: reg2mem
+     *
+     * A function for register to memory alignment.
+     */
+    function void reg2mem(
+        input  op_t   op,
+        input  word_t addr,
+        input  word_t din,
+        output word_t dout,
+        output strb_t strb
+    );
         unique case (op)
             core::STORE_WORD: begin
                 dout = din;
@@ -57,23 +73,22 @@ module reg2mem
                 strb = '0;
             end
         endcase
-endmodule : reg2mem
+    endfunction : reg2mem
 
-/**
- * Module: mem2reg
- *
- * A private module for memory to register alignment.
- */
-module mem2reg
-    import core::op_t;
-    import core::word_t;
-(
-    input  op_t        op,
-    input  logic [1:0] addr,
-    input  word_t      din,
-    output word_t      dout
-);
-    always_comb
+
+///////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Function: mem2reg
+     *
+     * A function for memory to register alignment.
+     */
+    function void mem2reg(
+        input  op_t        op,
+        input  logic [1:0] addr,
+        input  word_t      din,
+        output word_t      dout
+    );
         unique case (op)
             core::LOAD_WORD:
                 dout = din;
@@ -100,56 +115,11 @@ module mem2reg
             default:
                 dout = 'x;
         endcase
-endmodule : mem2reg
-
-/**
- * Module: memory
- *
- * A memory unit. Data MUST be naturally aligned.
- */
-module memory
-    import core::op_t;
-    import core::mm_t;
-    import core::strb_t;
-    import core::wb_t;
-    import core::word_t;
-#(
-    BASE = 32'h00000000,
-    SIZE = 32'h00001000
-)(
-    output word_t bypass,
-    axi.master    cache,
-    axis.slave    slave,
-    axis.master   master
-);
-    typedef enum logic [1:0] { IDLE, ADDR, DATA, RESP } state_t;
-
-    state_t wstate = IDLE;
-    state_t wnext;
-
-    state_t rstate = IDLE;
-    state_t rnext;
-
-    wire wstart = wstate == IDLE && wnext == ADDR;
-    wire wstop  = wstate == RESP && wnext == IDLE;
-    wire rstart = rstate == IDLE && rnext == ADDR;
-    wire rstop  = rstate == RESP && rnext == IDLE;
-
-    mm_t mm;
-    assign mm = slave.tdata;
-
-    wb_t wb;
-    assign master.tdata = wb;
-
-    assign slave.tready = master.tready & wstate == IDLE && rstate == IDLE;
-
-    //wire self = mm.alu >= BASE && mm.alu < BASE + SIZE;
-
-    wire write = core::is_store(mm.ctrl.op) & slave.tvalid;
-
-    wire read = core::is_load(mm.ctrl.op) & slave.tvalid;
+    endfunction : mem2reg
 
 ///////////////////////////////////////////////////////////////////////////////
+
+    typedef enum logic [1:0] { IDLE, ADDR, DATA, RESP } state_t;
 
     /*
      * Cache write
@@ -158,19 +128,28 @@ module memory
      *       to zero in declaration like wire.
      */
 
+    wire write = core::is_store(mm.ctrl.op) & down.tvalid;
+
+    state_t wstate = IDLE;
+    state_t wnext;
+
+    wire wstart = wstate == IDLE && wnext == ADDR;
+    wire wstop  = wstate == RESP && wnext == IDLE;
+
     logic awvalid;
     logic wvalid;
     logic bready;
     word_t wdata;
     strb_t wstrb;
 
-    reg2mem reg2mem (
-        .op(mm.ctrl.op),
-        .addr(mm.data.alu),
-        .din(mm.data.rs2),
-        .strb(wstrb),
-        .dout(wdata)
-    );
+    always_comb
+        reg2mem(
+            .op(mm.ctrl.op),
+            .addr(mm.data.alu),
+            .din(mm.data.rs2),
+            .strb(wstrb),
+            .dout(wdata)
+        );
 
     assign cache.awprot = axi4::AXI4;
 
@@ -264,6 +243,14 @@ module memory
      * Cache read
      */
 
+    wire read = core::is_load(mm.ctrl.op) & down.tvalid;
+
+    state_t rstate = IDLE;
+    state_t rnext;
+
+    wire rstart = rstate == IDLE && rnext == ADDR;
+    wire rstop  = rstate == RESP && rnext == IDLE;
+
     logic arvalid;
     logic rready;
 
@@ -271,6 +258,7 @@ module memory
 
     // FIXME reduce logic
     always_comb
+        /* verilator lint_off CASEINCOMPLETE */
         unique case (rstate)
             IDLE: begin
                 if (read) rnext = ADDR;
@@ -305,6 +293,7 @@ module memory
                 end
             end
         endcase
+        /* verilator lint_on CASEINCOMPLETE */
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn) begin
@@ -323,7 +312,7 @@ module memory
     op_t rop = core::NULL;
     logic [1:0] raddr = '0;
 
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge mm.aclk)
         if (rstart) begin
             rop <= mm.ctrl.op;
             raddr <= mm.data.alu[1:0];
@@ -332,12 +321,13 @@ module memory
     word_t aligned;
     word_t delayed;
 
-    mem2reg mem2reg (
-        .op(rop),
-        .addr(raddr),
-        .din(cache.rdata),
-        .dout(bypass)
-    );
+    always_comb
+        mem2reg(
+            .op(rop),
+            .addr(raddr),
+            .din(cache.rdata),
+            .dout(bypass)
+        );
 
     always_ff @(posedge cache.aclk)
         if (rstop) aligned <= bypass;
@@ -348,7 +338,17 @@ module memory
      * Streams
      */
 
+    mm_t mm;
+    assign mm = down.tdata;
+
+    wb_t wb;
+    assign up.tdata = wb;
+
+    assign wb.ctrl.rd = core::is_load(mm.ctrl.op) || mm.ctrl.op == core::REGISTER;
+
+    assign down.tready = up.tready & wstate == IDLE && rstate == IDLE;
+
      // FIXME not valid AXI
-     assign wb.data.rd.data = core::is_load(rop) ? aligned : delayed; 
+     assign wb.data.rd.data = core::is_load(rop) ? aligned : delayed;
 
 endmodule : memory
