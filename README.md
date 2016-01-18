@@ -1,24 +1,25 @@
+Core
+====
+
+![Diagram](http://spoonb.github.io/core/core.svg)
+
 Summary
 -------
 
-This project is the design of a single-issue RISC processor in
-[SystemVerilog][systemverilog]. The design is a 5-stage pipeline with hazard
-detection and data forwarding. The processor executes the base integer
-instruction set of the user level 32-bit [RISC-V][riscv] ISA (RV32I).
+This project is a single-issue RISC processor in [SystemVerilog 1800-2012][sytemverilog].
+The processor executes the base integer instruction set of the user level 32-bit [RISC-V][riscv] ISA (RV32I).
 
-Hardware Platforms
+Platforms
 ------------------
 
-The design is targeted for the Xilinx 7 Series FPGAs and SoCs. The [Arty][arty]
-board from Digilent is used for development and testing.
+The design is targeted for the Xilinx 7 Series FPGAs and SoCs.
+The [Arty][arty] board from Digilent is used for development and testing.
 
-Software Tools
+Dependencies
 --------------
 
-[Xilinx Vivado 2015.4][vivado] is used for hardware synthesis and simulation of
-the processor.
-The [RISC-V GNU toolchain][riscv-gnu-toolchain] is used for software development
-for the processor.
+[Xilinx Vivado 2015.4][vivado] is used for hardware synthesis and simulation.
+The [RISC-V GNU toolchain][riscv-gnu-toolchain] is used for software compiling and linking.
 
 [systemverilog]: http://standards.ieee.org/findstds/standard/1800-2012.html
 [riscv]: http://riscv.org/
