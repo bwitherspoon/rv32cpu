@@ -29,9 +29,9 @@ module ram #(
     logic [$clog2(RESP_DEPTH)-1:0] resp;
 
     bram #(
-        .WIDTH($bits(data_t)),
-        .DEPTH(DATA_DEPTH),
-        .INIT_B(INIT_DATA),
+        .DATA_WIDTH($bits(data_t)),
+        .DATA_DEPTH(DATA_DEPTH),
+        .INIT_DATA_B(INIT_DATA),
         .INIT_FILE(INIT_FILE)
     ) bram (
         .clk(data.aclk),
