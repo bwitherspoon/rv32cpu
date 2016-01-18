@@ -12,10 +12,13 @@ INT = axi.sv     \
 RTL = alu.sv     \
       bram.sv    \
       control.sv \
-      cpu.sv    \
+      cpu.sv     \
+      decode.sv  \
+      execute.sv \
       fetch.sv   \
       memory.sv  \
       ram.sv     \
-      regfile.sv
+      regfile.sv \
+      writeback.sv
 
 include ../vivado.mk

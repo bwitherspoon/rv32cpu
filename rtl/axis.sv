@@ -9,6 +9,9 @@ interface axis #(
     parameter ID_WIDTH   = 4,
     parameter DEST_WIDTH = 4,
     parameter USER_WIDTH = 16
+)(
+    input aclk,
+    input aresetn
 );
     localparam STRB_WIDTH = DATA_WIDTH / 8;
     localparam KEEP_WIDTH = STRB_WIDTH;
@@ -31,6 +34,8 @@ interface axis #(
     logic   tready;
 
     modport master (
+        input  aclk,
+        input  aresetn,
         output tdata,
         output tstrb,
         output tkeep,
@@ -43,6 +48,8 @@ interface axis #(
     );
 
     modport slave (
+        input  aclk,
+        input  aresetn,
         input  tdata,
         input  tstrb,
         input  tkeep,
@@ -55,6 +62,8 @@ interface axis #(
     );
 
     modport monitor (
+        input aclk,
+        input aresetn,
         input tdata,
         input tstrb,
         input tkeep,

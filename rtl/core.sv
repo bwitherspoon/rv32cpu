@@ -166,7 +166,7 @@ package core;
         STORE_WORD,
         STORE_HALF,
         STORE_BYTE
-    } fun_t;
+    } op_t;
 
     // ALU operation type
     typedef enum logic [3:0] {
@@ -182,7 +182,7 @@ package core;
         SRA,
         OP2,
         ANY = 4'bxxxx
-    } op_t;
+    } fun_t;
 
     // Jump / Branch operation type
     typedef enum logic [2:0] {
@@ -225,54 +225,45 @@ package core;
     typedef enum logic [1:0] {
         REG,
         ALU,
-        MEM,
-        RAM
+        EXE,
+        MEM
     } rs_t;
 
     // Data path control signals
     typedef struct packed {
-        fun_t fun;
         op_t  op;
+        fun_t fun;
         jmp_t jmp;
         op1_t op1;
         op2_t op2;
     } ctrl_t;
 
+    localparam ctrl_t KILL = '{
+        op: NULL,
+        fun:  ANY,
+        jmp: NONE,
+        op1: XX,
+        op2: XXX
+    };
+
     /*
      * Pipeline structures
      */
 
-    // Fetch instruction data type (64-bits)
-    typedef struct packed {
-        struct packed {
-            word_t pc;
-            inst_t ir;
-        } data;
-    } fi_t;
-
     // Decode instruction structure
     typedef struct packed {
-        ctrl_t ctrl;
-        logic pad;
         struct packed {
             word_t pc;
             inst_t ir;
-            word_t op1;
-            word_t op2;
-            word_t rs1;
-            word_t rs2;
-            addr_t rd;
-            logic [2:0] reserve;
         } data;
-    } di_t;
+    } id_t;
 
     // Execute instruction structure
     typedef struct packed {
         struct packed {
-            fun_t fun;
             op_t  op;
+            fun_t fun;
             jmp_t jmp;
-            logic [4:0] reserve;
         } ctrl;
         struct packed {
             word_t pc;
@@ -281,33 +272,31 @@ package core;
             word_t rs1;
             word_t rs2;
             addr_t rd;
-            logic [2:0] reserve;
         } data;
     } ex_t;
 
-    // Memory map structure
+    // Memory structure
     typedef struct packed {
         struct packed {
-            fun_t fun;
-            logic [3:0] reserve;
+            op_t op;
         } ctrl;
         struct packed {
-            addr_t rd;
             word_t alu;
-            logic [2:0] reserve;
+            word_t rs2;
+            addr_t rd;
         } data;
     } mm_t;
 
-    // Writeback structure
+    // Write-back structure
     typedef struct packed {
         struct packed {
-            fun_t fun;
-            logic [3:0] reserve;
+            op_t op;
         } ctrl;
         struct packed {
-            addr_t rd;
-            word_t alu;
-            logic [2:0] reserve;
+            struct packed {
+                word_t data;
+                addr_t addr;
+            } rd;
        } data;
     } wb_t;
 
@@ -315,13 +304,13 @@ package core;
      * Helper functions (synthesizable)
      */
 
-    function logic is_load (input fun_t fun);
-        return fun == LOAD_WORD || fun == LOAD_HALF || fun == LOAD_BYTE ||
-               fun == LOAD_HALF_UNSIGNED || fun == LOAD_BYTE_UNSIGNED;
+    function logic is_load (input op_t op);
+        return op == LOAD_WORD || op == LOAD_HALF || op == LOAD_BYTE ||
+               op == LOAD_HALF_UNSIGNED || op == LOAD_BYTE_UNSIGNED;
     endfunction
 
-    function logic is_store (input fun_t fun);
-        return fun == STORE_WORD || fun == STORE_HALF || fun == STORE_BYTE;
+    function logic is_store (input op_t op);
+        return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
     endfunction
 
 

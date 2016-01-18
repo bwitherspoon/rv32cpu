@@ -10,7 +10,7 @@
  * Instruction fetch module.
  */
  module fetch
-    import core::fi_t;
+    import core::id_t;
     import core::inst_t;
     import core::word_t;
 (
@@ -28,7 +28,7 @@
     wire data = code.rvalid & code.rready;
 
     // Fetch structure
-    fi_t tdata;
+    id_t tdata;
     assign pipe.tdata = tdata;
 
     // IR

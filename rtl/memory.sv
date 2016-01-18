@@ -8,18 +8,18 @@
  * A private module for register to memory alignment.
  */
 module reg2mem
-    import core::fun_t;
+    import core::op_t;
     import core::word_t;
     import core::strb_t;
 (
-    input  fun_t       fun,
-    input  word_t      addr,
-    input  word_t      din,
-    output word_t      dout,
-    output strb_t      strb
+    input  op_t   op,
+    input  word_t addr,
+    input  word_t din,
+    output word_t dout,
+    output strb_t strb
 );
     always_comb
-        unique case (fun)
+        unique case (op)
             core::STORE_WORD: begin
                 dout = din;
                 strb = '1;
@@ -65,16 +65,16 @@ endmodule : reg2mem
  * A private module for memory to register alignment.
  */
 module mem2reg
-    import core::fun_t;
+    import core::op_t;
     import core::word_t;
 (
-    input  fun_t       fun,
+    input  op_t        op,
     input  logic [1:0] addr,
     input  word_t      din,
     output word_t      dout
 );
     always_comb
-        unique case (fun)
+        unique case (op)
             core::LOAD_WORD:
                 dout = din;
             core::LOAD_HALF:
@@ -105,25 +105,22 @@ endmodule : mem2reg
 /**
  * Module: memory
  *
- * Data MUST be naturally aligned.
+ * A memory unit. Data MUST be naturally aligned.
  */
 module memory
-    import core::fun_t;
+    import core::op_t;
+    import core::mm_t;
     import core::strb_t;
+    import core::wb_t;
     import core::word_t;
 #(
     BASE = 32'h00000000,
     SIZE = 32'h00001000
 )(
-    input  logic    clk,
-    input  logic    resetn,
-    input  fun_t    fun,
-    input  word_t   addr,
-    input  word_t   din,
-    output word_t   dout,
-    output word_t   bypass,
-    output logic    idle,
-    axi.master      data
+    output word_t bypass,
+    axi.master    cache,
+    axis.slave    slave,
+    axis.master   master
 );
     typedef enum logic [1:0] { IDLE, ADDR, DATA, RESP } state_t;
 
@@ -135,55 +132,70 @@ module memory
 
     wire wstart = wstate == IDLE && wnext == ADDR;
     wire wstop  = wstate == RESP && wnext == IDLE;
-
     wire rstart = rstate == IDLE && rnext == ADDR;
     wire rstop  = rstate == RESP && rnext == IDLE;
 
-    assign idle = wstate == IDLE && rstate == IDLE;
+    mm_t mm;
+    assign mm = slave.tdata;
 
-    wire space = addr >= BASE && addr < BASE + SIZE;
+    wb_t wb;
+    assign master.tdata = wb;
 
-    wire store = core::is_store(fun);
+    assign slave.tready = master.tready & wstate == IDLE && rstate == IDLE;
 
-    wire load = core::is_load(fun);
+    //wire self = mm.alu >= BASE && mm.alu < BASE + SIZE;
+
+    wire write = core::is_store(mm.ctrl.op) & slave.tvalid;
+
+    wire read = core::is_load(mm.ctrl.op) & slave.tvalid;
+
+///////////////////////////////////////////////////////////////////////////////
 
     /*
-     * Write
+     * Cache write
+     *
+     * NOTE: Vivado 2015.4 synthesis grounds wdata and wstrb when initialized
+     *       to zero in declaration like wire.
      */
 
-    // NOTE Vivado synthesis grounds wdata and wstrb when initialized to zero
     logic awvalid;
     logic wvalid;
     logic bready;
     word_t wdata;
     strb_t wstrb;
 
-    reg2mem reg2mem (.fun, .addr, .din, .strb(wstrb), .dout(wdata));
+    reg2mem reg2mem (
+        .op(mm.ctrl.op),
+        .addr(mm.data.alu),
+        .din(mm.data.rs2),
+        .strb(wstrb),
+        .dout(wdata)
+    );
 
-    assign data.awprot = axi4::AXI4;
+    assign cache.awprot = axi4::AXI4;
 
-    // TODO reduce logic
+    // FIXME reduce logic
     always_comb
         unique case (wstate)
             IDLE: begin
-                if (store) wnext = ADDR;
+                if (write) wnext = ADDR;
                 else       wnext = IDLE;
-                awvalid = store;
-                wvalid  = store;
-                bready  = store;
+                awvalid = write;
+                wvalid  = write;
+                bready  = write;
             end
             ADDR: begin
-                if (data.awready & data.wready & data.bvalid) begin
+                if (cache.awready & cache.wready & cache.bvalid) begin
                     wnext   = IDLE;
                     awvalid = 1'b0;
                     wvalid  = 1'b0;
                     bready  = 1'b0;
-                end else if (data.awready & data.wready) begin
+                end else if (cache.awready & cache.wready) begin
                     wnext   = RESP;
                     awvalid = 1'b0;
                     wvalid  = 1'b0;
                     bready  = 1'b1;
-                end else if (data.awready) begin
+                end else if (cache.awready) begin
                     wnext   = DATA;
                     awvalid = 1'b0;
                     wvalid  = 1'b1;
@@ -196,12 +208,12 @@ module memory
                 end
             end
             DATA: begin
-                if (data.wready & data.bvalid) begin
+                if (cache.wready & cache.bvalid) begin
                     wnext   = IDLE;
                     awvalid = 1'b0;
                     wvalid  = 1'b0;
                     bready  = 1'b0;
-                end else if (data.wready) begin
+                end else if (cache.wready) begin
                     wnext   = RESP;
                     awvalid = 1'b0;
                     wvalid  = 1'b0;
@@ -214,7 +226,7 @@ module memory
                 end
             end
             RESP: begin
-                if (data.bvalid) begin
+                if (cache.bvalid) begin
                     wnext   = IDLE;
                     awvalid = 1'b0;
                     wvalid  = 1'b0;
@@ -228,48 +240,50 @@ module memory
             end
         endcase
 
-    always_ff @(posedge clk)
-        if (~resetn) begin
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn) begin
             wstate <= IDLE;
-            data.awvalid <= '0;
-            data.wvalid <= '0;
-            data.bready <= '0;
+            cache.awvalid <= '0;
+            cache.wvalid <= '0;
+            cache.bready <= '0;
         end else begin
             wstate <= wnext;
-            data.awvalid <= awvalid;
-            data.wvalid <= wvalid;
-            data.bready <= bready;
+            cache.awvalid <= awvalid;
+            cache.wvalid <= wvalid;
+            cache.bready <= bready;
             if (wstart) begin
-                data.awaddr <= addr & (BASE-1);
-                data.wdata <= wdata;
-                data.wstrb <= wstrb;
+                cache.awaddr <= mm.data.alu & (BASE-1);
+                cache.wdata <= wdata;
+                cache.wstrb <= wstrb;
             end
         end
 
+///////////////////////////////////////////////////////////////////////////////
+
     /*
-     * Read
+     * Cache read
      */
 
     logic arvalid;
     logic rready;
 
-    assign data.arprot = axi4::AXI4;
+    assign cache.arprot = axi4::AXI4;
 
-    // TODO reduce logic
+    // FIXME reduce logic
     always_comb
         unique case (rstate)
             IDLE: begin
-                if (load) rnext = ADDR;
+                if (read) rnext = ADDR;
                 else      rnext = IDLE;
-                arvalid = load;
-                rready  = load;
+                arvalid = read;
+                rready  = read;
             end
             ADDR: begin
-                if (data.arready & data.rvalid) begin
+                if (cache.arready & cache.rvalid) begin
                     rnext   = IDLE;
                     arvalid = 1'b0;
                     rready  = 1'b0;
-                end else if (data.arready) begin
+                end else if (cache.arready) begin
                     rnext   = RESP;
                     arvalid = 1'b0;
                     rready  = 1'b1;
@@ -280,7 +294,7 @@ module memory
                 end
             end
             RESP: begin
-                if (data.rvalid) begin
+                if (cache.rvalid) begin
                     rnext   = IDLE;
                     arvalid = 1'b0;
                     rready  = 1'b0;
@@ -292,38 +306,49 @@ module memory
             end
         endcase
 
-    always_ff @(posedge clk)
-        if (~resetn) begin
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn) begin
             rstate <= IDLE;
-            data.arvalid <= '0;
-            data.rready <= '0;
+            cache.arvalid <= '0;
+            cache.rready <= '0;
         end else begin
             rstate <= rnext;
-            data.arvalid <= arvalid;
-            data.rready <= rready;
+            cache.arvalid <= arvalid;
+            cache.rready <= rready;
             if (rstart) begin
-                data.araddr <= addr & (BASE-1);
+                cache.araddr <= mm.data.alu & (BASE-1);
             end
         end
 
-    fun_t rfun = core::NULL;
+    op_t rop = core::NULL;
     logic [1:0] raddr = '0;
 
-    always_ff @(posedge clk)
+    always_ff @(posedge cache.aclk)
         if (rstart) begin
-            rfun  <= fun;
-            raddr <= addr[1:0];
+            rop <= mm.ctrl.op;
+            raddr <= mm.data.alu[1:0];
         end
 
+    word_t aligned;
+    word_t delayed;
+
     mem2reg mem2reg (
-        .fun(rfun),
+        .op(rop),
         .addr(raddr),
-        .din(data.rdata),
+        .din(cache.rdata),
         .dout(bypass)
     );
 
-    always_ff @(posedge clk)
-        if (rstop)
-            dout <= bypass;
+    always_ff @(posedge cache.aclk)
+        if (rstop) aligned <= bypass;
+
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Streams
+     */
+
+     // FIXME not valid AXI
+     assign wb.data.rd.data = core::is_load(rop) ? aligned : delayed; 
 
 endmodule : memory

@@ -8,10 +8,10 @@
  * An arithmetic and logic unit (ALU) for RISC-V
  */
 module alu
-    import core::op_t;
+    import core::fun_t;
     import core::word_t;
 (
-    input  op_t     opcode,
+    input  fun_t    fun,
     input  word_t   op1,
     input  word_t   op2,
     output word_t   out
@@ -19,7 +19,7 @@ module alu
     wire [4:0] shamt = op2[4:0];
 
     always_comb
-        unique case (opcode)
+        unique case (fun)
             core::ADD:  out = op1 + op2;
             core::SUB:  out = op1 - op2;
             core::SLL:  out = op1 << shamt;
