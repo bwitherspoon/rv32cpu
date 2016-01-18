@@ -307,7 +307,7 @@ module control
                     core::BEQ_LB_SB_ADD_SUB: ctrl = (funct7[5]) ? SUB : ADD;
                     core::BNE_LH_SH_SLL:     ctrl = SLL;
                     core::LW_SW_SLT:         ctrl = SLT;
-                    core::SLTU:              ctrl = SLTU;
+                    core::SLTU_SLTIU:        ctrl = SLTU;
                     core::BLT_LBU_XOR:       ctrl = XOR;
                     core::BGE_LHU_SRL_SRA:   ctrl = (funct7[5]) ? SRA : SRL;
                     core::BLTU_OR:           ctrl = OR;
