@@ -11,8 +11,12 @@ TEXT    ?= 0x040
 DATA    ?= 0xC00
 BSS     ?= 0x800
 
-.PHONY: clean
+.PHONY: all test clean
 .INTERMEDIATE: boot.o
+
+all: boot.mem
+
+test:
 
 boot.mem:
 
