@@ -21,6 +21,7 @@ module decode
     import core::rs_t;
     import core::word_t;
 (
+    input  logic  bubble,
     input  rs_t   rs1_sel,
     input  rs_t   rs2_sel,
     input  word_t alu_data,
@@ -30,7 +31,6 @@ module decode
     input  word_t rs2_data,
     output addr_t rs1_addr,
     output addr_t rs2_addr,
-    output ctrl_t control,
     output logic  invalid,
     axis.slave    up,
     axis.master   down
@@ -51,8 +51,6 @@ module decode
 
     assign rs1_addr = ir.r.rs1;
     assign rs2_addr = ir.r.rs2;
-
-    assign control = ctrl;
 
     imm_t i_imm;
     imm_t s_imm;
@@ -119,16 +117,14 @@ module decode
         endcase
 
     // Streams
-    assign up.tready = down.tready;
-
     always_ff @(posedge down.aclk)
         if (~down.aresetn) begin
             ex.ctrl.op <= core::NULL;
             ex.ctrl.jmp <= core::NONE;
         end else if (down.tready) begin
-            ex.ctrl.op  <= (up.tvalid) ? ctrl.op : core::NULL;
+            ex.ctrl.op  <= ctrl.op;
             ex.ctrl.fun <= ctrl.fun;
-            ex.ctrl.jmp <= (up.tvalid) ? ctrl.jmp : core::NONE;
+            ex.ctrl.jmp <= ctrl.jmp;
             ex.data.pc  <= pc;
             ex.data.op1 <= op1;
             ex.data.op2 <= op2;
@@ -145,7 +141,7 @@ module decode
         else
             down.tvalid <= '0;
 
-    assign up.tready = down.tready;
+    assign up.tready = bubble ? '0 : down.tready;
 
     // Error
     assign invalid = bad & up.tvalid;

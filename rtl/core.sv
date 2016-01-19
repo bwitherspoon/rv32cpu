@@ -277,7 +277,8 @@ package core;
     // Memory structure
     typedef struct packed {
         struct packed {
-            op_t op;
+            op_t  op;
+            jmp_t jmp;
         } ctrl;
         struct packed {
             word_t alu;

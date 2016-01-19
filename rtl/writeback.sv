@@ -17,7 +17,6 @@ module writeback
     output logic  rd,
     output addr_t rd_addr,
     output word_t rd_data,
-    input  logic  stall,
     axis.slave    up
 );
     wb_t wb;
@@ -30,7 +29,7 @@ module writeback
 
     assign rd_data = wb.data.rd.data;
 
-    assign up.tready = ~stall;
+    assign up.tready = '1;
 
 endmodule
 

@@ -50,35 +50,16 @@ module cpu
      * Hazards
      */
 
-    // TODO store -> load
-
-    //wire branch = ex.ctrl.branch | ex.ctrl.jump;
-
-    // Bubble after jump to wait for address
-    //wire jump = ctrl.jmp == core::JAL_OR_JALR;
-
-    // Bubble after load to account for load latency
-    //wire load = core::is_load(ctrl.fun);
-
-    // A bubble prevents the PC from advancing and inserts NOPs
-    //wire bubble = load | jump;
-
-    //wire idle;
-
-    // A stall locks the entier pipeline and bubbles
-    //wire stall = ~idle;
-
     wire bubble;
-
-    ctrl_t ctrl;
+    wire flush;
 
     hazard hazard (
-        .control(ctrl),
         .decode(id),
         .execute(ex),
         .memory(mm),
         .writeback(wb),
-        .bubble
+        .bubble,
+        .flush
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -88,8 +69,8 @@ module cpu
      */
 
     wire invalid;
-
     wire trap = ~rst & (irq | invalid);
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,7 +87,7 @@ module cpu
         .target,
         .trap,
         .handler(core::KERN_BASE),
-        .bubble,
+        .flush,
         .cache(code),
         .down(id)
     );
@@ -146,6 +127,7 @@ module cpu
     );
 
     decode decode (
+        .bubble,
         .rs1_sel(core::REG),
         .rs2_sel(core::REG),
         .alu_data,
@@ -155,7 +137,6 @@ module cpu
         .rs2_data,
         .rs1_addr,
         .rs2_addr,
-        .control(ctrl),
         .invalid,
         .up(id),
         .down(ex)
@@ -203,7 +184,6 @@ module cpu
         .rd(rd_en),
         .rd_addr(rd_addr ),
         .rd_data(rd_data ),
-        .stall('0),
         .up(wb)
     );
 

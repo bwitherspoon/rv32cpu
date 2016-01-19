@@ -42,7 +42,7 @@ module ram #(
         .dia(data.wdata),
         .doa(),
         .rstb(~data.aresetn),
-        .enb(~data.aresetn | raddr),
+        .enb(raddr),
         .web('0),
         .addrb(araddr),
         .dib('0),
@@ -62,9 +62,8 @@ module ram #(
     assign data.bvalid = |resp;
 
     // Read
-    always_ff @(posedge data.aclk)
-        if (~data.aresetn)             data.arready <= '0;
-        else if (rdata | ~data.rvalid) data.arready <= '1;
+    // TODO pending address FIFO
+    assign data.arready = data.rready;
 
     always_ff @(posedge data.aclk)
         if (~data.aresetn) data.rvalid <= '0;

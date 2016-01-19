@@ -78,13 +78,6 @@ module top #(
 
     ram ram (.data(data), .*);
 
-    cpu cpu (
-        .clk,
-        .rst,
-        .irq,
-        .code(code),
-        .data(data),
-        .mmio(mmio)
-    );
+    cpu cpu (.data(data), .code(code), .mmio(mmio), .*);
 
 endmodule
