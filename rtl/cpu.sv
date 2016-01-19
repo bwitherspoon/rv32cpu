@@ -50,7 +50,7 @@ module cpu
      * Hazards
      */
 
-    wire bubble;
+    wire stall;
     wire flush;
 
     hazard hazard (
@@ -58,7 +58,7 @@ module cpu
         .execute(ex),
         .memory(mm),
         .writeback(wb),
-        .bubble,
+        .stall,
         .flush
     );
 
@@ -72,6 +72,23 @@ module cpu
     wire trap = ~rst & (irq | invalid);
 
 
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Forwarding
+     */
+
+    rs_t rs1;
+    rs_t rs2;
+
+    forward forward (
+        .decode(id),
+        .execute(ex),
+        .memory(mm),
+        .writeback(wb),
+        .rs1,
+        .rs2
+    );
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -127,9 +144,9 @@ module cpu
     );
 
     decode decode (
-        .bubble,
-        .rs1_sel(core::REG),
-        .rs2_sel(core::REG),
+        .stall,
+        .rs1_sel(rs1),
+        .rs2_sel(rs2),
         .alu_data,
         .exe_data,
         .mem_data,

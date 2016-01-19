@@ -21,7 +21,7 @@ module decode
     import core::rs_t;
     import core::word_t;
 (
-    input  logic  bubble,
+    input  logic  stall,
     input  rs_t   rs1_sel,
     input  rs_t   rs2_sel,
     input  word_t alu_data,
@@ -102,7 +102,7 @@ module decode
    always_comb
         unique case (ctrl.op1)
             core::PC: op1 = pc;
-            default:  op1 = rs1_data;
+            default:  op1 = rs1;
         endcase
 
     // Second operand select
@@ -113,7 +113,7 @@ module decode
             core::B_IMM: op2 = b_imm;
             core::U_IMM: op2 = u_imm;
             core::J_IMM: op2 = j_imm;
-            default:     op2 = rs2_data;
+            default:     op2 = rs2;
         endcase
 
     // Streams
@@ -121,6 +121,7 @@ module decode
         if (~down.aresetn) begin
             ex.ctrl.op <= core::NULL;
             ex.ctrl.jmp <= core::NONE;
+            ex.data.rd <= '0;
         end else if (down.tready) begin
             ex.ctrl.op  <= ctrl.op;
             ex.ctrl.fun <= ctrl.fun;
@@ -141,7 +142,7 @@ module decode
         else
             down.tvalid <= '0;
 
-    assign up.tready = bubble ? '0 : down.tready;
+    assign up.tready = stall ? '0 : down.tready;
 
     // Error
     assign invalid = bad & up.tvalid;

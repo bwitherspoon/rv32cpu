@@ -50,7 +50,7 @@
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.araddr <= core::CODE_BASE;
-        else if (down.tready)
+        else if (down.tready && cache.arready)
             if (trap)
                 cache.araddr <= handler;
             else if (branch)
@@ -61,10 +61,10 @@
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.arvalid <= '1;
-        else if (down.tready)
-            cache.arvalid = '1;
+        else if (down.tready && cache.arready)
+            cache.arvalid <= '1;
         else if (raddr)
-            cache.arvalid = '0;
+            cache.arvalid <= '0;
 
     assign cache.rready = down.tready;
 

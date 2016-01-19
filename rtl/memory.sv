@@ -128,7 +128,7 @@ module memory
      *       to zero in declaration like wire.
      */
 
-    wire write = core::is_store(mm.ctrl.op) & down.tvalid;
+    wire write = core::is_store(mm.ctrl.op) & up.tvalid;
 
     state_t wstate = IDLE;
     state_t wnext;
@@ -243,7 +243,7 @@ module memory
      * Cache read
      */
 
-    wire read = core::is_load(mm.ctrl.op) & down.tvalid;
+    wire read = core::is_load(mm.ctrl.op) & up.tvalid;
 
     state_t rstate = IDLE;
     state_t rnext;
@@ -331,13 +331,14 @@ module memory
             .dout(aligned)
         );
 
-    assign up.tready = down.tready;
+    assign up.tready = down.tready & rstate == IDLE;
 
     assign bypass  = core::is_load(mm.ctrl.op) ? aligned : mm.data.alu;
 
     always_ff @(posedge down.aclk)
         if (~down.aresetn) begin
             wb.ctrl.op <= core::NULL;
+            wb.data.rd <= '0;
         end else begin
             wb.ctrl.op <= mm.ctrl.op;
             wb.data.rd.data <= bypass;
@@ -347,7 +348,7 @@ module memory
     always_ff @(posedge down.aclk)
         if (~down.aresetn)
             down.tvalid <= '0;
-        else if (up.tvalid & up.tready)
+        else if (rstop)
             down.tvalid <= '1;
         else if (down.tvalid & down.tready)
             down.tvalid <= '0;
