@@ -16,6 +16,7 @@ RTL = alu.sv     \
       decode.sv  \
       execute.sv \
       fetch.sv   \
+      hazard.sv  \
       memory.sv  \
       ram.sv     \
       regfile.sv \
