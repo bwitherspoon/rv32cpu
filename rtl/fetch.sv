@@ -18,13 +18,13 @@
     input  word_t target,
     input  logic  trap,
     input  word_t handler,
+    input  logic  bubble,
     axi.master    cache,
     axis.master   down
 );
     // Handshake signals
     wire raddr = cache.arvalid & cache.arready;
     wire rdata = cache.rvalid & cache.rready;
-    wire tdata = down.tvalid & down.tready;
 
     // Fetch structure
     id_t id;
@@ -33,30 +33,41 @@
     // IR
     assign id.data.ir = cache.rdata;
 
-    // PC and AXI
+    // AXI stream
+    wire tready = down.tready & ~bubble;
+
+    assign down.tvalid = cache.rvalid;
+
+    // PC
     always_ff @(posedge cache.aclk)
-        if (~cache.aresetn) begin
+        if (~cache.aresetn)
             id.data.pc <= core::CODE_BASE;
-            cache.araddr <= core::CODE_BASE;
-        end else begin
-            if (raddr & rdata) begin
+        else
+            if (raddr & tready)
                 id.data.pc <= cache.araddr;
+
+    // AXI
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn)
+            cache.araddr <= core::CODE_BASE;
+        else
+            if (raddr)
                 if (trap)
                     cache.araddr <= handler;
                 else if (branch)
                     cache.araddr <= target;
-                else
+                else if (tready)
                     cache.araddr <= cache.araddr + 4;
-            end
-        end
 
     assign cache.arprot = axi4::AXI4;
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.arvalid <= '0;
-        else
+        else if (trap | branch | tready)
             cache.arvalid <= '1;
+        else if (raddr)
+            cache.arvalid <= '0;
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
@@ -65,21 +76,5 @@
             cache.rready <= '1;
         else if (rdata)
             cache.rready <= '0;
-
-    // Stream
-    logic branched;
-
-    always_ff @(posedge down.aclk)
-        branched <= branch;
-
-    logic tvalid;
-
-    always_ff @(posedge down.aclk)
-        if (~down.aresetn)
-            tvalid <= '0;
-        else if (rdata)
-            tvalid <= '1;
-
-    assign down.tvalid = (branch | branched) ? '0: tvalid;
 
 endmodule : fetch

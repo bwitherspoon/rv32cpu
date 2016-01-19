@@ -17,20 +17,29 @@ module execute
     output logic  branch,
     output word_t target,
     output word_t bypass,
-    axis.slave    down,
-    axis.master   up
+    axis.slave    up,
+    axis.master   down
 );
     ex_t ex;
     mm_t mm;
+ 
     word_t out;
 
-    assign ex = down.tdata;
+    assign ex = up.tdata;
 
-    assign up.tdata = mm;
+    assign down.tdata = mm;
 
-    assign down.tready = up.tready;
+    assign up.tready = down.tready;
 
-    assign target = out;
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            down.tvalid <= '0;
+        else
+            down.tvalid <= up.tvalid;
+
+    assign target = branch ? out : ex.data.pc + 4;
+
+    assign bypass = out;
 
     // Comparators
     wire eq  = ex.data.rs1 == ex.data.rs2;
@@ -55,8 +64,8 @@ module execute
         .out
     );
 
-    always_ff @(posedge up.aclk) begin : registers
-        if (~up.aresetn) begin
+    always_ff @(posedge down.aclk) begin : registers
+        if (~down.aresetn) begin
             mm.ctrl.op  <= core::NULL;
         end else begin
             mm.ctrl.op  <= ex.ctrl.op;

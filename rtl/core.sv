@@ -289,7 +289,7 @@ package core;
     // Write-back structure
     typedef struct packed {
         struct packed {
-            logic rd;
+            op_t op;
         } ctrl;
         struct packed {
             struct packed {
@@ -303,14 +303,22 @@ package core;
      * Helper functions (synthesizable)
      */
 
-    function logic is_load (input op_t op);
+    function logic is_load(input op_t op);
         return op == LOAD_WORD || op == LOAD_HALF || op == LOAD_BYTE ||
                op == LOAD_HALF_UNSIGNED || op == LOAD_BYTE_UNSIGNED;
     endfunction
 
-    function logic is_store (input op_t op);
+    function logic is_store(input op_t op);
         return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
     endfunction
 
+    function logic is_jump(input jmp_t jmp);
+        return jmp == JAL_OR_JALR;
+    endfunction
+
+    function logic is_branch(input jmp_t jmp);
+        return jmp == BEQ || jmp == BNE || jmp == BLT || jmp == BLTU ||
+               jmp == BGE || jmp == BGEU;
+    endfunction
 
 endpackage

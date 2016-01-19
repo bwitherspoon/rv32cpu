@@ -30,24 +30,29 @@ module decode
     input  word_t rs2_data,
     output addr_t rs1_addr,
     output addr_t rs2_addr,
+    output ctrl_t control,
     output logic  invalid,
-    axis.slave    down,
-    axis.master   up
+    axis.slave    up,
+    axis.master   down
 );
     id_t id;
-    assign id = up.tdata;
+    ex_t ex;
 
     word_t pc;
-    assign pc = id.data.pc;
-
     inst_t ir;
-    assign ir = id.data.ir;
 
-    ex_t ex;
+    ctrl_t ctrl;
+
+    assign id = up.tdata;
     assign down.tdata = ex;
+
+    assign pc = id.data.pc;
+    assign ir = id.data.ir;
 
     assign rs1_addr = ir.r.rs1;
     assign rs2_addr = ir.r.rs2;
+
+    assign control = ctrl;
 
     imm_t i_imm;
     imm_t s_imm;
@@ -68,10 +73,8 @@ module decode
 
     logic bad;
 
-    ctrl_t ctrl;
-
     // Control decoder
-    control control (
+    control decoder (
         .opcode(ir.r.opcode),
         .funct3(ir.r.funct3),
         .funct7(ir.r.funct7),

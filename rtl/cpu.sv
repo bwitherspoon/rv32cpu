@@ -29,15 +29,12 @@ module cpu
     axi.master   data,
     axi.master   mmio
 );
-    wire resetn = ~rst;
-    wire aresetn = ~rst;
-    wire aclk = clk;
-
-///////////////////////////////////////////////////////////////////////////////
-
     /*
      * Interfaces
      */
+
+    wire aresetn = ~rst;
+    wire aclk = clk;
 
     axis #(.DATA_WIDTH($bits(id_t))) id (.*);
 
@@ -71,44 +68,18 @@ module cpu
     // A stall locks the entier pipeline and bubbles
     //wire stall = ~idle;
 
-///////////////////////////////////////////////////////////////////////////////
+    wire bubble;
 
-    /*
-     * Forwarding
-     */
+    ctrl_t ctrl;
 
-    // FIXME clean up this mess
-//    always_comb
-//        if (id.data.rs1_addr == ex.data.reg_addr
-//            && id.data.rs1_addr != '0
-//            && ex.ctrl.fun == core::REGISTER)
-//            id.ctrl.rs1 = core::ALU;
-//        else if (id.data.rs1_addr == mem.data.reg_addr
-//                 && id.data.rs1_addr != '0
-//                 && mem.ctrl.fun == core::REGISTER)
-//            id.ctrl.rs1 = core::MEM;
-//        else if (id.data.rs1_addr == mem.data.reg_addr
-//                 && id.data.rs1_addr != '0
-//                 && mem.ctrl.load == '1)
-//            id.ctrl.rs1 = core::RAM;
-//        else
-//            id.ctrl.rs1 = core::REG;
-//
-//    always_comb
-//        if (id.data.rs2_addr == ex.data.reg_addr
-//            && id.data.rs2_addr != '0
-//            && ex.ctrl.fun == core::REGISTER)
-//            id.ctrl.rs2 = core::ALU;
-//        else if (id.data.rs2_addr == mem.data.reg_addr
-//                 && id.data.rs2_addr != '0
-//                 && mem.ctrl.fun == core::REGISTER)
-//            id.ctrl.rs2 = core::MEM;
-//        else if (id.data.rs2_addr == mem.data.reg_addr
-//                 && id.data.rs2_addr != '0
-//                 && mem.ctrl.load == '1)
-//            id.ctrl.rs2 = core::RAM;
-//        else
-//            id.ctrl.rs2 = core::REG;
+    hazard hazard (
+        .control(ctrl),
+        .decode(id),
+        .execute(ex),
+        .memory(mm),
+        .writeback(wb),
+        .bubble
+    );
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -135,6 +106,7 @@ module cpu
         .target,
         .trap,
         .handler(core::KERN_BASE),
+        .bubble,
         .cache(code),
         .down(id)
     );
@@ -183,9 +155,10 @@ module cpu
         .rs2_data,
         .rs1_addr,
         .rs2_addr,
+        .control(ctrl),
         .invalid,
-        .down(id),
-        .up(ex)
+        .up(id),
+        .down(ex)
     );
 
 
@@ -199,8 +172,8 @@ module cpu
         .branch,
         .target,
         .bypass(alu_data),
-        .down(ex),
-        .up(mm)
+        .up(ex),
+        .down(mm)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,8 +188,8 @@ module cpu
     ) memory (
         .bypass(mem_data),
         .cache(data),
-        .down(mm),
-        .up(wb)
+        .up(mm),
+        .down(wb)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,7 +203,8 @@ module cpu
         .rd(rd_en),
         .rd_addr(rd_addr ),
         .rd_data(rd_data ),
-        .down(wb)
+        .stall('0),
+        .up(wb)
     );
 
 endmodule

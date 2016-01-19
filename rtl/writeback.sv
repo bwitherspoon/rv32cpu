@@ -17,19 +17,20 @@ module writeback
     output logic  rd,
     output addr_t rd_addr,
     output word_t rd_data,
-    axis.slave    down
+    input  logic  stall,
+    axis.slave    up
 );
     wb_t wb;
 
-    assign wb = down.tdata;
+    assign wb = up.tdata;
+
+    assign rd = wb.ctrl.op == core::REGISTER;
 
     assign rd_addr = wb.data.rd.addr;
 
     assign rd_data = wb.data.rd.data;
 
-    assign rd = down.tvalid & wb.ctrl.rd;
-
-    assign down.tready = '1;
+    assign up.tready = ~stall;
 
 endmodule
 

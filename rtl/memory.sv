@@ -20,8 +20,8 @@ module memory
 )(
     output word_t bypass,
     axi.master    cache,
-    axis.slave    down,
-    axis.master   up
+    axis.slave    up,
+    axis.master   down
 );
     /**
      * Module: reg2mem
@@ -309,29 +309,6 @@ module memory
             end
         end
 
-    op_t rop = core::NULL;
-    logic [1:0] raddr = '0;
-
-    always_ff @(posedge mm.aclk)
-        if (rstart) begin
-            rop <= mm.ctrl.op;
-            raddr <= mm.data.alu[1:0];
-        end
-
-    word_t aligned;
-    word_t delayed;
-
-    always_comb
-        mem2reg(
-            .op(rop),
-            .addr(raddr),
-            .din(cache.rdata),
-            .dout(bypass)
-        );
-
-    always_ff @(posedge cache.aclk)
-        if (rstop) aligned <= bypass;
-
 ///////////////////////////////////////////////////////////////////////////////
 
     /*
@@ -339,16 +316,40 @@ module memory
      */
 
     mm_t mm;
-    assign mm = down.tdata;
-
     wb_t wb;
-    assign up.tdata = wb;
 
-    assign wb.ctrl.rd = core::is_load(mm.ctrl.op) || mm.ctrl.op == core::REGISTER;
+    assign mm = up.tdata;
+    assign down.tdata = wb;
 
-    assign down.tready = up.tready & wstate == IDLE && rstate == IDLE;
+    word_t aligned;
 
-     // FIXME not valid AXI
-     assign wb.data.rd.data = core::is_load(rop) ? aligned : delayed;
+    always_comb
+        mem2reg(
+            .op(mm.ctrl.op),
+            .addr(mm.data.alu[1:0]),
+            .din(cache.rdata),
+            .dout(aligned)
+        );
+
+    assign up.tready = down.tready;
+
+    assign bypass  = core::is_load(mm.ctrl.op) ? aligned : mm.data.alu;
+
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn) begin
+            wb.ctrl.op <= core::NULL;
+        end else begin
+            wb.ctrl.op <= mm.ctrl.op;
+            wb.data.rd.data <= bypass;
+            wb.data.rd.addr <= mm.data.rd;
+        end
+
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            down.tvalid <= '0;
+        else if (up.tvalid & up.tready)
+            down.tvalid <= '1;
+        else if (down.tvalid & down.tready)
+            down.tvalid <= '0;
 
 endmodule : memory
