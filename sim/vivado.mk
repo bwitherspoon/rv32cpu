@@ -28,7 +28,7 @@ PATH := $(VIVADO_DIR)/bin:$(PATH)
 
 VPATH = $(RTLDIR):$(SRCDIR):$(LIBDIR)
 
-.PHONY: lib all tcl gui xsim xelab xvlog clean
+.PHONY: all test tcl gui xsim xelab xvlog clean
 
 all: xelab
 
@@ -53,7 +53,7 @@ $(TOP:.sv=.wcfg):
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
 	xelab --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)
 
-$(LIBDIR)/$(INF:.sv=.sdb): | $(PKG:.sv=.sdb)
+$(LIBDIR)/$(INT:.sv=.sdb): | $(PKG:.sv=.sdb)
 
 $(LIBDIR)/$(RTL:.sv=.sdb): | $(PKG:.sv=.sdb) $(INT:.sv=.sdb)
 
