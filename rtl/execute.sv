@@ -67,8 +67,10 @@ module execute
     always_ff @(posedge down.aclk) begin : registers
         if (~down.aresetn) begin
             mm.ctrl.op  <= core::NULL;
+            mm.ctrl.jmp <= core::NONE;
         end else begin
             mm.ctrl.op  <= ex.ctrl.op;
+            mm.ctrl.jmp <= ex.ctrl.jmp;
             mm.data.rd  <= ex.data.rd;
             mm.data.alu <= (jmp) ? ex.data.pc + 4 : out;
         end
