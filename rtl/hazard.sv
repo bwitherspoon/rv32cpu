@@ -24,7 +24,7 @@ module hazard
     axis.monitor execute,
     axis.monitor memory,
     axis.monitor writeback,
-    output logic bubble,
+    output logic stall,
     output logic flush
 );
     id_t id;
@@ -41,15 +41,14 @@ module hazard
 
     assign opcode = id.data.ir.r.opcode;
 
-    wire id_load_store = (opcode == core::LOAD || opcode == core::STORE) && decode.tvalid;
-    wire ex_load_store = (is_load(ex.ctrl.op) || is_store(ex.ctrl.op)) && execute.tvalid;
-    wire mm_load_store = (is_load(mm.ctrl.op) || is_store(mm.ctrl.op)) && memory.tvalid;
+    wire id_load = opcode == core::LOAD && decode.tvalid;
+    wire ex_load = is_load(ex.ctrl.op) && execute.tvalid;
+    wire mm_load = is_load(mm.ctrl.op) && memory.tvalid;
 
     wire ex_branch = (is_jump(ex.ctrl.jmp) || is_branch(ex.ctrl.jmp)) && execute.tvalid;
     wire mm_branch = (is_jump(mm.ctrl.jmp) || is_branch(mm.ctrl.jmp)) && memory.tvalid;
 
-    assign flush = ex_branch | mm_branch;
-
-    assign bubble = '0;
+    assign stall = ex_load | mm_load;
+    assign flush = ex_load | mm_load | ex_branch | mm_branch;
 
 endmodule

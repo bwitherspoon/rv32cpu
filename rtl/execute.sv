@@ -68,6 +68,7 @@ module execute
         if (~down.aresetn) begin
             mm.ctrl.op  <= core::NULL;
             mm.ctrl.jmp <= core::NONE;
+            mm.data.rd <= '0;
         end else begin
             mm.ctrl.op  <= ex.ctrl.op;
             mm.ctrl.jmp <= ex.ctrl.jmp;

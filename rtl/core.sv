@@ -313,6 +313,10 @@ package core;
         return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
     endfunction
 
+    function logic is_reg(input op_t op);
+        return op == REGISTER;
+    endfunction
+
     function logic is_jump(input jmp_t jmp);
         return jmp == JAL_OR_JALR;
     endfunction
