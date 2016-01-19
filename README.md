@@ -6,7 +6,7 @@ Core
 Summary
 -------
 
-This project is a single-issue RISC processor in [SystemVerilog 1800-2012][sytemverilog].
+This project is a single-issue RISC processor in [SystemVerilog 1800-2012][systemverilog].
 The processor executes the base integer instruction set of the user level 32-bit [RISC-V][riscv] ISA (RV32I).
 
 Platforms
