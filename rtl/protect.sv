@@ -128,8 +128,22 @@ module protect (
         endcase
     end : arready
 
-    assign cache.rdata   = data.rdata;
-    assign cache.rresp   = data.rresp;
+    // Read data channel
+    always_comb begin
+        unique case (read)
+            DATA:    cache.rdata = data.rdata;
+            MMIO:    cache.rdata = mmio.rdata;
+            default: cache.rdata = 'x;
+        endcase
+    end
+
+    always_comb begin : rresp
+        unique case (read)
+            DATA:    cache.rresp = data.rresp;
+            MMIO:    cache.rresp = mmio.rresp;
+            default: cache.rresp = axi4::DECERR;
+        endcase
+    end : rresp
 
     always_comb begin : rvalid
         unique case (read)
