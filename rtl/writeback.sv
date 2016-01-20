@@ -17,6 +17,7 @@ module writeback
     output logic  rd,
     output addr_t rd_addr,
     output word_t rd_data,
+    output word_t count,
     axis.slave    up
 );
     wb_t wb;
@@ -30,6 +31,12 @@ module writeback
     assign rd_data = wb.data.rd.data;
 
     assign up.tready = '1;
+
+    always_ff @(posedge up.aclk)
+        if (~up.aresetn)
+            count <= '0;
+        else if (up.tvalid & wb.ctrl.op != core::NULL)
+            count <= count + 1;
 
 endmodule
 
