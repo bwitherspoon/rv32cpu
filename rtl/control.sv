@@ -344,21 +344,27 @@ module control
     /*
      * Push downstream once transaction has completed
      */
-    wire done = ~core::is_load(mm.ctrl.op)  & ~core::is_store(mm.ctrl.op) |
-                 rstate == RESP & rnext == IDLE |
-                 rstate != IDLE & wnext == IDLE;
-
     always_ff @(posedge down.aclk)
         if (~down.aresetn) begin
             wb.ctrl.op <= core::NULL;
-            wb.data.rd <= '0;
-            down.tvalid <= '0;
-        end else if (down.tready & done) begin
+        end else if (down.tready) begin
             wb.ctrl.op <= mm.ctrl.op;
             wb.data.rd.data <= bypass;
             wb.data.rd.addr <= mm.data.rd;
-            down.tvalid <= up.tvalid;
-        end else if (down.tvalid & down.tready)
+        end
+
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            down.tvalid <= '0;
+        else if (down.tready)
+            if (core::is_load(mm.ctrl.op))
+                if (rstate == RESP & rnext == IDLE)
+                    down.tvalid <= '1;
+                else
+                    down.tvalid <= '0;
+           else
+                down.tvalid <= up.tvalid;
+        else if (down.tvalid)
             down.tvalid <= '0;
 
 endmodule : control
