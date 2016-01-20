@@ -340,7 +340,6 @@ module decode
 
     // Control decoder
     always_comb begin : decoder
-        inval = 1'b0;
         unique case (ir.r.opcode)
             core::OP_IMM:
                 unique case (ir.r.funct3)
@@ -353,7 +352,6 @@ module decode
                     core::BLTU_OR:           ctrl = ORI;
                     core::BGEU_AND:          ctrl = ANDI;
                     default: begin
-                        inval = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -368,7 +366,6 @@ module decode
                     core::BLTU_OR:           ctrl = OR;
                     core::BGEU_AND:          ctrl = AND;
                     default: begin
-                        inval = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -385,7 +382,6 @@ module decode
                     core::BGE_LHU_SRL_SRA:   ctrl = BGE;
                     core::BGEU_AND:          ctrl = BGEU;
                     default: begin
-                        inval = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -397,7 +393,6 @@ module decode
                     core::BEQ_LB_SB_ADD_SUB: ctrl = LB;
                     core::BLT_LBU_XOR:       ctrl = LBU;
                     default: begin
-                        inval = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
@@ -407,12 +402,10 @@ module decode
                     core::BNE_LH_SH_SLL:     ctrl = SH;
                     core::LW_SW_SLT:         ctrl = SW;
                     default: begin
-                        inval = 1'b1;
                         ctrl = KILL;
                     end
                 endcase
             default: begin
-                inval = 1'b1;
                 ctrl = KILL;
             end
         endcase
@@ -483,7 +476,7 @@ module decode
     assign up.tready = stall ? '0 : down.tready;
 
     // Error
-    assign invalid = inval & ~up.tvalid;
+    assign invalid = ctrl == KILL & up.tvalid;
 
 endmodule : decode
 
