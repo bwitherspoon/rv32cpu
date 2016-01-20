@@ -37,7 +37,7 @@ test: xsim
 tcl: xelab $(INIT)
 	xsim $(SNAP)
 
-gui: $(TOP:.sv=.wcfg) xelab $(MEM)
+gui: $(TOP:.sv=.wcfg) xelab $(INIT)
 	xsim -gui -view $< $(SNAP) &
 
 xsim: xelab $(INIT)
