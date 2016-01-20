@@ -31,12 +31,6 @@ module execute
 
     assign up.tready = down.tready;
 
-    always_ff @(posedge down.aclk)
-        if (~down.aresetn)
-            down.tvalid <= '0;
-        else
-            down.tvalid <= up.tvalid;
-
     assign target = branch ? out : ex.data.pc + 4;
 
     assign bypass = out;
@@ -64,12 +58,20 @@ module execute
         .out
     );
 
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            down.tvalid <= '0;
+        else if (down.tready)
+            down.tvalid <= up.tvalid;
+        else if (down.tvalid)
+            down.tvalid <= '0;
+
     always_ff @(posedge down.aclk) begin : registers
         if (~down.aresetn) begin
             mm.ctrl.op  <= core::NULL;
             mm.ctrl.jmp <= core::NONE;
             mm.data.rd <= '0;
-        end else begin
+        end else if (down.tready) begin
             mm.ctrl.op  <= ex.ctrl.op;
             mm.ctrl.jmp <= ex.ctrl.jmp;
             mm.data.rd  <= ex.data.rd;
