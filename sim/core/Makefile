@@ -10,15 +10,15 @@ PKG = axi4.sv    \
 INT = axi.sv     \
       axis.sv
 RTL = alu.sv     \
+      arbitrate.sv \
       block.sv   \
-      control.sv \
       cpu.sv     \
       decode.sv  \
       execute.sv \
       fetch.sv   \
       forward.sv \
       hazard.sv  \
-      protect.sv \
+      memory.sv  \
       ram.sv     \
       regfile.sv \
       writeback.sv

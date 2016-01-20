@@ -182,12 +182,12 @@ module cpu
 
     axi cache (.*);
 
-    protect protect (.*);
+    arbitrate arbitrate (.*);
 
-    control #(
+    memory #(
         .BASE(core::CODE_BASE),
         .SIZE(core::CODE_SIZE)
-    ) control (
+    ) memory (
         .bypass(mem_data),
         .cache(cache),
         .up(mm),

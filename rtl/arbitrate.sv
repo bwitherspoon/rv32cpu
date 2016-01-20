@@ -3,11 +3,11 @@
  */
 
 /**
- * Module: protect
+ * Module: arbitrate
  *
- * Memory protection and multiplexing.
+ * Memory translate and multiplexing.
  */
-module protect (
+module arbitrate (
     axi.slave  cache,
     axi.master code,
     axi.master data,
@@ -156,4 +156,4 @@ module protect (
     assign data.rready = (read == DATA) ? cache.rready : '0;
     assign mmio.rready = (read == MMIO) ? cache.rready : '0;
 
-endmodule : protect
+endmodule : arbitrate

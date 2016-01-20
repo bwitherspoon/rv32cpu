@@ -3,11 +3,11 @@
  */
 
 /**
- * Module: control
+ * Module: memory
  *
  * A memory controller. Data MUST be naturally aligned.
  */
-module control
+module memory
     import core::addr_t;
     import core::op_t;
     import core::mm_t;
@@ -367,4 +367,4 @@ module control
         else if (down.tvalid)
             down.tvalid <= '0;
 
-endmodule : control
+endmodule : memory
