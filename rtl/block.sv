@@ -3,12 +3,12 @@
  */
 
 /**
- * Module: bram
+ * Module: block
  *
  * Synchronous block RAM in NO_CHANGE mode with byte write enable and output
  * latch reset.
  */
-module bram #(
+module block #(
     int unsigned DATA_WIDTH  = 32,
     int unsigned DATA_DEPTH  = 1024,
     int unsigned INIT_DATA_A = '0,

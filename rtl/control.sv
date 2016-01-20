@@ -1,366 +1,356 @@
 /*
- * Copyright (c) 2015, C. Brett Witherspoon
+ * Copyright (c) 2015, 2016 C. Brett Witherspoon
  */
 
 /**
  * Module: control
+ *
+ * A memory controller. Data MUST be naturally aligned.
  */
 module control
-    import core::opcode_t;
-    import core::funct3_t;
-    import core::funct7_t;
-    import core::ctrl_t;
-(
-     input  opcode_t opcode,
-     input  funct3_t funct3,
-     input  funct7_t funct7,
-     output logic    bad,
-     output ctrl_t   ctrl
+    import core::addr_t;
+    import core::op_t;
+    import core::mm_t;
+    import core::strb_t;
+    import core::wb_t;
+    import core::word_t;
+#(
+    BASE = 32'h00000000,
+    SIZE = 32'h00001000
+)(
+    output word_t bypass,
+    axi.master    cache,
+    axis.slave    up,
+    axis.master   down
 );
-    localparam ctrl_t KILL = '{
-        op:  core::NULL,
-        fun: core::ANY,
-        jmp: core::NONE,
-        op1: core::XX,
-        op2: core::XXX
-    };
-    localparam ctrl_t ADDI = '{
-        op:  core::REGISTER,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t SLTI = '{
-       op:  core::REGISTER,
-       fun: core::SLT,
-       jmp: core::NONE,
-       op1: core::RS1,
-       op2: core::I_IMM
-    };
-    localparam ctrl_t SLTIU = '{
-        op:  core::REGISTER,
-        fun: core::SLTU,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t ANDI = '{
-        op:  core::REGISTER,
-        fun: core::AND,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t ORI = '{
-        op:  core::REGISTER,
-        fun: core::OR,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t XORI = '{
-        op:  core::REGISTER,
-        fun: core::XOR,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t SLLI = '{
-        op: core::REGISTER,
-        fun: core::SLL,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t SRLI = '{
-        op:  core::REGISTER,
-        fun: core::SRL,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t SRAI = '{
-        op:  core::REGISTER,
-        fun: core::SRA,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t LUI = '{
-        op:  core::REGISTER,
-        fun: core::OP2,
-        jmp: core::NONE,
-        op1: core::XX,
-        op2: core::U_IMM
-    };
-    localparam ctrl_t AUIPC = '{
-        op:  core::REGISTER,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::PC,
-        op2: core::U_IMM
-    };
-    localparam ctrl_t ADD = '{
-        op:  core::REGISTER,
-        fun: core::AND,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t SLT = '{
-        op:  core::REGISTER,
-        fun: core::SLT,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t SLTU = '{
-        op:  core::REGISTER,
-        fun: core::SLTU,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t AND = '{
-        op:  core::REGISTER,
-        fun: core::AND,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t OR = '{
-        op:  core::REGISTER,
-        fun: core::OR,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t XOR = '{
-        op:  core::REGISTER,
-        fun: core::XOR,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t SLL = '{
-        op:  core::REGISTER,
-        fun: core::SLL,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t SRL = '{
-        op: core::REGISTER,
-        fun: core::SRL,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t SUB = '{
-        op:  core::REGISTER,
-        fun: core::SUB,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t SRA = '{
-        op:  core::REGISTER,
-        fun: core::SRA,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::RS2
-    };
-    localparam ctrl_t JAL = '{
-        op:  core::REGISTER,
-        fun: core::ADD,
-        jmp: core::JAL_OR_JALR,
-        op1: core::PC,
-        op2: core::J_IMM
-    };
-    localparam ctrl_t JALR = '{
-        op:  core::REGISTER,
-        fun: core::ADD,
-        jmp: core::JAL_OR_JALR,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t BEQ = '{
-        op:  core::NULL,
-        fun: core::ADD,
-        jmp: core::BEQ,
-        op1: core::PC,
-        op2: core::B_IMM
-    };
-    localparam ctrl_t BNE = '{
-        op:  core::NULL,
-        fun: core::ADD,
-        jmp: core::BNE,
-        op1: core::PC,
-        op2: core::B_IMM
-    };
-    localparam ctrl_t BLT = '{
-        op:  core::NULL,
-        fun: core::ADD,
-        jmp: core::BLT,
-        op1: core::PC,
-        op2: core::B_IMM
-    };
-    localparam ctrl_t BLTU = '{
-        op:  core::NULL,
-        fun: core::ADD,
-        jmp: core::BLTU,
-        op1: core::PC,
-        op2: core::B_IMM
-    };
-    localparam ctrl_t BGE = '{
-        op:  core::NULL,
-        fun: core::ADD,
-        jmp: core::BGE,
-        op1: core::PC,
-        op2: core::B_IMM
-    };
-    localparam ctrl_t BGEU = '{
-        op:  core::NULL,
-        fun: core::ADD,
-        jmp: core::BGEU,
-        op1: core::PC,
-        op2: core::B_IMM
-    };
-    localparam ctrl_t LW = '{
-        op:  core::LOAD_WORD,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t LH = '{
-        op:  core::LOAD_HALF,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t LHU = '{
-        op:  core::LOAD_HALF_UNSIGNED,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t LB = '{
-        op:  core::LOAD_BYTE,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t LBU = '{
-        op: core::LOAD_BYTE_UNSIGNED,
-        fun:  core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::I_IMM
-    };
-    localparam ctrl_t SW = '{
-        op:  core::STORE_WORD,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::S_IMM
-    };
-    localparam ctrl_t SH = '{
-        op:  core::STORE_HALF,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::S_IMM
-    };
-    localparam ctrl_t SB = '{
-        op:  core::STORE_BYTE,
-        fun: core::ADD,
-        jmp: core::NONE,
-        op1: core::RS1,
-        op2: core::S_IMM
-    };
-
-    always_comb begin : decoder
-        bad = 1'b0;
-        unique case (opcode)
-            core::OP_IMM:
-                unique case (funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = ADDI;
-                    core::BNE_LH_SH_SLL:     ctrl = SLLI;
-                    core::LW_SW_SLT:         ctrl = SLTI;
-                    core::SLTU_SLTIU:        ctrl = SLTIU;
-                    core::BLT_LBU_XOR:       ctrl = XORI;
-                    core::BGE_LHU_SRL_SRA:   ctrl = (funct7[5]) ? SRAI : SRLI;
-                    core::BLTU_OR:           ctrl = ORI;
-                    core::BGEU_AND:          ctrl = ANDI;
-                    default: begin
-                        bad = 1'b1;
-                        ctrl = KILL;
+    /**
+     * Module: reg2mem
+     *
+     * A function for register to controller alignment.
+     */
+    function void reg2mem(
+        input  op_t   op,
+        input  word_t addr,
+        input  word_t din,
+        output word_t dout,
+        output strb_t strb
+    );
+        unique case (op)
+            core::STORE_WORD: begin
+                dout = din;
+                strb = '1;
+            end
+            core::STORE_HALF: begin
+                if (addr[1]) begin
+                    dout = din << 16;
+                    strb = 4'b1100;
+                end else begin
+                    dout = din;
+                    strb = 4'b0011;
+                end
+            end
+            core::STORE_BYTE:
+                unique case (addr[1:0])
+                    2'b00: begin
+                        dout = din;
+                        strb = 4'b0001;
                     end
-                endcase
-            core::OP:
-                unique case (funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = (funct7[5]) ? SUB : ADD;
-                    core::BNE_LH_SH_SLL:     ctrl = SLL;
-                    core::LW_SW_SLT:         ctrl = SLT;
-                    core::SLTU_SLTIU:        ctrl = SLTU;
-                    core::BLT_LBU_XOR:       ctrl = XOR;
-                    core::BGE_LHU_SRL_SRA:   ctrl = (funct7[5]) ? SRA : SRL;
-                    core::BLTU_OR:           ctrl = OR;
-                    core::BGEU_AND:          ctrl = AND;
-                    default: begin
-                        bad = 1'b1;
-                        ctrl = KILL;
+                    2'b01: begin
+                        dout = din << 8;
+                        strb = 4'b0010;
                     end
-                endcase
-            core::LUI:   ctrl = LUI;
-            core::AUIPC: ctrl = AUIPC;
-            core::JAL:   ctrl = JAL;
-            core::JALR:  ctrl = JALR;
-            core::BRANCH:
-                unique case (funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = BEQ;
-                    core::BNE_LH_SH_SLL:     ctrl = BNE;
-                    core::BLT_LBU_XOR :      ctrl = BLT;
-                    core::BLTU_OR:           ctrl = BLTU;
-                    core::BGE_LHU_SRL_SRA:   ctrl = BGE;
-                    core::BGEU_AND:          ctrl = BGEU;
-                    default: begin
-                        bad = 1'b1;
-                        ctrl = KILL;
+                    2'b10: begin
+                        dout = din << 16;
+                        strb = 4'b0100;
                     end
-                endcase
-            core::LOAD:
-                unique case (funct3)
-                    core::LW_SW_SLT:         ctrl = LW;
-                    core::BNE_LH_SH_SLL:     ctrl = LH;
-                    core::BGE_LHU_SRL_SRA:   ctrl = LHU;
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = LB;
-                    core::BLT_LBU_XOR:       ctrl = LBU;
-                    default: begin
-                        bad = 1'b1;
-                        ctrl = KILL;
-                    end
-                endcase
-            core::STORE:
-                unique case (funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = SB;
-                    core::BNE_LH_SH_SLL:     ctrl = SH;
-                    core::LW_SW_SLT:         ctrl = SW;
-                    default: begin
-                        bad = 1'b1;
-                        ctrl = KILL;
+                    2'b11: begin
+                        dout = din << 24;
+                        strb = 4'b1000;
                     end
                 endcase
             default: begin
-                bad = 1'b1;
-                ctrl = KILL;
+                dout = 'x;
+                strb = '0;
             end
         endcase
-    end : decoder
+    endfunction : reg2mem
 
-endmodule
+
+///////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Function: mem2reg
+     *
+     * A function for controller to register alignment.
+     */
+    function void mem2reg(
+        input  op_t        op,
+        input  logic [1:0] addr,
+        input  word_t      din,
+        output word_t      dout
+    );
+        unique case (op)
+            core::LOAD_WORD:
+                dout = din;
+            core::LOAD_HALF:
+                if (addr[1]) dout = {{16{din[31]}}, din[31:16]};
+                else         dout = {{16{din[15]}}, din[15:0]};
+            core::LOAD_BYTE:
+                unique case (addr)
+                    2'b00: dout = {{24{din[7]}},  din[7:0]};
+                    2'b01: dout = {{24{din[15]}}, din[15:8]};
+                    2'b10: dout = {{24{din[23]}}, din[23:16]};
+                    2'b11: dout = {{24{din[31]}}, din[31:24]};
+                endcase
+            core::LOAD_HALF_UNSIGNED:
+                if (addr[1]) dout = {16'h0000, din[31:16]};
+                else         dout = {16'h0000, din[15:0]};
+            core::LOAD_BYTE_UNSIGNED:
+                unique case (addr)
+                    2'b00: dout = {24'h000000, din[7:0]};
+                    2'b01: dout = {24'h000000, din[15:8]};
+                    2'b10: dout = {24'h000000, din[23:16]};
+                    2'b11: dout = {24'h000000, din[31:24]};
+                endcase
+            default:
+                dout = 'x;
+        endcase
+    endfunction : mem2reg
+
+///////////////////////////////////////////////////////////////////////////////
+
+    typedef enum logic [1:0] { IDLE, ADDR, DATA, RESP } state_t;
+
+    /*
+     * Cache write
+     *
+     * NOTE: Vivado 2015.4 synthesis grounds wdata and wstrb when initialized
+     *       to zero in declaration like wire.
+     */
+
+    wire write = core::is_store(mm.ctrl.op) & up.tvalid;
+
+    state_t wstate = IDLE;
+    state_t wnext;
+
+    wire wstart = wstate == IDLE && wnext == ADDR;
+    wire wstop  = wstate == RESP && wnext == IDLE;
+
+    logic awvalid;
+    logic wvalid;
+    logic bready;
+    word_t wdata;
+    strb_t wstrb;
+
+    always_comb
+        reg2mem(
+            .op(mm.ctrl.op),
+            .addr(mm.data.alu),
+            .din(mm.data.rs2),
+            .strb(wstrb),
+            .dout(wdata)
+        );
+
+    assign cache.awprot = axi4::AXI4;
+
+    // FIXME reduce logic
+    always_comb
+        unique case (wstate)
+            IDLE: begin
+                if (write) wnext = ADDR;
+                else       wnext = IDLE;
+                awvalid = write;
+                wvalid  = write;
+                bready  = write;
+            end
+            ADDR: begin
+                if (cache.awready & cache.wready & cache.bvalid) begin
+                    wnext   = IDLE;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b0;
+                    bready  = 1'b0;
+                end else if (cache.awready & cache.wready) begin
+                    wnext   = RESP;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b0;
+                    bready  = 1'b1;
+                end else if (cache.awready) begin
+                    wnext   = DATA;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b1;
+                    bready  = 1'b1;
+                end else begin
+                    wnext   = ADDR;
+                    awvalid = 1'b1;
+                    wvalid  = 1'b1;
+                    bready  = 1'b1;
+                end
+            end
+            DATA: begin
+                if (cache.wready & cache.bvalid) begin
+                    wnext   = IDLE;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b0;
+                    bready  = 1'b0;
+                end else if (cache.wready) begin
+                    wnext   = RESP;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b0;
+                    bready  = 1'b1;
+                end else begin
+                    wnext   = DATA;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b1;
+                    bready  = 1'b1;
+                end
+            end
+            RESP: begin
+                if (cache.bvalid) begin
+                    wnext   = IDLE;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b0;
+                    bready  = 1'b0;
+                end else begin
+                    wnext   = RESP;
+                    awvalid = 1'b0;
+                    wvalid  = 1'b0;
+                    bready  = 1'b1;
+                end
+            end
+        endcase
+
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn) begin
+            wstate <= IDLE;
+            cache.awvalid <= '0;
+            cache.wvalid <= '0;
+            cache.bready <= '0;
+        end else begin
+            wstate <= wnext;
+            cache.awvalid <= awvalid;
+            cache.wvalid <= wvalid;
+            cache.bready <= bready;
+            if (wstart) begin
+                cache.awaddr <= mm.data.alu & (BASE-1);
+                cache.wdata <= wdata;
+                cache.wstrb <= wstrb;
+            end
+        end
+
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Cache read
+     */
+
+    wire read = core::is_load(mm.ctrl.op) & up.tvalid;
+
+    state_t rstate = IDLE;
+    state_t rnext;
+
+    wire rstart = rstate == IDLE && rnext == ADDR;
+    wire rstop  = rstate == RESP && rnext == IDLE;
+
+    logic arvalid;
+    logic rready;
+
+    assign cache.arprot = axi4::AXI4;
+
+    // FIXME reduce logic
+    always_comb
+        /* verilator lint_off CASEINCOMPLETE */
+        unique case (rstate)
+            IDLE: begin
+                if (read) rnext = ADDR;
+                else      rnext = IDLE;
+                arvalid = read;
+                rready  = read;
+            end
+            ADDR: begin
+                if (cache.arready & cache.rvalid) begin
+                    rnext   = IDLE;
+                    arvalid = 1'b0;
+                    rready  = 1'b0;
+                end else if (cache.arready) begin
+                    rnext   = RESP;
+                    arvalid = 1'b0;
+                    rready  = 1'b1;
+                end else begin
+                    rnext   = ADDR;
+                    arvalid = 1'b1;
+                    rready  = 1'b1;
+                end
+            end
+            RESP: begin
+                if (cache.rvalid) begin
+                    rnext   = IDLE;
+                    arvalid = 1'b0;
+                    rready  = 1'b0;
+                end else begin
+                    rnext   = RESP;
+                    arvalid = 1'b0;
+                    rready  = 1'b1;
+                end
+            end
+        endcase
+        /* verilator lint_on CASEINCOMPLETE */
+
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn) begin
+            rstate <= IDLE;
+            cache.arvalid <= '0;
+            cache.rready <= '0;
+        end else begin
+            rstate <= rnext;
+            cache.arvalid <= arvalid;
+            cache.rready <= rready;
+            if (rstart) begin
+                cache.araddr <= mm.data.alu & (BASE-1);
+            end
+        end
+
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Streams
+     */
+
+    mm_t mm;
+    wb_t wb;
+
+    assign mm = up.tdata;
+    assign down.tdata = wb;
+
+    word_t aligned;
+
+    always_comb
+        mem2reg(
+            .op(mm.ctrl.op),
+            .addr(mm.data.alu[1:0]),
+            .din(cache.rdata),
+            .dout(aligned)
+        );
+
+    assign up.tready = down.tready & rstate == IDLE;
+
+    assign bypass  = core::is_load(mm.ctrl.op) ? aligned : mm.data.alu;
+
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn) begin
+            wb.ctrl.op <= core::NULL;
+            wb.data.rd <= '0;
+        end else begin
+            wb.ctrl.op <= mm.ctrl.op;
+            wb.data.rd.data <= bypass;
+            wb.data.rd.addr <= mm.data.rd;
+        end
+
+    always_ff @(posedge down.aclk)
+        if (~down.aresetn)
+            down.tvalid <= '0;
+        else if (rstop)
+            down.tvalid <= '1;
+        else if (down.tvalid & down.tready)
+            down.tvalid <= '0;
+
+endmodule : control
