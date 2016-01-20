@@ -180,12 +180,16 @@ module cpu
      * Memory
      */
 
+    axi cache (.*);
+
+    protect protect (.*);
+
     control #(
         .BASE(core::CODE_BASE),
         .SIZE(core::CODE_SIZE)
     ) control (
         .bypass(mem_data),
-        .cache(data),
+        .cache(cache),
         .up(mm),
         .down(wb)
     );

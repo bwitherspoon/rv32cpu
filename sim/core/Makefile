@@ -18,7 +18,7 @@ RTL = alu.sv     \
       fetch.sv   \
       forward.sv \
       hazard.sv  \
-      control.sv \
+      protect.sv \
       ram.sv     \
       regfile.sv \
       writeback.sv
