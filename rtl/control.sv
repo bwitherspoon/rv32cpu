@@ -331,26 +331,34 @@ module control
             .dout(aligned)
         );
 
-    assign up.tready = down.tready & rstate == IDLE;
+    /*
+     * Assert upstream ready if downstream is ready, and not beginning a
+     * transaction
+     */
+    assign up.tready = down.tready &
+                       wstate == IDLE & wnext != ADDR &
+                       rstate == IDLE & rnext != ADDR;
 
     assign bypass  = core::is_load(mm.ctrl.op) ? aligned : mm.data.alu;
+
+    /*
+     * Push downstream once transaction has completed
+     */
+    wire done = ~core::is_load(mm.ctrl.op)  & ~core::is_store(mm.ctrl.op) |
+                 rstate == RESP & rnext == IDLE |
+                 rstate != IDLE & wnext == IDLE;
 
     always_ff @(posedge down.aclk)
         if (~down.aresetn) begin
             wb.ctrl.op <= core::NULL;
             wb.data.rd <= '0;
-        end else begin
+            down.tvalid <= '0;
+        end else if (down.tready & done) begin
             wb.ctrl.op <= mm.ctrl.op;
             wb.data.rd.data <= bypass;
             wb.data.rd.addr <= mm.data.rd;
-        end
-
-    always_ff @(posedge down.aclk)
-        if (~down.aresetn)
-            down.tvalid <= '0;
-        else if (rstop)
-            down.tvalid <= '1;
-        else if (down.tvalid & down.tready)
+            down.tvalid <= up.tvalid;
+        end else if (down.tvalid & down.tready)
             down.tvalid <= '0;
 
 endmodule : control
