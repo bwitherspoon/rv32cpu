@@ -22,7 +22,7 @@ module execute
 );
     ex_t ex;
     mm_t mm;
- 
+
     word_t out;
 
     assign ex = up.tdata;
@@ -74,6 +74,7 @@ module execute
             mm.ctrl.jmp <= ex.ctrl.jmp;
             mm.data.rd  <= ex.data.rd;
             mm.data.alu <= (jmp) ? ex.data.pc + 4 : out;
+            mm.data.rs2 <= ex.data.rs2;
         end
     end : registers
 
