@@ -180,10 +180,10 @@ module cpu
      * Memory
      */
 
-    memory #(
+    control #(
         .BASE(core::CODE_BASE),
         .SIZE(core::CODE_SIZE)
-    ) memory (
+    ) control (
         .bypass(mem_data),
         .cache(data),
         .up(mm),

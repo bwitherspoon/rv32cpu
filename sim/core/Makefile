@@ -10,7 +10,7 @@ PKG = axi4.sv    \
 INT = axi.sv     \
       axis.sv
 RTL = alu.sv     \
-      bram.sv    \
+      block.sv   \
       control.sv \
       cpu.sv     \
       decode.sv  \
@@ -18,7 +18,7 @@ RTL = alu.sv     \
       fetch.sv   \
       forward.sv \
       hazard.sv  \
-      memory.sv  \
+      control.sv \
       ram.sv     \
       regfile.sv \
       writeback.sv
