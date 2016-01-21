@@ -156,7 +156,9 @@ package core;
     // CPU function type
     typedef enum logic [3:0] {
         NULL,
-        REGISTER,
+        INTEGER,
+        BRANCH_,
+        JUMP_,
         LOAD_WORD,
         LOAD_HALF,
         LOAD_BYTE,
@@ -186,14 +188,14 @@ package core;
 
     // Jump / Branch operation type
     typedef enum logic [2:0] {
-        NONE,
         JAL_JALR,
         BEQ,
         BNE,
         BLT,
         BLTU,
         BGE,
-        BGEU
+        BGEU,
+        NONE = 3'bxxx
     } br_t;
 
     // Program counter select
@@ -237,14 +239,6 @@ package core;
         op1_t op1;
         op2_t op2;
     } ctrl_t;
-
-    localparam ctrl_t KILL = '{
-        op:  NULL,
-        fun: ANY,
-        br:  NONE,
-        op1: XX,
-        op2: XXX
-    };
 
     /*
      * Pipeline structures
@@ -314,16 +308,16 @@ package core;
         return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
     endfunction
 
-    function logic isregister(input op_t op);
-        return op == REGISTER;
+    function logic isinteger(input op_t op);
+        return op == INTEGER;
     endfunction
 
-    function logic isjump(input br_t br);
-        return br == JAL_JALR;
+    function logic isjump(input op_t op);
+        return op == JUMP_;
     endfunction
 
-    function logic isbranch(input br_t br);
-        return br == BNE || br == BLT || br == BLTU || br == BGE || br == BGEU;
+    function logic isbranch(input op_t op);
+        return op == BRANCH_;
     endfunction
 
 endpackage

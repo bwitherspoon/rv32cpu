@@ -33,15 +33,30 @@ module testbench;
     axi data (.*);
     axi mmio (.*);
 
-    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.data(code));
-    ram ram (.data(data));
-    ram io (.data(mmio));
+    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.bus(code));
+    ram ram (.bus(data));
+    ram io (.bus(mmio));
 
     cpu cpu (.*);
 
+    task dump();
+        $error("dumping memory contents");
+        for (int i = 0; i < 8; i++) begin : pretty_print
+            $write("%08d:", i*4);
+            for (int j = 0; j < 4; j++)
+                $write("%08h ", io.block.mem[i+j]);
+            $write("\n");
+        end : pretty_print
+    endtask
+
     initial begin
+        io.block.mem[0] = '1;
         reset(); // GSR ~100 ns
-        #900ns $finish;
+        repeat (16) @(posedge clk);
+        reset();
+        #900ns;
+        assert(io.block.mem[4] == 32'hFFFF0000) else dump();
+        $finish;
     end
 
 endmodule : testbench

@@ -49,16 +49,14 @@ module cpu
      * Hazards
      */
 
-    wire stall;
-    wire flush;
+    wire bubble;
 
     hazard hazard (
         .decode(id),
         .execute(ex),
         .memory(mm),
         .writeback(wb),
-        .stall,
-        .flush
+        .bubble
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,9 +101,9 @@ module cpu
         .target,
         .trap,
         .handler(core::KERN_BASE),
-        .flush,
+        .bubble,
         .cache(code),
-        .down(id)
+        .sink(id)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,7 +141,6 @@ module cpu
     );
 
     decode decode (
-        .stall,
         .rs1_sel(rs1),
         .rs2_sel(rs2),
         .alu_data,
@@ -154,8 +151,8 @@ module cpu
         .rs1_addr,
         .rs2_addr,
         .invalid,
-        .up(id),
-        .down(ex)
+        .source(id),
+        .sink(ex)
     );
 
 
@@ -169,8 +166,8 @@ module cpu
         .branch,
         .target,
         .bypass(alu_data),
-        .up(ex),
-        .down(mm)
+        .source(ex),
+        .sink(mm)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,14 +180,11 @@ module cpu
 
     arbitrate arbitrate (.*);
 
-    memory #(
-        .BASE(core::CODE_BASE),
-        .SIZE(core::CODE_SIZE)
-    ) memory (
+    memory memory (
         .bypass(mem_data),
         .cache(cache),
-        .up(mm),
-        .down(wb)
+        .source(mm),
+        .sink(wb)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,10 +195,10 @@ module cpu
 
 
     writeback writeback (
-        .rd(rd_en),
-        .rd_addr(rd_addr ),
-        .rd_data(rd_data ),
-        .up(wb)
+        .rd_load(rd_en),
+        .rd_addr(rd_addr),
+        .rd_data(rd_data),
+        .source(wb)
     );
 
 endmodule

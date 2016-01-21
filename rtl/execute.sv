@@ -7,7 +7,7 @@
 /**
  * Module: execute
  *
- * TODO: Add module documentation
+ * Execute stage
  */
 module execute
     import core::ex_t;
@@ -17,19 +17,19 @@ module execute
     output logic  branch,
     output word_t target,
     output word_t bypass,
-    axis.slave    up,
-    axis.master   down
+    axis.slave    source,
+    axis.master   sink
 );
     ex_t ex;
     mm_t mm;
 
     word_t out;
 
-    assign ex = up.tdata;
+    assign ex = source.tdata;
 
-    assign down.tdata = mm;
+    assign sink.tdata = mm;
 
-    assign up.tready = down.tready;
+    assign source.tready = sink.tready;
 
     assign target = branch ? out : ex.data.pc + 4;
 
@@ -58,20 +58,18 @@ module execute
         .out
     );
 
-    always_ff @(posedge down.aclk)
-        if (~down.aresetn)
-            down.tvalid <= '0;
-        else if (down.tready)
-            down.tvalid <= up.tvalid;
-        else if (down.tvalid)
-            down.tvalid <= '0;
+    always_ff @(posedge sink.aclk)
+        if (~sink.aresetn)
+            sink.tvalid <= '0;
+        else if (sink.tvalid & sink.tready)
+            sink.tvalid <= source.tvalid;
 
-    always_ff @(posedge down.aclk) begin : registers
-        if (~down.aresetn) begin
+    always_ff @(posedge sink.aclk) begin : registers
+        if (~sink.aresetn) begin
             mm.ctrl.op  <= core::NULL;
             mm.ctrl.br <= core::NONE;
             mm.data.rd <= '0;
-        end else if (down.tready) begin
+        end else if (sink.tready) begin
             mm.ctrl.op  <= ex.ctrl.op;
             mm.ctrl.br <= ex.ctrl.br;
             mm.data.rd  <= ex.data.rd;

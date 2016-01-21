@@ -15,8 +15,8 @@ module forward
     import core::mm_t;
     import core::wb_t;
     import core::rs_t;
+    import core::isinteger;
     import core::isload;
-    import core::isregister;
 (
     axis.monitor decode,
     axis.monitor execute,
@@ -35,8 +35,8 @@ module forward
     assign mm = memory.tdata;
     assign wb = writeback.tdata;
 
-    wire ex_reg_store = isregister(ex.ctrl.op) | isload(ex.ctrl.op);
-    wire mm_reg_store = isregister(mm.ctrl.op) | isload(mm.ctrl.op);
+    wire ex_reg_store = isinteger(ex.ctrl.op) | isload(ex.ctrl.op);
+    wire mm_reg_store = isinteger(mm.ctrl.op) | isload(mm.ctrl.op);
 
     wire id_ex_rs1_rd = id.data.ir.r.rs1 == ex.data.rd;
     wire id_mm_rs1_rd = id.data.ir.r.rs1 == mm.data.rd;
