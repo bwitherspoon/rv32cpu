@@ -128,7 +128,7 @@ module memory
      *       to zero in declaration like wire.
      */
 
-    wire write = core::is_store(mm.ctrl.op) & up.tvalid;
+    wire write = core::isstore(mm.ctrl.op) & up.tvalid;
 
     state_t wstate = IDLE;
     state_t wnext;
@@ -243,7 +243,7 @@ module memory
      * Cache read
      */
 
-    wire read = core::is_load(mm.ctrl.op) & up.tvalid;
+    wire read = core::isload(mm.ctrl.op) & up.tvalid;
 
     state_t rstate = IDLE;
     state_t rnext;
@@ -339,7 +339,7 @@ module memory
                        wstate == IDLE & wnext != ADDR &
                        rstate == IDLE & rnext != ADDR;
 
-    assign bypass  = core::is_load(mm.ctrl.op) ? aligned : mm.data.alu;
+    assign bypass  = core::isload(mm.ctrl.op) ? aligned : mm.data.alu;
 
     /*
      * Push downstream once transaction has completed
@@ -357,7 +357,7 @@ module memory
         if (~down.aresetn)
             down.tvalid <= '0;
         else if (down.tready)
-            if (core::is_load(mm.ctrl.op))
+            if (core::isload(mm.ctrl.op))
                 if (rstate == RESP & rnext == IDLE)
                     down.tvalid <= '1;
                 else

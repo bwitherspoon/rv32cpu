@@ -15,10 +15,10 @@ module hazard
     import core::ex_t;
     import core::mm_t;
     import core::wb_t;
-    import core::is_load;
-    import core::is_store;
-    import core::is_jump;
-    import core::is_branch;
+    import core::isload;
+    import core::isstore;
+    import core::isjump;
+    import core::isbranch;
 (
     axis.monitor decode,
     axis.monitor execute,
@@ -42,11 +42,11 @@ module hazard
     assign opcode = id.data.ir.r.opcode;
 
     wire id_load = opcode == core::LOAD && decode.tvalid;
-    wire ex_load = is_load(ex.ctrl.op) && execute.tvalid;
-    wire mm_load = is_load(mm.ctrl.op) && memory.tvalid;
+    wire ex_load = isload(ex.ctrl.op) && execute.tvalid;
+    wire mm_load = isload(mm.ctrl.op) && memory.tvalid;
 
-    wire ex_branch = (is_jump(ex.ctrl.jmp) || is_branch(ex.ctrl.jmp)) && execute.tvalid;
-    wire mm_branch = (is_jump(mm.ctrl.jmp) || is_branch(mm.ctrl.jmp)) && memory.tvalid;
+    wire ex_branch = (isjump(ex.ctrl.br) || isbranch(ex.ctrl.br)) && execute.tvalid;
+    wire mm_branch = (isjump(mm.ctrl.br) || isbranch(mm.ctrl.br)) && memory.tvalid;
 
     assign stall = ex_load | mm_load;
     assign flush = ex_load | mm_load | ex_branch | mm_branch;

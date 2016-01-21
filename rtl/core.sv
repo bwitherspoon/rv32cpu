@@ -164,7 +164,8 @@ package core;
         LOAD_BYTE_UNSIGNED,
         STORE_WORD,
         STORE_HALF,
-        STORE_BYTE
+        STORE_BYTE,
+        INVALID = 4'b1111
     } op_t;
 
     // ALU operation type
@@ -186,14 +187,14 @@ package core;
     // Jump / Branch operation type
     typedef enum logic [2:0] {
         NONE,
-        JAL_OR_JALR,
+        JAL_JALR,
         BEQ,
         BNE,
         BLT,
         BLTU,
         BGE,
         BGEU
-    } jmp_t;
+    } br_t;
 
     // Program counter select
     typedef enum logic [1:0] {
@@ -232,7 +233,7 @@ package core;
     typedef struct packed {
         op_t  op;
         fun_t fun;
-        jmp_t jmp;
+        br_t  br;
         op1_t op1;
         op2_t op2;
     } ctrl_t;
@@ -240,7 +241,7 @@ package core;
     localparam ctrl_t KILL = '{
         op:  NULL,
         fun: ANY,
-        jmp: NONE,
+        br:  NONE,
         op1: XX,
         op2: XXX
     };
@@ -262,7 +263,7 @@ package core;
         struct packed {
             op_t  op;
             fun_t fun;
-            jmp_t jmp;
+            br_t  br;
         } ctrl;
         struct packed {
             word_t pc;
@@ -277,8 +278,8 @@ package core;
     // Memory structure
     typedef struct packed {
         struct packed {
-            op_t  op;
-            jmp_t jmp;
+            op_t op;
+            br_t br;
         } ctrl;
         struct packed {
             word_t alu;
@@ -304,26 +305,25 @@ package core;
      * Helper functions (synthesizable)
      */
 
-    function logic is_load(input op_t op);
+    function logic isload(input op_t op);
         return op == LOAD_WORD || op == LOAD_HALF || op == LOAD_BYTE ||
                op == LOAD_HALF_UNSIGNED || op == LOAD_BYTE_UNSIGNED;
     endfunction
 
-    function logic is_store(input op_t op);
+    function logic isstore(input op_t op);
         return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
     endfunction
 
-    function logic is_reg(input op_t op);
+    function logic isregister(input op_t op);
         return op == REGISTER;
     endfunction
 
-    function logic is_jump(input jmp_t jmp);
-        return jmp == JAL_OR_JALR;
+    function logic isjump(input br_t br);
+        return br == JAL_JALR;
     endfunction
 
-    function logic is_branch(input jmp_t jmp);
-        return jmp == BEQ || jmp == BNE || jmp == BLT || jmp == BLTU ||
-               jmp == BGE || jmp == BGEU;
+    function logic isbranch(input br_t br);
+        return br == BNE || br == BLT || br == BLTU || br == BGE || br == BGEU;
     endfunction
 
 endpackage
