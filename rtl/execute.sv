@@ -41,13 +41,13 @@ module execute
     wire ltu = ex.data.rs1 < ex.data.rs2;
 
     // Jump / Branch
-    wire jmp  = ex.ctrl.jmp == core::JAL_OR_JALR;
-    wire beq  = ex.ctrl.jmp == core::BEQ  & eq;
-    wire bne  = ex.ctrl.jmp == core::BNE  & ~eq;
-    wire blt  = ex.ctrl.jmp == core::BLT  & lt;
-    wire bltu = ex.ctrl.jmp == core::BLTU & ltu;
-    wire bge  = ex.ctrl.jmp == core::BGE  & (eq | ~lt);
-    wire bgeu = ex.ctrl.jmp == core::BGEU & (eq | ~ltu);
+    wire jmp  = ex.ctrl.br == core::JAL_JALR;
+    wire beq  = ex.ctrl.br == core::BEQ  & eq;
+    wire bne  = ex.ctrl.br == core::BNE  & ~eq;
+    wire blt  = ex.ctrl.br == core::BLT  & lt;
+    wire bltu = ex.ctrl.br == core::BLTU & ltu;
+    wire bge  = ex.ctrl.br == core::BGE  & (eq | ~lt);
+    wire bgeu = ex.ctrl.br == core::BGEU & (eq | ~ltu);
 
     assign branch = jmp | beq | bne | blt | bltu | bge | bgeu;
 
@@ -69,11 +69,11 @@ module execute
     always_ff @(posedge down.aclk) begin : registers
         if (~down.aresetn) begin
             mm.ctrl.op  <= core::NULL;
-            mm.ctrl.jmp <= core::NONE;
+            mm.ctrl.br <= core::NONE;
             mm.data.rd <= '0;
         end else if (down.tready) begin
             mm.ctrl.op  <= ex.ctrl.op;
-            mm.ctrl.jmp <= ex.ctrl.jmp;
+            mm.ctrl.br <= ex.ctrl.br;
             mm.data.rd  <= ex.data.rd;
             mm.data.alu <= (jmp) ? ex.data.pc + 4 : out;
             mm.data.rs2 <= ex.data.rs2;

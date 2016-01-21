@@ -15,7 +15,6 @@ module cpu
     import core::imm_t;
     import core::inst_t;
     import core::id_t;
-    import core::jmp_t;
     import core::mm_t;
     import core::op_t;
     import core::rs_t;
