@@ -103,9 +103,8 @@ module cpu
         .target,
         .trap,
         .handler(core::KERN_BASE),
-        .flush,
         .cache(code),
-        .down(id)
+        .sink(id)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,14 +182,11 @@ module cpu
 
     arbitrate arbitrate (.*);
 
-    memory #(
-        .BASE(core::CODE_BASE),
-        .SIZE(core::CODE_SIZE)
-    ) memory (
+    memory memory (
         .bypass(mem_data),
         .cache(cache),
-        .up(mm),
-        .down(wb)
+        .source(mm),
+        .sink(wb)
     );
 
 ///////////////////////////////////////////////////////////////////////////////

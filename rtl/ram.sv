@@ -8,25 +8,27 @@
  * Module: ram
  */
 module ram #(
+    ADDR_DEPTH = 4,
     DATA_DEPTH = 1024,
     RESP_DEPTH = 4,
     INIT_DATA  = 32'h00000000,
     INIT_FILE  = ""
 )(
-    axi.slave data
+    axi.slave bus
 );
-    typedef logic [$bits(data.wdata)-1:0] data_t;
+    typedef logic [$bits(bus.wdata)-1:0] data_t;
 
-    wire waddr = data.awvalid & data.awready;
-    wire wdata = data.wvalid & data.wready;
-    wire wresp = data.bvalid & data.bready;
-    wire raddr = data.arvalid & data.arready;
-    wire rdata = data.rvalid & data.rready;
+    // Handshake signals
+    wire waddr = bus.awvalid & bus.awready;
+    wire wdata = bus.wvalid & bus.wready;
+    wire wresp = bus.bvalid & bus.bready;
+    wire raddr = bus.arvalid & bus.arready;
+    wire rdata = bus.rvalid & bus.rready;
 
-    wire [$clog2(DATA_DEPTH)-1:0] awaddr = data.awaddr[$clog2(DATA_DEPTH)-1+2:2];
-    wire [$clog2(DATA_DEPTH)-1:0] araddr = data.araddr[$clog2(DATA_DEPTH)-1+2:2];
+    // Pending write responses
+    logic [$clog2(RESP_DEPTH)-1:0] resp = '0;
 
-    logic [$clog2(RESP_DEPTH)-1:0] resp;
+    data_t nc;
 
     block #(
         .DATA_WIDTH($bits(data_t)),
@@ -34,42 +36,44 @@ module ram #(
         .INIT_DATA_B(INIT_DATA),
         .INIT_FILE(INIT_FILE)
     ) block (
-        .clk(data.aclk),
+        .clk(bus.aclk),
         .rsta(1'b0),
         .ena(waddr & wdata),
-        .wea(data.wstrb),
-        .addra(awaddr),
-        .dia(data.wdata),
-        .doa(),
-        .rstb(~data.aresetn),
-        .enb(raddr),
+        .wea(bus.wstrb),
+        .addra(bus.awaddr[$clog2(DATA_DEPTH)-1+2:2]),
+        .dia(bus.wdata),
+        .doa(nc),
+        .rstb(~bus.aresetn),
+        .enb(~bus.aresetn | raddr),
         .web('0),
-        .addrb(araddr),
+        .addrb(bus.araddr[$clog2(DATA_DEPTH)-1+2:2]),
         .dib('0),
-        .dob(data.rdata)
+        .dob(bus.rdata)
     );
 
     // Write
-    always_ff @(posedge data.aclk)
+    always_ff @(posedge bus.aclk)
         if (~data.aresetn)                 resp <= '0;
         else if (waddr & wdata & ~wresp)   resp <= resp + 1;
         else if (~(waddr & wdata) & wresp) resp <= resp - 1;
 
-    assign data.awready = ~&resp;
-    assign data.wready = ~&resp;
+    assign bus.awready = ~&resp;
+    assign bus.wready = ~&resp;
 
-    assign data.bresp = axi4::OKAY;
-    assign data.bvalid = |resp;
+    assign bus.bresp = axi4::OKAY;
+    assign bus.bvalid = |resp;
 
     // Read
-    // TODO pending address FIFO
-    assign data.arready = data.rready;
+    assign bus.arready = bus.rready;
 
-    always_ff @(posedge data.aclk)
-        if (~data.aresetn) data.rvalid <= '0;
-        else if (raddr)    data.rvalid <= '1;
-        else if (rdata)    data.rvalid <= '0;
+    always_ff @(posedge bus.aclk)
+        if (~bus.aresetn)
+            bus.rvalid = '0;
+        else if (raddr)
+            bus.rvalid = '1;
+        else if (rdata)
+            bus.rvalid = '0;
 
-    assign data.rresp = axi4::OKAY;
+    assign bus.rresp = axi4::OKAY;
 
 endmodule

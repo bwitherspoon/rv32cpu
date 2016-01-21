@@ -33,14 +33,16 @@ module testbench;
     axi data (.*);
     axi mmio (.*);
 
-    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.data(code));
-    ram ram (.data(data));
-    ram io (.data(mmio));
+    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.bus(code));
+    ram ram (.bus(data));
+    ram io (.bus(mmio));
 
     cpu cpu (.*);
 
     initial begin
         reset(); // GSR ~100 ns
+        repeat (16) @(posedge clk);
+        reset();
         #900ns $finish;
     end
 
