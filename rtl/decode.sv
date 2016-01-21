@@ -434,7 +434,7 @@ module decode
             default:     op2 = rs2;
         endcase
 
-    // Streams
+    // AXI
     always_ff @(posedge down.aclk)
         if (~down.aresetn) begin
             ex.ctrl.op <= core::NULL;
@@ -457,10 +457,10 @@ module decode
             down.tvalid <= '0;
         else if (up.tvalid)
             down.tvalid <= '1;
-        else
+        else if (down.tvalid & down.tready)
             down.tvalid <= '0;
 
-    assign up.tready = stall ? '0 : down.tready;
+    assign up.tready = down.tready;
 
     // Error
     assign invalid = ctrl.op == core::INVALID & up.tvalid;
