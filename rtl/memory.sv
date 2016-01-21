@@ -140,10 +140,10 @@ module memory
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.bready <= '0;
-        else if (write)
-            cache.bready <= '1;
         else if (cache.bvalid & cache.bready)
             cache.bready <= '0;
+        else if (write)
+            cache.bready <= '1;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -160,10 +160,10 @@ module memory
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.rready <= '0;
-        else if (read)
-            cache.rready <= '1;
         else if (cache.rvalid & cache.rready)
             cache.rready <= '0;
+        else if (read)
+            cache.rready <= '1;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -177,7 +177,16 @@ module memory
     assign mm = source.tdata;
     assign sink.tdata = wb;
 
-    assign source.tready = sink.tvalid & sink.tready;
+    assign source.tready = ~read & ~cache.rready & ~write & ~cache.bready;
+
+    // TODO
+    always_ff @(posedge sink.aclk)
+        if (~sink.aresetn)
+            sink.tvalid <= '0;
+        else if (source.tvalid)
+            sink.tvalid <= '1;
+        else if (sink.tvalid & sink.tready)
+            sink.tvalid <= '0;
 
     word_t aligned;
 
@@ -200,14 +209,4 @@ module memory
             wb.data.rd.addr <= mm.data.rd;
         end
 
-    always_ff @(posedge sink.aclk)
-        if (~sink.aresetn) begin
-            sink.tvalid <= '0;
-        end else if (sink.tvalid & sink.tready) begin
-            if (write)
-                sink.tvalid <= '0;
-        end else if (sink.tready) begin
-            if (cache.bvalid)
-                sink.tvalid <= '1;
-        end
 endmodule : memory

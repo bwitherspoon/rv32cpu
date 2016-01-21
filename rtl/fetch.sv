@@ -18,6 +18,7 @@
     input  word_t target,
     input  logic  trap,
     input  word_t handler,
+    input  logic  bubble,
     axi.master    cache,
     axis.master   sink
 );
@@ -54,30 +55,23 @@
 
     assign cache.arprot = axi4::AXI4;
 
-    wire hazard = id.data.ir.r.opcode == core::BRANCH ||
-                  id.data.ir.r.opcode == core::JAL ||
-                  id.data.ir.r.opcode == core::JALR;;
-
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.arvalid <= '1;
-        else if (~hazard)
+        else if (~bubble)
             cache.arvalid <= '1;
         else if (raddr)
             cache.arvalid <= '0;
 
     assign cache.rready = sink.tready;
 
-    logic tvalid;
-
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn)
-            tvalid <= '0;
-        else if (~hazard)
-            tvalid <= '1;
-        else if (raddr)
-            tvalid <= '0;
+            sink.tvalid <= '0;
+        else if (~bubble)
+            sink.tvalid <= '1;
+        else if (tdata)
+            sink.tvalid <= '0;
 
-    assign sink.tvalid = tvalid & cache.rvalid;
 
 endmodule : fetch

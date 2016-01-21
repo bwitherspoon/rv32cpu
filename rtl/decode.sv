@@ -21,7 +21,6 @@ module decode
     import core::rs_t;
     import core::word_t;
 (
-    input  logic  stall,
     input  rs_t   rs1_sel,
     input  rs_t   rs2_sel,
     input  word_t alu_data,
@@ -32,8 +31,8 @@ module decode
     output addr_t rs1_addr,
     output addr_t rs2_addr,
     output logic  invalid,
-    axis.slave    up,
-    axis.master   down
+    axis.slave    source,
+    axis.master   sink
 );
     localparam ctrl_t INVAL = '{
         op:  core::INVALID,
@@ -310,8 +309,8 @@ module decode
 
     ctrl_t ctrl;
 
-    assign id = up.tdata;
-    assign down.tdata = ex;
+    assign id = source.tdata;
+    assign sink.tdata = ex;
 
     assign pc = id.data.pc;
     assign ir = id.data.ir;
@@ -435,12 +434,12 @@ module decode
         endcase
 
     // AXI
-    always_ff @(posedge down.aclk)
-        if (~down.aresetn) begin
+    always_ff @(posedge sink.aclk)
+        if (~sink.aresetn) begin
             ex.ctrl.op <= core::NULL;
             ex.ctrl.br <= core::NONE;
             ex.data.rd <= '0;
-        end else if (down.tready) begin
+        end else if (sink.tready) begin
             ex.ctrl.op  <= ctrl.op;
             ex.ctrl.fun <= ctrl.fun;
             ex.ctrl.br  <= ctrl.br;
@@ -452,18 +451,18 @@ module decode
             ex.data.rd  <= ir.r.rd;
         end
 
-    always_ff @(posedge down.aclk)
-        if (~down.aresetn)
-            down.tvalid <= '0;
-        else if (up.tvalid)
-            down.tvalid <= '1;
-        else if (down.tvalid & down.tready)
-            down.tvalid <= '0;
+    always_ff @(posedge sink.aclk)
+        if (~sink.aresetn)
+            sink.tvalid <= '0;
+        else if (source.tvalid)
+            sink.tvalid <= '1;
+        else if (sink.tvalid & sink.tready)
+            sink.tvalid <= '0;
 
-    assign up.tready = down.tready;
+    assign source.tready = sink.tready;
 
     // Error
-    assign invalid = ctrl.op == core::INVALID & up.tvalid;
+    assign invalid = ctrl.op == core::INVALID & source.tvalid;
 
 endmodule : decode
 
