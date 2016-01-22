@@ -61,7 +61,7 @@ module execute
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn)
             sink.tvalid <= '0;
-        else if (sink.tvalid & sink.tready)
+        else if (sink.tready)
             sink.tvalid <= source.tvalid;
 
     always_ff @(posedge sink.aclk) begin : registers
