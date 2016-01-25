@@ -68,11 +68,11 @@ module ram #(
 
     always_ff @(posedge bus.aclk)
         if (~bus.aresetn)
-            bus.rvalid = '0;
+            bus.rvalid <= '0;
         else if (raddr)
-            bus.rvalid = '1;
+            bus.rvalid <= '1;
         else if (rdata)
-            bus.rvalid = '0;
+            bus.rvalid <= '0;
 
     assign bus.rresp = axi4::OKAY;
 
