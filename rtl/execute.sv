@@ -66,8 +66,8 @@ module execute
 
     always_ff @(posedge sink.aclk) begin : registers
         if (~sink.aresetn) begin
-            mm.ctrl.op  <= core::NULL;
-            mm.ctrl.br <= core::NONE;
+            mm.ctrl.op  <= core::NONE;
+            mm.ctrl.br <= core::IGNORE;
             mm.data.rd <= '0;
         end else if (sink.tready) begin
             mm.ctrl.op  <= ex.ctrl.op;

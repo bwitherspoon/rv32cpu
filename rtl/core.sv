@@ -124,7 +124,7 @@ package core;
 
     // CPU function type
     typedef enum logic [3:0] {
-        NULL,
+        NONE,
         INTEGER,
         BRANCH,
         JUMP,
@@ -164,7 +164,7 @@ package core;
         BLTU,
         BGE,
         BGEU,
-        NONE = 3'bxxx
+        IGNORE = 3'bxxx
     } br_t;
 
     // Program counter select

@@ -10,7 +10,7 @@
  * TODO: Add module documentation
  */
 module hazard
-    import core::opcode_t;
+    import opcodes::opcode_t;
     import core::id_t;
     import core::ex_t;
     import core::mm_t;

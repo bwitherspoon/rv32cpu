@@ -38,7 +38,7 @@ module writeback
     always_ff @(posedge source.aclk)
         if (~source.aresetn)
             count <= '0;
-        else if (source.tvalid & wb.ctrl.op == core::NULL)
+        else if (source.tvalid & wb.ctrl.op == core::NONE)
             count <= count + 1;
 
 endmodule

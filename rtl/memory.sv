@@ -203,7 +203,7 @@ module memory
 
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn) begin
-            wb.ctrl.op <= core::NULL;
+            wb.ctrl.op <= core::NONE;
         end else if (sink.tready) begin
             wb.ctrl.op <= mm.ctrl.op;
             wb.data.rd.data <= bypass;
