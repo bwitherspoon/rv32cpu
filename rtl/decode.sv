@@ -189,14 +189,14 @@ module decode
         op2: core::RS2
     };
     localparam ctrl_t JAL = '{
-        op:  core::JUMP_,
+        op:  core::JUMP,
         fun: core::ADD,
         br:  core::JAL_JALR,
         op1: core::PC,
         op2: core::J_IMM
     };
     localparam ctrl_t JALR = '{
-        op:  core::JUMP_,
+        op:  core::JUMP,
         fun: core::ADD,
         br:  core::JAL_JALR,
         op1: core::RS1,
@@ -210,35 +210,35 @@ module decode
         op2: core::B_IMM
     };
     localparam ctrl_t BNE = '{
-        op:  core::BRANCH_,
+        op:  core::BRANCH,
         fun: core::ADD,
         br:  core::BNE,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BLT = '{
-        op:  core::BRANCH_,
+        op:  core::BRANCH,
         fun: core::ADD,
         br:  core::BLT,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BLTU = '{
-        op:  core::BRANCH_,
+        op:  core::BRANCH,
         fun: core::ADD,
         br:  core::BLTU,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BGE = '{
-        op:  core::BRANCH_,
+        op:  core::BRANCH,
         fun: core::ADD,
         br:  core::BGE,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BGEU = '{
-        op:  core::BRANCH_,
+        op:  core::BRANCH,
         fun: core::ADD,
         br:  core::BGEU,
         op1: core::PC,
@@ -338,7 +338,7 @@ module decode
     // Control decoder
     always_comb begin : control
         unique case (ir.r.opcode)
-            core::OP_IMM:
+            opcodes::OP_IMM:
                 unique case (ir.r.funct3)
                     core::BEQ_LB_SB_ADD_SUB: ctrl = ADDI;
                     core::BNE_LH_SH_SLL:     ctrl = SLLI;
@@ -350,7 +350,7 @@ module decode
                     core::BGEU_AND:          ctrl = ANDI;
                     default:                 ctrl = INVAL;
                 endcase
-            core::OP:
+            opcodes::OP:
                 unique case (ir.r.funct3)
                     core::BEQ_LB_SB_ADD_SUB: ctrl = (ir.r.funct7[5]) ? SUB : ADD;
                     core::BNE_LH_SH_SLL:     ctrl = SLL;
@@ -362,11 +362,11 @@ module decode
                     core::BGEU_AND:          ctrl = AND;
                     default:                 ctrl = INVAL;
                 endcase
-            core::LUI:   ctrl = LUI;
-            core::AUIPC: ctrl = AUIPC;
-            core::JAL:   ctrl = JAL;
-            core::JALR:  ctrl = JALR;
-            core::BRANCH:
+            opcodes::LUI:   ctrl = LUI;
+            opcodes::AUIPC: ctrl = AUIPC;
+            opcodes::JAL:   ctrl = JAL;
+            opcodes::JALR:  ctrl = JALR;
+            opcodes::BRANCH:
                 unique case (ir.r.funct3)
                     core::BEQ_LB_SB_ADD_SUB: ctrl = BEQ;
                     core::BNE_LH_SH_SLL:     ctrl = BNE;
@@ -376,7 +376,7 @@ module decode
                     core::BGEU_AND:          ctrl = BGEU;
                     default:                 ctrl = INVAL;
                 endcase
-            core::LOAD:
+            opcodes::LOAD:
                 unique case (ir.r.funct3)
                     core::LW_SW_SLT:         ctrl = LW;
                     core::BNE_LH_SH_SLL:     ctrl = LH;
@@ -385,7 +385,7 @@ module decode
                     core::BLT_LBU_XOR:       ctrl = LBU;
                     default:                 ctrl = INVAL;
                 endcase
-            core::STORE:
+            opcodes::STORE:
                 unique case (ir.r.funct3)
                     core::BEQ_LB_SB_ADD_SUB: ctrl = SB;
                     core::BNE_LH_SH_SLL:     ctrl = SH;

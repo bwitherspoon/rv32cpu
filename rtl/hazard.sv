@@ -40,7 +40,8 @@ module hazard
 
     assign opcode = id.data.ir.r.opcode;
 
-    wire branch = opcode == core::JAL || opcode == core::JALR || opcode == core::BRANCH;
+    wire branch = opcode == opcodes::JAL || opcode == opcodes::JALR ||
+                  opcode == opcodes::BRANCH;
 
     assign bubble = branch;
 
