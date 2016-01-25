@@ -35,11 +35,14 @@
     assign id.data.ir = cache.rdata;
 
     // PC
+    word_t pc;
+    assign pc = id.data.pc;
+
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
-            id.data.pc <= core::CODE_BASE;
-        else if (cache.arvalid & cache.arready & sink.tready)
-            id.data.pc <= cache.araddr;
+            pc <= core::CODE_BASE;
+        else if (cache.arready & sink.tready)
+            pc <= cache.araddr;
 
     // AXI
     always_ff @(posedge cache.aclk)
