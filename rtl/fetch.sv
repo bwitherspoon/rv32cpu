@@ -36,7 +36,7 @@
 
     // PC
     word_t pc;
-    assign pc = id.data.pc;
+    assign id.data.pc = pc;
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
