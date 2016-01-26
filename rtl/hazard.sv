@@ -10,7 +10,6 @@
  * TODO: Add module documentation
  */
 module hazard
-    import opcodes::opcode_t;
     import core::id_t;
     import core::ex_t;
     import core::mm_t;
@@ -36,7 +35,7 @@ module hazard
     assign mm = memory.tdata;
     assign wb = writeback.tdata;
 
-    opcode_t opcode;
+    opcodes::opcode_t opcode;
 
     assign opcode = id.data.ir.r.opcode;
 
