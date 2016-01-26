@@ -41,13 +41,13 @@ module execute
     wire ltu = ex.data.rs1 < ex.data.rs2;
 
     // Jump / Branch
-    wire jmp  = ex.ctrl.br == core::JAL_JALR;
-    wire beq  = ex.ctrl.br == core::BEQ  & eq;
-    wire bne  = ex.ctrl.br == core::BNE  & ~eq;
-    wire blt  = ex.ctrl.br == core::BLT  & lt;
-    wire bltu = ex.ctrl.br == core::BLTU & ltu;
-    wire bge  = ex.ctrl.br == core::BGE  & (eq | ~lt);
-    wire bgeu = ex.ctrl.br == core::BGEU & (eq | ~ltu);
+    wire jmp  = ex.ctrl.op == core::JUMP;
+    wire beq  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BEQ  & eq;
+    wire bne  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BNE  & ~eq;
+    wire blt  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BLT  & lt;
+    wire bltu = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BLTU & ltu;
+    wire bge  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BGE  & (eq | ~lt);
+    wire bgeu = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BGEU & (eq | ~ltu);
 
     assign branch = jmp | beq | bne | blt | bltu | bge | bgeu;
 

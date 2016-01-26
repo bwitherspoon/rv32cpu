@@ -191,14 +191,14 @@ module decode
     localparam ctrl_t JAL = '{
         op:  core::JUMP,
         fun: core::ADD,
-        br:  core::JAL_JALR,
+        br:  core::JAL,
         op1: core::PC,
         op2: core::J_IMM
     };
     localparam ctrl_t JALR = '{
         op:  core::JUMP,
         fun: core::ADD,
-        br:  core::JAL_JALR,
+        br:  core::JAL,
         op1: core::RS1,
         op2: core::I_IMM
     };

@@ -157,7 +157,8 @@ package core;
 
     // Jump / Branch operation type
     typedef enum logic [2:0] {
-        JAL_JALR,
+        JAL,
+        JALR,
         BEQ,
         BNE,
         BLT,
