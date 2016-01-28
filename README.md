@@ -1,7 +1,9 @@
 Core
 ====
 
-![Diagram](http://spoonb.github.io/core/core.svg)
+![Diagram](http://bwitherspoon.github.io/core/core.svg)
+
+![VivadoBoard](http://bwitherspoon.github.io/core/bd.png)
 
 Summary
 -------
