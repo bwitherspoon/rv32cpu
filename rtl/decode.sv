@@ -440,15 +440,21 @@ module decode
             ex.ctrl.br <= core::NONE;
             ex.data.rd <= '0;
         end else if (sink.tready) begin
-            ex.ctrl.op  <= ctrl.op;
-            ex.ctrl.fun <= ctrl.fun;
-            ex.ctrl.br  <= ctrl.br;
-            ex.data.pc  <= pc;
-            ex.data.op1 <= op1;
-            ex.data.op2 <= op2;
-            ex.data.rs1 <= rs1;
-            ex.data.rs2 <= rs2;
-            ex.data.rd  <= ir.r.rd;
+            if (source.tvalid) begin
+                ex.ctrl.op  <= ctrl.op;
+                ex.ctrl.fun <= ctrl.fun;
+                ex.ctrl.br  <= ctrl.br;
+                ex.data.pc  <= pc;
+                ex.data.op1 <= op1;
+                ex.data.op2 <= op2;
+                ex.data.rs1 <= rs1;
+                ex.data.rs2 <= rs2;
+                ex.data.rd  <= ir.r.rd;
+            end else begin
+                ex.ctrl.op <= core::NULL;
+                ex.ctrl.br <= core::NONE;
+                ex.data.rd <= '0;
+            end
         end
 
     always_ff @(posedge sink.aclk)

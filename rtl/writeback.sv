@@ -18,11 +18,11 @@ module writeback
     output addr_t rd_addr,
     output word_t rd_data,
     output word_t count,
-    axis.slave    up
+    axis.slave    source
 );
     wb_t wb;
 
-    assign wb = up.tdata;
+    assign wb = source.tdata;
 
     assign rd = wb.ctrl.op == core::REGISTER;
 
@@ -30,12 +30,12 @@ module writeback
 
     assign rd_data = wb.data.rd.data;
 
-    assign up.tready = '1;
+    assign source.tready = '1;
 
-    always_ff @(posedge up.aclk)
-        if (~up.aresetn)
+    always_ff @(posedge source.aclk)
+        if (~source.aresetn)
             count <= '0;
-        else if (up.tvalid & wb.ctrl.op != core::NULL)
+        else if (source.tvalid & wb.ctrl.op != core::NULL)
             count <= count + 1;
 
 endmodule

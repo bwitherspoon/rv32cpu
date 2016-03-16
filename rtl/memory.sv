@@ -81,10 +81,10 @@ module memory
      * A function for memory to register alignment.
      */
     function void mem2reg(
-        input  op_t        op,
-        input  logic [1:0] addr,
-        input  word_t      din,
-        output word_t      dout
+        input  op_t   op,
+        input  word_t addr,
+        input  word_t din,
+        output word_t dout
     );
         unique case (op)
             core::LOAD_WORD:
@@ -93,7 +93,7 @@ module memory
                 if (addr[1]) dout = {{16{din[31]}}, din[31:16]};
                 else         dout = {{16{din[15]}}, din[15:0]};
             core::LOAD_BYTE:
-                unique case (addr)
+                unique case (addr[1:0])
                     2'b00: dout = {{24{din[7]}},  din[7:0]};
                     2'b01: dout = {{24{din[15]}}, din[15:8]};
                     2'b10: dout = {{24{din[23]}}, din[23:16]};
@@ -103,7 +103,7 @@ module memory
                 if (addr[1]) dout = {16'h0000, din[31:16]};
                 else         dout = {16'h0000, din[15:0]};
             core::LOAD_BYTE_UNSIGNED:
-                unique case (addr)
+                unique case (addr[1:0])
                     2'b00: dout = {24'h000000, din[7:0]};
                     2'b01: dout = {24'h000000, din[15:8]};
                     2'b10: dout = {24'h000000, din[23:16]};
@@ -120,30 +120,57 @@ module memory
      * Cache write
      */
 
+    strb_t wstrb;
+    word_t wdata;
+
     always_comb
         reg2mem(
             .op(mm.ctrl.op),
             .addr(mm.data.alu),
             .din(mm.data.rs2),
-            .strb(cache.wstrb),
-            .dout(cache.wdata)
+            .strb(wstrb),
+            .dout(wdata)
         );
 
     wire write = core::isstore(mm.ctrl.op) & source.tvalid;
 
-    assign cache.awaddr = mm.data.alu;
     assign cache.awprot = axi4::AXI4;
 
-    assign cache.awvalid = write;
-    assign cache.wvalid = write;
+    always_ff @(posedge cache.aclk)
+        if (write & ~(cache.wvalid & ~cache.wready))
+            cache.wdata <= wdata;
+
+    always_ff @(posedge cache.aclk)
+        if (write & ~(cache.wvalid & ~cache.wready))
+            cache.wstrb <= wstrb;
+
+    always_ff @(posedge cache.aclk)
+        if (write & ~(cache.awvalid & ~cache.awready))
+            cache.awaddr <= mm.data.alu;
+
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn)
+            cache.awvalid <= '0;
+        else if (write)
+            cache.awvalid <= '1;
+        else if (cache.awvalid & cache.awready)
+            cache.awvalid <= '0;
+
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn)
+            cache.wvalid <= '0;
+        else if (write)
+            cache.wvalid <= '1;
+        else if (cache.wvalid & cache.wready)
+            cache.wvalid <= '0;
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.bready <= '0;
-        else if (cache.bvalid & cache.bready)
-            cache.bready <= '0;
         else if (write)
             cache.bready <= '1;
+        else if (cache.bvalid & cache.bready)
+            cache.bready <= '0;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -155,15 +182,25 @@ module memory
 
     assign cache.arprot = axi4::AXI4;
 
-    assign cache.arvalid = read;
+    always_ff @(posedge cache.aclk)
+        if (~cache.aresetn)
+            cache.arvalid <= '0;
+        else if (read)
+            cache.arvalid <= '1;
+        else if (cache.arvalid & cache.arready)
+            cache.arvalid <= '0;
+
+    always_ff @(posedge cache.aclk)
+        if (read & ~(cache.arvalid & ~cache.arready))
+            cache.araddr <= mm.data.alu;
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
             cache.rready <= '0;
-        else if (cache.rvalid & cache.rready)
-            cache.rready <= '0;
         else if (read)
             cache.rready <= '1;
+        else if (cache.rvalid & cache.rready)
+            cache.rready <= '0;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -171,15 +208,16 @@ module memory
      * Streams
      */
 
+    word_t rdata;
+
     mm_t mm;
     wb_t wb;
 
     assign mm = source.tdata;
     assign sink.tdata = wb;
 
-    assign source.tready = ~read & ~cache.rready & ~write & ~cache.bready;
+    assign source.tready = sink.tready;
 
-    // TODO
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn)
             sink.tvalid <= '0;
@@ -188,25 +226,23 @@ module memory
         else if (sink.tvalid & sink.tready)
             sink.tvalid <= '0;
 
-    word_t aligned;
-
     always_comb
         mem2reg(
             .op(mm.ctrl.op),
-            .addr(mm.data.alu[1:0]),
+            .addr(mm.data.alu),
             .din(cache.rdata),
-            .dout(aligned)
+            .dout(rdata)
         );
 
-    assign bypass = core::isload(mm.ctrl.op) ? aligned : mm.data.alu;
+    assign bypass = core::isload(mm.ctrl.op) ? rdata : mm.data.alu;
 
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn) begin
             wb.ctrl.op <= core::NULL;
         end else if (sink.tready) begin
-            wb.ctrl.op <= mm.ctrl.op;
+            wb.ctrl.op <= (source.tvalid) ? mm.ctrl.op : core::NULL;
             wb.data.rd.data <= bypass;
-            wb.data.rd.addr <= mm.data.rd;
+            wb.data.rd.addr <= (source.tvalid) ? mm.data.rd : '0;
         end
 
 endmodule : memory

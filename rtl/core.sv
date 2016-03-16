@@ -64,37 +64,37 @@ package core;
     } funct3_t;
 
     // Instruction address space base
-    localparam word_t CODE_BASE = 32'h00000000;
+    localparam CODE_BASE = 32'h00000000;
 
     // Instruction address space size
-    localparam word_t CODE_SIZE = 32'h00000200;
+    localparam CODE_SIZE = 32'h00000200;
 
     // Kernal address space
-    localparam word_t KERN_BASE = 32'h00000200;
+    localparam KERN_BASE = 32'h00000200;
 
     // Kernal address space
-    localparam word_t KERN_SIZE = 32'h00000200;
+    localparam KERN_SIZE = 32'h00000200;
 
     // Data address space base
-    localparam word_t DATA_BASE = 32'h00000000;
+    localparam DATA_BASE = 32'h00000000;
 
     // Data address space size
-    localparam word_t DATA_SIZE = 32'h00000200;
+    localparam DATA_SIZE = 32'h00000200;
 
     // BSS address space base
-    localparam word_t BSS_BASE = 32'h00000200;
+    localparam BSS_BASE = 32'h00000200;
 
     // BAA address space size
-    localparam word_t BSS_SIZE = 32'h00000100;
+    localparam BSS_SIZE = 32'h00000100;
 
     // Stack base address
-    localparam word_t STACK_BASE = 32'h00000FFF;
+    localparam STACK_BASE = 32'h00000FFF;
 
     // Stack size
-    localparam word_t STACK_SIZE = 32'h00000100;
+    localparam STACK_SIZE = 32'h00000100;
 
     // Memory mapped peripheral address space
-    localparam word_t MMIO_BASE = 32'h40000000;
+    localparam MMIO_BASE = 32'h40000000;
 
 
     // Instruction type
@@ -147,7 +147,7 @@ package core;
         } uj;
     } inst_t;
 
-    localparam word_t NOP = 32'h00000013;
+    localparam NOP = 32'h00000013;
 
     /*
      * Control
@@ -237,14 +237,6 @@ package core;
         op1_t op1;
         op2_t op2;
     } ctrl_t;
-
-    localparam ctrl_t KILL = '{
-        op:  NULL,
-        fun: ANY,
-        br:  NONE,
-        op1: XX,
-        op2: XXX
-    };
 
     /*
      * Pipeline structures

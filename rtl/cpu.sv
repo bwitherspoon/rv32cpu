@@ -166,8 +166,8 @@ module cpu
         .branch,
         .target,
         .bypass(alu_data),
-        .up(ex),
-        .down(mm)
+        .source(ex),
+        .sink(mm)
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ module cpu
 
     axi cache (.*);
 
-    arbitrate arbitrate (.*);
+    arbitrate arbitrate (.cache(cache), .*);
 
     memory memory (
         .bypass(mem_data),
@@ -198,7 +198,7 @@ module cpu
         .rd(rd_en),
         .rd_addr(rd_addr),
         .rd_data(rd_data),
-        .up(wb)
+        .source(wb)
     );
 
 endmodule

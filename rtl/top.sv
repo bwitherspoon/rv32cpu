@@ -74,9 +74,9 @@ module top #(
     ram #(
         .INIT_DATA(core::NOP),
         .INIT_FILE(INIT_FILE)
-    ) rom (.data(code), .*);
+    ) rom (.bus(code), .*);
 
-    ram ram (.data(data), .*);
+    ram ram (.bus(data), .*);
 
     cpu cpu (.data(data), .code(code), .mmio(mmio), .*);
 

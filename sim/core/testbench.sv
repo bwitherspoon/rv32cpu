@@ -42,7 +42,6 @@ module testbench;
     initial begin
         reset(); // GSR ~100 ns
         repeat (16) @(posedge clk);
-        reset();
         #900ns $finish;
     end
 
