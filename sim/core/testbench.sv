@@ -39,10 +39,20 @@ module testbench;
 
     cpu cpu (.*);
 
+    task dump();
+        $error("dumping memory contents");
+        for (int i = 0; i < 8; i++) begin : pretty_print
+            $write("%08d:", i*4);
+            for (int j = 0; j < 4; j++)
+                $write("%08h ", io.block.mem[i+j]);
+            $write("\n");
+        end : pretty_print
+    endtask
+
     initial begin
         reset(); // GSR ~100 ns
-        repeat (16) @(posedge clk);
-        #900ns $finish;
+        repeat (100) @(posedge clk);
+        $finish;
     end
 
 endmodule : testbench

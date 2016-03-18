@@ -193,11 +193,13 @@ module cpu
      * Writeback
      */
 
+    word_t count;
 
     writeback writeback (
-        .rd(rd_en),
+        .rd_load(rd_en),
         .rd_addr(rd_addr),
         .rd_data(rd_data),
+        .count(count),
         .source(wb)
     );
 

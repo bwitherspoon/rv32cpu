@@ -238,9 +238,9 @@ module memory
 
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn) begin
-            wb.ctrl.op <= core::NULL;
+            wb.ctrl.op <= core::NONE;
         end else if (sink.tready) begin
-            wb.ctrl.op <= (source.tvalid) ? mm.ctrl.op : core::NULL;
+            wb.ctrl.op <= (source.tvalid) ? mm.ctrl.op : core::NONE;
             wb.data.rd.data <= bypass;
             wb.data.rd.addr <= (source.tvalid) ? mm.data.rd : '0;
         end

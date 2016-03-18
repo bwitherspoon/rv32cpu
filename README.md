@@ -1,12 +1,14 @@
 Core
 ====
 
-![Diagram](http://spoonb.github.io/core/core.svg)
+![Diagram](http://bwitherspoon.github.io/core/core.svg)
+
+![VivadoBoard](http://bwitherspoon.github.io/core/bd.png)
 
 Summary
 -------
 
-This project is a single-issue RISC processor in [SystemVerilog 1800-2012][sytemverilog].
+This project is a single-issue RISC processor in [SystemVerilog 1800-2012][systemverilog].
 The processor executes the base integer instruction set of the user level 32-bit [RISC-V][riscv] ISA (RV32I).
 
 Platforms

@@ -1,40 +1,9 @@
 /**
- * Copyright (c) 2015, C. Brett Witherspoon
+ * Copyright (c) 2015, 2016 C. Brett Witherspoon
  */
 package core;
 
-    /*
-     * Data
-     */
-
-    // Opcodes
-    typedef enum logic [6:0] {
-        LOAD      = 'b0000011,
-        LOAD_FP   = 'b0000111,
-        CUSTOM_0  = 'b0001011,
-        MISC_MEM  = 'b0001111,
-        OP_IMM    = 'b0010011,
-        AUIPC     = 'b0010111,
-        OP_IMM_32 = 'b0011011,
-        STORE     = 'b0100011,
-        STORE_FP  = 'b0100111,
-        CUSTOM_1  = 'b0101011,
-        AMO       = 'b0101111,
-        OP        = 'b0110011,
-        LUI       = 'b0110111,
-        OP_32     = 'b0111011,
-        MADD      = 'b1000011,
-        MSUB      = 'b1000111,
-        NMSUB     = 'b1001011,
-        NMADD     = 'b1001111,
-        OP_FP     = 'b1010011,
-        CUSTOM_2  = 'b1011011,
-        BRANCH    = 'b1100011,
-        JALR      = 'b1100111,
-        JAL       = 'b1101111,
-        SYSTEM    = 'b1110011,
-        CUSTOM_3  = 'b1111011
-    } opcode_t;
+    import opcodes::opcode_t;
 
     // Word type
     typedef logic [31:0] word_t;
@@ -155,8 +124,10 @@ package core;
 
     // CPU function type
     typedef enum logic [3:0] {
-        NULL,
-        REGISTER,
+        NONE,
+        INTEGER,
+        BRANCH,
+        JUMP,
         LOAD_WORD,
         LOAD_HALF,
         LOAD_BYTE,
@@ -186,14 +157,15 @@ package core;
 
     // Jump / Branch operation type
     typedef enum logic [2:0] {
-        NONE,
-        JAL_JALR,
+        JAL,
+        JALR,
         BEQ,
         BNE,
         BLT,
         BLTU,
         BGE,
-        BGEU
+        BGEU,
+        IGNORE = 3'bxxx
     } br_t;
 
     // Program counter select
@@ -306,16 +278,16 @@ package core;
         return op == STORE_WORD || op == STORE_HALF || op == STORE_BYTE;
     endfunction
 
-    function logic isregister(input op_t op);
-        return op == REGISTER;
+    function logic isinteger(input op_t op);
+        return op == INTEGER;
     endfunction
 
-    function logic isjump(input br_t br);
-        return br == JAL_JALR;
+    function logic isjump(input op_t op);
+        return op == JUMP;
     endfunction
 
-    function logic isbranch(input br_t br);
-        return br == BNE || br == BLT || br == BLTU || br == BGE || br == BGEU;
+    function logic isbranch(input op_t op);
+        return op == BRANCH;
     endfunction
 
 endpackage

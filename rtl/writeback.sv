@@ -13,8 +13,11 @@ module writeback
     import core::addr_t;
     import core::word_t;
     import core::wb_t;
+    import core::isinteger;
+    import core::isload;
+    import core::isjump;
 (
-    output logic  rd,
+    output logic  rd_load,
     output addr_t rd_addr,
     output word_t rd_data,
     output word_t count,
@@ -24,7 +27,7 @@ module writeback
 
     assign wb = source.tdata;
 
-    assign rd = wb.ctrl.op == core::REGISTER;
+    assign rd_load = isinteger(wb.ctrl.op) | isload(wb.ctrl.op) | isjump(wb.ctrl.op);
 
     assign rd_addr = wb.data.rd.addr;
 
@@ -35,7 +38,7 @@ module writeback
     always_ff @(posedge source.aclk)
         if (~source.aresetn)
             count <= '0;
-        else if (source.tvalid & wb.ctrl.op != core::NULL)
+        else if (source.tvalid & wb.ctrl.op == core::NONE)
             count <= count + 1;
 
 endmodule
