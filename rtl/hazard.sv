@@ -6,8 +6,6 @@
 
 /**
  * Module: hazard
- *
- * TODO: Add module documentation
  */
 module hazard
     import core::id_t;
@@ -23,25 +21,41 @@ module hazard
     axis.monitor execute,
     axis.monitor memory,
     axis.monitor writeback,
-    output logic bubble
+    output logic bubble,
+    output logic stall
 );
     id_t id;
     ex_t ex;
     mm_t mm;
     wb_t wb;
 
+    opcodes::opcode_t opcode;
+
+    enum logic { READ, IDLE } state = IDLE;
+
     assign id = decode.tdata;
     assign ex = execute.tdata;
     assign mm = memory.tdata;
     assign wb = writeback.tdata;
-
-    opcodes::opcode_t opcode;
 
     assign opcode = id.data.ir.r.opcode;
 
     wire branch = opcode == opcodes::JAL || opcode == opcodes::JALR ||
                   opcode == opcodes::BRANCH;
 
+    // Memory read hazard
+    always_ff @(posedge decode.aclk)
+        case (state)
+            IDLE:
+                if (opcode == opcodes::LOAD)
+                    state <= READ;
+            READ:
+                if (core::isload(wb.ctrl.op))
+                    state <= IDLE;
+        endcase
+
     assign bubble = branch;
+
+    assign stall = state == READ;
 
 endmodule

@@ -216,12 +216,12 @@ module memory
     assign mm = source.tdata;
     assign sink.tdata = wb;
 
-    assign source.tready = sink.tready;
+    assign source.tready = sink.tready & ~cache.rready;
 
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn)
             sink.tvalid <= '0;
-        else if (source.tvalid)
+        else if (source.tvalid & ~cache.rready)
             sink.tvalid <= '1;
         else if (sink.tvalid & sink.tready)
             sink.tvalid <= '0;

@@ -50,13 +50,15 @@ module cpu
      */
 
     wire bubble;
+    wire stall;
 
     hazard hazard (
         .decode(id),
         .execute(ex),
         .memory(mm),
         .writeback(wb),
-        .bubble
+        .bubble,
+        .stall
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,6 +143,7 @@ module cpu
     );
 
     decode decode (
+        .stall,
         .rs1_sel(rs1),
         .rs2_sel(rs2),
         .alu_data,

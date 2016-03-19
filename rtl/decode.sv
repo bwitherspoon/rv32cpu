@@ -21,6 +21,7 @@ module decode
     import core::rs_t;
     import core::word_t;
 (
+    input  logic  stall,
     input  rs_t   rs1_sel,
     input  rs_t   rs2_sel,
     input  word_t alu_data,
@@ -459,7 +460,7 @@ module decode
         else if (sink.tvalid & sink.tready)
             sink.tvalid <= '0;
 
-    assign source.tready = sink.tready;
+    assign source.tready = sink.tready & ~stall;
 
     // Error
     assign invalid = ctrl.op == core::INVALID & source.tvalid;
