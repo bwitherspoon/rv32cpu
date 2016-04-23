@@ -30,14 +30,14 @@ module ram #(
 
     data_t nc;
 
-    block #(
+    blockram #(
         .DATA_WIDTH($bits(data_t)),
         .DATA_DEPTH(DATA_DEPTH),
         .INIT_DATA_B(INIT_DATA),
         .INIT_FILE(INIT_FILE)
-    ) block (
+    ) blockram (
         .clk(bus.aclk),
-        .rsta(1'b0),
+        .rsta('0),
         .ena(waddr & wdata),
         .wea(bus.wstrb),
         .addra(bus.awaddr[$clog2(DATA_DEPTH)-1+2:2]),

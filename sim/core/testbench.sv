@@ -44,7 +44,7 @@ module testbench;
         for (int i = 0; i < 8; i++) begin : pretty_print
             $write("%08d:", i*4);
             for (int j = 0; j < 4; j++)
-                $write("%08h ", io.block.mem[i+j]);
+                $write("%08h ", io.blockram.mem[i+j]);
             $write("\n");
         end : pretty_print
     endtask

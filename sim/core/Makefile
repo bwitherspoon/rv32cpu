@@ -12,7 +12,7 @@ INT = axi.sv     \
       axis.sv
 RTL = alu.sv     \
       arbitrate.sv \
-      block.sv   \
+      blockram.sv  \
       cpu.sv     \
       decode.sv  \
       execute.sv \
