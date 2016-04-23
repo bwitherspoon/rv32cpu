@@ -9,11 +9,11 @@
  * latch reset.
  */
 module blockram #(
-    int unsigned DATA_WIDTH  = 32,
-    int unsigned DATA_DEPTH  = 1024,
-    int unsigned INIT_DATA_A = '0,
-    int unsigned INIT_DATA_B = '0,
-    string       INIT_FILE   = ""
+    DATA_WIDTH  = 32,
+    DATA_DEPTH  = 1024,
+    INIT_DATA_A = '0,
+    INIT_DATA_B = '0,
+    INIT_FILE   = ""
 )(
     input  logic                          clk,
     input  logic                          rsta,

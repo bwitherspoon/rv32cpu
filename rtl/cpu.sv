@@ -127,7 +127,7 @@ module cpu
 
     // The output of the execute stage is available on the memory stream interface.
     mm_t exe;
-    assign exe = mm_t'(mm.monitor.tdata);
+    assign exe = mm_t'(mm.tdata);
     assign exe_data = exe.data.alu;
 
     regfile regfile (

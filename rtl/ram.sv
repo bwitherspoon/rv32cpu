@@ -53,9 +53,12 @@ module ram #(
 
     // Write
     always_ff @(posedge bus.aclk)
-        if (~data.aresetn)                 resp <= '0;
-        else if (waddr & wdata & ~wresp)   resp <= resp + 1;
-        else if (~(waddr & wdata) & wresp) resp <= resp - 1;
+        if (~bus.aresetn)
+            resp <= '0;
+        else if (waddr & wdata & ~wresp)
+            resp <= resp + 1;
+        else if (~(waddr & wdata) & wresp)
+            resp <= resp - 1;
 
     assign bus.awready = ~&resp;
     assign bus.wready = ~&resp;
