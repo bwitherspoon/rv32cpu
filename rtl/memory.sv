@@ -15,15 +15,16 @@ module memory
     import core::wb_t;
     import core::word_t;
 (
-    output word_t bypass,
-    axi.master    cache,
-    axis.slave    source,
-    axis.master   sink
+    logic       aclk,
+    logic       aresetn,
+    axi.master  cache,
+    axis.slave  source,
+    axis.master sink
 );
     /**
-     * Module: reg2mem
+     * Function: reg2mem
      *
-     * A function for register to memory alignment.
+     * A helper function for register to memory alignment.
      */
     function void reg2mem(
         input  op_t   op,
@@ -78,7 +79,7 @@ module memory
     /**
      * Function: mem2reg
      *
-     * A function for memory to register alignment.
+     * A helper function for memory to register alignment.
      */
     function void mem2reg(
         input  op_t   op,
@@ -117,11 +118,28 @@ module memory
 ///////////////////////////////////////////////////////////////////////////////
 
     /*
-     * Cache write
+     * Internal signals
      */
+
+    op_t op;
+    word_t rdata;
 
     strb_t wstrb;
     word_t wdata;
+
+    mm_t mm;
+    wb_t wb;
+
+    // Map interfaces to internal structures
+    assign mm = source.tdata;
+
+    assign sink.tdata = wb;
+
+///////////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Cache write
+     */
 
     always_comb
         reg2mem(
@@ -136,19 +154,19 @@ module memory
 
     assign cache.awprot = axi4::AXI4;
 
-    always_ff @(posedge cache.aclk)
-        if (write & ~(cache.wvalid & ~cache.wready))
-            cache.wdata <= wdata;
-
-    always_ff @(posedge cache.aclk)
-        if (write & ~(cache.wvalid & ~cache.wready))
-            cache.wstrb <= wstrb;
-
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge aclk)
         if (write & ~(cache.awvalid & ~cache.awready))
             cache.awaddr <= mm.data.alu;
 
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge aclk)
+        if (write & ~(cache.wvalid & ~cache.wready))
+            cache.wdata <= wdata;
+
+    always_ff @(posedge aclk)
+        if (write & ~(cache.wvalid & ~cache.wready))
+            cache.wstrb <= wstrb;
+
+    always_ff @(posedge aclk)
         if (~cache.aresetn)
             cache.awvalid <= '0;
         else if (write)
@@ -156,7 +174,7 @@ module memory
         else if (cache.awvalid & cache.awready)
             cache.awvalid <= '0;
 
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge aclk)
         if (~cache.aresetn)
             cache.wvalid <= '0;
         else if (write)
@@ -164,7 +182,7 @@ module memory
         else if (cache.wvalid & cache.wready)
             cache.wvalid <= '0;
 
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge aclk)
         if (~cache.aresetn)
             cache.bready <= '0;
         else if (write)
@@ -182,7 +200,7 @@ module memory
 
     assign cache.arprot = axi4::AXI4;
 
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge aclk)
         if (~cache.aresetn)
             cache.arvalid <= '0;
         else if (read)
@@ -190,59 +208,46 @@ module memory
         else if (cache.arvalid & cache.arready)
             cache.arvalid <= '0;
 
-    always_ff @(posedge cache.aclk)
+    always_ff @(posedge aclk)
         if (read & ~(cache.arvalid & ~cache.arready))
             cache.araddr <= mm.data.alu;
 
-    always_ff @(posedge cache.aclk)
-        if (~cache.aresetn)
-            cache.rready <= '0;
-        else if (read)
-            cache.rready <= '1;
-        else if (cache.rvalid & cache.rready)
-            cache.rready <= '0;
+    always_ff @(posedge aclk)
+        if (read & ~(cache.arvalid & ~cache.arready))
+            op <= mm.ctrl.op;
 
-///////////////////////////////////////////////////////////////////////////////
-
-    /*
-     * Streams
-     */
-
-    word_t rdata;
-
-    mm_t mm;
-    wb_t wb;
-
-    assign mm = source.tdata;
-    assign sink.tdata = wb;
-
-    assign source.tready = sink.tready & ~cache.rready;
-
-    always_ff @(posedge sink.aclk)
-        if (~sink.aresetn)
-            sink.tvalid <= '0;
-        else if (source.tvalid & ~cache.rready)
-            sink.tvalid <= '1;
-        else if (sink.tvalid & sink.tready)
-            sink.tvalid <= '0;
+    assign cache.rready = sink.tready;
 
     always_comb
         mem2reg(
-            .op(mm.ctrl.op),
-            .addr(mm.data.alu),
+            .op(op),
+            .addr(cache.araddr),
             .din(cache.rdata),
             .dout(rdata)
         );
 
-    assign bypass = core::isload(mm.ctrl.op) ? rdata : mm.data.alu;
+///////////////////////////////////////////////////////////////////////////////
 
-    always_ff @(posedge sink.aclk)
-        if (~sink.aresetn) begin
-            wb.ctrl.op <= core::NONE;
-        end else if (sink.tready) begin
-            wb.ctrl.op <= (source.tvalid) ? mm.ctrl.op : core::NONE;
-            wb.data.rd.data <= bypass;
-            wb.data.rd.addr <= (source.tvalid) ? mm.data.rd : '0;
+    /*
+     * Register streams
+     */
+
+    assign source.tready = sink.tready;
+
+    always_ff @(posedge aclk)
+        if (~aresetn)
+            sink.tvalid <= '0;
+        else if (~read & ~write)
+            sink.tvalid <= '1;
+        else if (sink.tvalid & sink.tready)
+            sink.tvalid <= '0;
+
+    always_ff @(posedge aclk)
+        if (~read & ~write) begin
+            wb.ctrl.op      <= mm.ctrl.op;
+            wb.data.rd.data <= mm.data.alu;
+            wb.data.rd.addr <= mm.data.rd;
         end
 
 endmodule : memory
+

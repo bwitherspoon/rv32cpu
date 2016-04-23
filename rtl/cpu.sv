@@ -183,7 +183,8 @@ module cpu
     arbitrate arbitrate (.cache(cache), .*);
 
     memory memory (
-        .bypass(mem_data),
+        .aclk,
+        .aresetn,
         .cache(cache),
         .source(mm),
         .sink(wb)
