@@ -150,21 +150,16 @@ module memory
             .dout(wdata)
         );
 
-    wire write = core::isstore(mm.ctrl.op) & source.tvalid;
+    wire write = core::isstore(mm.ctrl.op) & source.tvalid & source.tready;
 
     assign cache.awprot = axi4::AXI4;
 
     always_ff @(posedge aclk)
-        if (write & ~(cache.awvalid & ~cache.awready))
+        if (write & ~(cache.awvalid & ~cache.awready)) begin
             cache.awaddr <= mm.data.alu;
-
-    always_ff @(posedge aclk)
-        if (write & ~(cache.wvalid & ~cache.wready))
-            cache.wdata <= wdata;
-
-    always_ff @(posedge aclk)
-        if (write & ~(cache.wvalid & ~cache.wready))
-            cache.wstrb <= wstrb;
+            cache.wdata  <= wdata;
+            cache.wstrb  <= wstrb;
+        end
 
     always_ff @(posedge aclk)
         if (~cache.aresetn)
@@ -196,7 +191,7 @@ module memory
      * Cache read
      */
 
-    wire read = core::isload(mm.ctrl.op) & source.tvalid;
+    wire read = core::isload(mm.ctrl.op) & source.tvalid & source.tready;
 
     assign cache.arprot = axi4::AXI4;
 
@@ -209,12 +204,10 @@ module memory
             cache.arvalid <= '0;
 
     always_ff @(posedge aclk)
-        if (read & ~(cache.arvalid & ~cache.arready))
+        if (read & ~(cache.arvalid & ~cache.arready)) begin
             cache.araddr <= mm.data.alu;
-
-    always_ff @(posedge aclk)
-        if (read & ~(cache.arvalid & ~cache.arready))
             op <= mm.ctrl.op;
+        end
 
     assign cache.rready = sink.tready;
 
@@ -229,7 +222,7 @@ module memory
 ///////////////////////////////////////////////////////////////////////////////
 
     /*
-     * Register streams
+     * Register stream
      */
 
     assign source.tready = ~cache.arvalid & ~cache.rvalid & sink.tready;
@@ -237,15 +230,15 @@ module memory
     always_ff @(posedge aclk)
         if (~aresetn)
             sink.tvalid <= '0;
-        else if (~read & ~write)
+        else if (~read | (cache.rvalid & cache.rready))
             sink.tvalid <= '1;
         else if (sink.tvalid & sink.tready)
             sink.tvalid <= '0;
 
     always_ff @(posedge aclk)
-        if (~read & ~write) begin
-            wb.ctrl.op      <= mm.ctrl.op;
-            wb.data.rd.data <= mm.data.alu;
+        if (~read | (cache.rvalid & cache.rready)) begin
+            wb.ctrl.op      <= (cache.rvalid & cache.rready) ? op : mm.ctrl.op;
+            wb.data.rd.data <= (cache.rvalid & cache.rready) ? rdata : mm.data.alu;
             wb.data.rd.addr <= mm.data.rd;
         end
 

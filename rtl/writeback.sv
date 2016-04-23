@@ -6,8 +6,6 @@
 
 /**
  * Module: writeback
- *
- * TODO: Add module documentation
  */
 module writeback
     import core::addr_t;
@@ -38,7 +36,7 @@ module writeback
     always_ff @(posedge source.aclk)
         if (~source.aresetn)
             count <= '0;
-        else if (source.tvalid & wb.ctrl.op == core::NONE)
+        else if (source.tvalid & source.tready)
             count <= count + 1;
 
 endmodule
