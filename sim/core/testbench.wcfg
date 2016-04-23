@@ -7,14 +7,15 @@
          <top_modules>
             <top_module name="axi4" />
             <top_module name="core" />
+            <top_module name="opcodes" />
             <top_module name="testbench" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="318166666fs"></ZoomStartTime>
-      <ZoomEndTime time="392366667fs"></ZoomEndTime>
-      <Cursor1Time time="380000000fs"></Cursor1Time>
+      <ZoomStartTime time="216778800fs"></ZoomStartTime>
+      <ZoomEndTime time="293832648fs"></ZoomEndTime>
+      <Cursor1Time time="420000000fs"></Cursor1Time>
    </zoom_setting>
    <WVObjectSize size="16" />
    <wvobject db_ref_id="1" type="logic" fp_name="/testbench/clk">
@@ -254,13 +255,11 @@
       </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group88">
-      <obj_property name="label">MMIO</obj_property>
+      <obj_property name="label">IO</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="group" fp_name="group104">
          <obj_property name="label">Write</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/awaddr">
             <obj_property name="ElementShortName">awaddr[31:0]</obj_property>
             <obj_property name="ObjectShortName">awaddr[31:0]</obj_property>
@@ -309,7 +308,6 @@
       <wvobject type="group" fp_name="group105">
          <obj_property name="label">Read</obj_property>
          <obj_property name="DisplayName">label</obj_property>
-         <obj_property name="isExpanded"></obj_property>
          <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/araddr">
             <obj_property name="ElementShortName">araddr[31:0]</obj_property>
             <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
@@ -347,10 +345,7 @@
    <wvobject type="group" fp_name="group66">
       <obj_property name="label">ALU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/execute/alu/fun">
-         <obj_property name="ElementShortName">fun[3:0]</obj_property>
-         <obj_property name="ObjectShortName">fun[3:0]</obj_property>
-      </wvobject>
+      <obj_property name="isExpanded"></obj_property>
       <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/execute/alu/op1">
          <obj_property name="ElementShortName">op1[31:0]</obj_property>
          <obj_property name="ObjectShortName">op1[31:0]</obj_property>
