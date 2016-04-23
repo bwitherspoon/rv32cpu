@@ -11,7 +11,6 @@ module cpu
     import core::addr_t;
     import core::ctrl_t;
     import core::ex_t;
-    import core::fun_t;
     import core::imm_t;
     import core::inst_t;
     import core::id_t;

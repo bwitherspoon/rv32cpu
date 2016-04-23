@@ -35,269 +35,269 @@ module decode
     axis.slave    source,
     axis.master   sink
 );
-    localparam ctrl_t INVAL = '{
-        op:  core::INVALID,
-        fun: core::ANY,
-        br:  core::IGNORE,
+    localparam ctrl_t NONE = '{
+        op:  core::NONE,
+        fn:  core::ANY,
+        br:  core::NA,
         op1: core::XX,
         op2: core::XXX
     };
     localparam ctrl_t ADDI = '{
         op:  core::INTEGER,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t SLTI = '{
         op:  core::INTEGER,
-        fun: core::SLT,
-        br:  core::IGNORE,
+        fn:  core::SLT,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t SLTIU = '{
         op:  core::INTEGER,
-        fun: core::SLTU,
-        br:  core::IGNORE,
+        fn:  core::SLTU,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t ANDI = '{
         op:  core::INTEGER,
-        fun: core::AND,
-        br:  core::IGNORE,
+        fn:  core::AND,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t ORI = '{
         op:  core::INTEGER,
-        fun: core::OR,
-        br:  core::IGNORE,
+        fn:  core::OR,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t XORI = '{
         op:  core::INTEGER,
-        fun: core::XOR,
-        br:  core::IGNORE,
+        fn:  core::XOR,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t SLLI = '{
         op:  core::INTEGER,
-        fun: core::SLL,
-        br:  core::IGNORE,
+        fn:  core::SLL,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t SRLI = '{
         op:  core::INTEGER,
-        fun: core::SRL,
-        br:  core::IGNORE,
+        fn:  core::SRL,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t SRAI = '{
         op:  core::INTEGER,
-        fun: core::SRA,
-        br:  core::IGNORE,
+        fn:  core::SRA,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t LUI = '{
         op:  core::INTEGER,
-        fun: core::OP2,
-        br:  core::IGNORE,
+        fn:  core::OP2,
+        br:  core::NA,
         op1: core::XX,
         op2: core::U_IMM
     };
     localparam ctrl_t AUIPC = '{
         op:  core::INTEGER,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::PC,
         op2: core::U_IMM
     };
     localparam ctrl_t ADD = '{
         op:  core::INTEGER,
-        fun: core::AND,
-        br:  core::IGNORE,
+        fn:  core::AND,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t SLT = '{
         op:  core::INTEGER,
-        fun: core::SLT,
-        br:  core::IGNORE,
+        fn:  core::SLT,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t SLTU = '{
         op:  core::INTEGER,
-        fun: core::SLTU,
-        br:  core::IGNORE,
+        fn:  core::SLTU,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t AND = '{
         op:  core::INTEGER,
-        fun: core::AND,
-        br:  core::IGNORE,
+        fn:  core::AND,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t OR = '{
         op:  core::INTEGER,
-        fun: core::OR,
-        br:  core::IGNORE,
+        fn:  core::OR,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t XOR = '{
         op:  core::INTEGER,
-        fun: core::XOR,
-        br:  core::IGNORE,
+        fn:  core::XOR,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t SLL = '{
         op:  core::INTEGER,
-        fun: core::SLL,
-        br:  core::IGNORE,
+        fn:  core::SLL,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t SRL = '{
         op:  core::INTEGER,
-        fun: core::SRL,
-        br:  core::IGNORE,
+        fn:  core::SRL,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t SUB = '{
         op:  core::INTEGER,
-        fun: core::SUB,
-        br:  core::IGNORE,
+        fn:  core::SUB,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t SRA = '{
         op:  core::INTEGER,
-        fun: core::SRA,
-        br:  core::IGNORE,
+        fn:  core::SRA,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
     };
     localparam ctrl_t JAL = '{
         op:  core::JUMP,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::JAL,
         op1: core::PC,
         op2: core::J_IMM
     };
     localparam ctrl_t JALR = '{
         op:  core::JUMP,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::JAL,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t BEQ = '{
         op:  core::BRANCH,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::BEQ,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BNE = '{
         op:  core::BRANCH,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::BNE,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BLT = '{
         op:  core::BRANCH,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::BLT,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BLTU = '{
         op:  core::BRANCH,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::BLTU,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BGE = '{
         op:  core::BRANCH,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::BGE,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t BGEU = '{
         op:  core::BRANCH,
-        fun: core::ADD,
+        fn:  core::ADD,
         br:  core::BGEU,
         op1: core::PC,
         op2: core::B_IMM
     };
     localparam ctrl_t LW = '{
         op:  core::LOAD_WORD,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t LH = '{
         op:  core::LOAD_HALF,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t LHU = '{
         op:  core::LOAD_HALF_UNSIGNED,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t LB = '{
         op:  core::LOAD_BYTE,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t LBU = '{
         op:  core::LOAD_BYTE_UNSIGNED,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::I_IMM
     };
     localparam ctrl_t SW = '{
         op:  core::STORE_WORD,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::S_IMM
     };
     localparam ctrl_t SH = '{
         op:  core::STORE_HALF,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::S_IMM
     };
     localparam ctrl_t SB = '{
         op:  core::STORE_BYTE,
-        fun: core::ADD,
-        br:  core::IGNORE,
+        fn:  core::ADD,
+        br:  core::NA,
         op1: core::RS1,
         op2: core::S_IMM
     };
@@ -349,7 +349,7 @@ module decode
                     core::BGE_LHU_SRL_SRA:   ctrl = (ir.r.funct7[5]) ? SRAI : SRLI;
                     core::BLTU_OR:           ctrl = ORI;
                     core::BGEU_AND:          ctrl = ANDI;
-                    default:                 ctrl = INVAL;
+                    default:                 ctrl = NONE;
                 endcase
             opcodes::OP:
                 unique case (ir.r.funct3)
@@ -361,7 +361,7 @@ module decode
                     core::BGE_LHU_SRL_SRA:   ctrl = (ir.r.funct7[5]) ? SRA : SRL;
                     core::BLTU_OR:           ctrl = OR;
                     core::BGEU_AND:          ctrl = AND;
-                    default:                 ctrl = INVAL;
+                    default:                 ctrl = NONE;
                 endcase
             opcodes::LUI:   ctrl = LUI;
             opcodes::AUIPC: ctrl = AUIPC;
@@ -375,7 +375,7 @@ module decode
                     core::BLTU_OR:           ctrl = BLTU;
                     core::BGE_LHU_SRL_SRA:   ctrl = BGE;
                     core::BGEU_AND:          ctrl = BGEU;
-                    default:                 ctrl = INVAL;
+                    default:                 ctrl = NONE;
                 endcase
             opcodes::LOAD:
                 unique case (ir.r.funct3)
@@ -384,17 +384,17 @@ module decode
                     core::BGE_LHU_SRL_SRA:   ctrl = LHU;
                     core::BEQ_LB_SB_ADD_SUB: ctrl = LB;
                     core::BLT_LBU_XOR:       ctrl = LBU;
-                    default:                 ctrl = INVAL;
+                    default:                 ctrl = NONE;
                 endcase
             opcodes::STORE:
                 unique case (ir.r.funct3)
                     core::BEQ_LB_SB_ADD_SUB: ctrl = SB;
                     core::BNE_LH_SH_SLL:     ctrl = SH;
                     core::LW_SW_SLT:         ctrl = SW;
-                    default:                 ctrl = INVAL;
+                    default:                 ctrl = NONE;
                 endcase
             default:
-                ctrl = INVAL;
+                ctrl = NONE;
         endcase
     end : control
 
@@ -436,13 +436,9 @@ module decode
 
     // AXI
     always_ff @(posedge sink.aclk)
-        if (~sink.aresetn) begin
-            ex.ctrl.op <= core::NONE;
-            ex.ctrl.br <= core::IGNORE;
-            ex.data.rd <= '0;
-        end else if (sink.tready) begin
+        if (sink.tready) begin
             ex.ctrl.op  <= ctrl.op;
-            ex.ctrl.fun <= ctrl.fun;
+            ex.ctrl.fn  <= ctrl.fn;
             ex.ctrl.br  <= ctrl.br;
             ex.data.pc  <= pc;
             ex.data.op1 <= op1;
@@ -463,7 +459,7 @@ module decode
     assign source.tready = sink.tready & ~stall;
 
     // Error
-    assign invalid = ctrl.op == core::INVALID & source.tvalid;
+    assign invalid = ctrl.op == core::NONE & source.tvalid;
 
 endmodule : decode
 

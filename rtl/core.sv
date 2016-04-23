@@ -65,7 +65,6 @@ package core;
     // Memory mapped peripheral address space
     localparam MMIO_BASE = 32'h40000000;
 
-
     // Instruction type
     typedef union packed {
         struct packed {
@@ -135,8 +134,7 @@ package core;
         LOAD_BYTE_UNSIGNED,
         STORE_WORD,
         STORE_HALF,
-        STORE_BYTE,
-        INVALID = 4'b1111
+        STORE_BYTE
     } op_t;
 
     // ALU operation type
@@ -153,7 +151,7 @@ package core;
         SRA,
         OP2,
         ANY = 4'bxxxx
-    } fun_t;
+    } fn_t;
 
     // Jump / Branch operation type
     typedef enum logic [2:0] {
@@ -165,7 +163,7 @@ package core;
         BLTU,
         BGE,
         BGEU,
-        IGNORE = 3'bxxx
+        NA = 3'bxxx
     } br_t;
 
     // Program counter select
@@ -204,7 +202,7 @@ package core;
     // Data path control signals
     typedef struct packed {
         op_t  op;
-        fun_t fun;
+        fn_t  fn;
         br_t  br;
         op1_t op1;
         op2_t op2;
@@ -225,9 +223,9 @@ package core;
     // Execute instruction structure
     typedef struct packed {
         struct packed {
-            op_t  op;
-            fun_t fun;
-            br_t  br;
+            op_t op;
+            fn_t fn;
+            br_t br;
         } ctrl;
         struct packed {
             word_t pc;

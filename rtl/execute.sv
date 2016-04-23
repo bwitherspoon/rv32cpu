@@ -55,7 +55,7 @@ module execute
     assign branch = jmp | beq | bne | blt | bltu | bge | bgeu;
 
     alu alu (
-        .fun(ex.ctrl.fun),
+        .fn(ex.ctrl.fn),
         .op1(ex.data.op1),
         .op2(ex.data.op2),
         .out
@@ -70,11 +70,7 @@ module execute
             sink.tvalid <= '0;
 
     always_ff @(posedge sink.aclk) begin : registers
-        if (~sink.aresetn) begin
-            mm.ctrl.op  <= core::NONE;
-            mm.ctrl.br <= core::IGNORE;
-            mm.data.rd <= '0;
-        end else if (sink.tready) begin
+        if (sink.tready) begin
             mm.ctrl.op  <= ex.ctrl.op;
             mm.ctrl.br <= ex.ctrl.br;
             mm.data.rd  <= ex.data.rd;
