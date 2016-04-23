@@ -232,7 +232,7 @@ module memory
      * Register streams
      */
 
-    assign source.tready = sink.tready;
+    assign source.tready = ~cache.arvalid & ~cache.rvalid & sink.tready;
 
     always_ff @(posedge aclk)
         if (~aresetn)

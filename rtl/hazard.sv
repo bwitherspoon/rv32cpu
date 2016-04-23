@@ -31,8 +31,6 @@ module hazard
 
     opcodes::opcode_t opcode;
 
-    enum logic { READ, IDLE } state = IDLE;
-
     assign id = decode.tdata;
     assign ex = execute.tdata;
     assign mm = memory.tdata;
@@ -43,19 +41,8 @@ module hazard
     wire branch = opcode == opcodes::JAL || opcode == opcodes::JALR ||
                   opcode == opcodes::BRANCH;
 
-    // Memory read hazard
-    always_ff @(posedge decode.aclk)
-        case (state)
-            IDLE:
-                if (opcode == opcodes::LOAD)
-                    state <= READ;
-            READ:
-                if (core::isload(wb.ctrl.op))
-                    state <= IDLE;
-        endcase
-
     assign bubble = branch;
 
-    assign stall = state == READ;
+    assign stall = core::isload(ex.ctrl.op) | core::isload(mm.ctrl.op);
 
 endmodule
