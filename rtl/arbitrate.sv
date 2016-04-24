@@ -41,17 +41,16 @@ module arbitrate (
         else if (rmmio) read = MMIO;
         else            read = NONE;
 
-
     // Write address channel
-    assign code.awaddr   = cache.awaddr & (core::CODE_BASE-1);
+    assign code.awaddr   = cache.awaddr;
     assign code.awprot   = cache.awprot;
     assign code.awvalid  = (write == CODE) ? cache.awvalid : '0;
 
-    assign data.awaddr   = cache.awaddr & (core::DATA_BASE-1);
+    assign data.awaddr   = cache.awaddr;
     assign data.awprot   = cache.awprot;
     assign data.awvalid  = (write == DATA) ? cache.awvalid : '0;
 
-    assign mmio.awaddr   = cache.awaddr & (core::MMIO_BASE-1);
+    assign mmio.awaddr   = cache.awaddr;
     assign mmio.awprot   = cache.awprot;
     assign mmio.awvalid  = (write == MMIO) ? cache.awvalid : '0;
 
@@ -110,12 +109,12 @@ module arbitrate (
     assign mmio.bready  = (write == MMIO) ? cache.bready : '0;
 
     // Address read channel
-    assign data.araddr  = cache.araddr & (core::DATA_BASE-1);
+    assign data.araddr  = cache.araddr;
     assign data.arprot  = cache.arprot;
     assign data.araddr  = cache.araddr;
     assign data.arvalid = (read == DATA) ? cache.arvalid : '0;
 
-    assign mmio.araddr  = cache.araddr & (core::MMIO_BASE-1);
+    assign mmio.araddr  = cache.araddr;
     assign mmio.arprot  = cache.arprot;
     assign mmio.araddr  = cache.araddr;
     assign mmio.arvalid = (read == MMIO) ? cache.arvalid : '0;
