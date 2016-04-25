@@ -101,7 +101,7 @@ module cpu
         .branch,
         .target,
         .trap,
-        .handler(core::KERN_BASE),
+        .handler(core::TRAP_ADDR),
         .bubble,
         .cache(code),
         .sink(id)

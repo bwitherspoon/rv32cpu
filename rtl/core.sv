@@ -32,11 +32,14 @@ package core;
         BGEU_AND          = 'b111
     } funct3_t;
 
-    // Instruction address space base
-    localparam CODE_BASE = 32'h00000000;
+    // Trap routine address
+    localparam TRAP_ADDR = 32'h00000200;
 
-    // Instruction address space size
-    localparam CODE_SIZE = 32'h00000200;
+    // Boot loader address space base
+    localparam BOOT_BASE = 32'h00000000;
+
+    // Boot loader address space size
+    localparam BOOT_SIZE = 32'h00000200;
 
     // Kernal address space
     localparam KERN_BASE = 32'h00000200;
@@ -44,23 +47,17 @@ package core;
     // Kernal address space
     localparam KERN_SIZE = 32'h00000200;
 
+    // Instruction address space base
+    localparam CODE_BASE = 32'h00000400;
+
+    // Instruction address space size
+    localparam CODE_SIZE = 32'h00000C00;
+
     // Data address space base
-    localparam DATA_BASE = 32'h00000000;
+    localparam DATA_BASE = 32'h00001000;
 
     // Data address space size
-    localparam DATA_SIZE = 32'h00000200;
-
-    // BSS address space base
-    localparam BSS_BASE = 32'h00000200;
-
-    // BAA address space size
-    localparam BSS_SIZE = 32'h00000100;
-
-    // Stack base address
-    localparam STACK_BASE = 32'h00000FFF;
-
-    // Stack size
-    localparam STACK_SIZE = 32'h00000100;
+    localparam DATA_SIZE = 32'h00001000;
 
     // Memory mapped peripheral address space
     localparam MMIO_BASE = 32'h40000000;

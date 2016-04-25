@@ -40,14 +40,14 @@
 
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
-            pc <= core::CODE_BASE;
+            pc <= core::BOOT_BASE;
         else if (~(sink.tvalid & ~sink.tready))
             pc <= cache.araddr;
 
     // AXI
     always_ff @(posedge cache.aclk)
         if (~cache.aresetn)
-            cache.araddr <= core::CODE_BASE;
+            cache.araddr <= core::BOOT_BASE;
         else if (~(cache.arvalid & ~cache.arready))
             if (trap)
                 cache.araddr <= handler;
