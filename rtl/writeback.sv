@@ -25,7 +25,7 @@ module writeback
 
     assign wb = source.tdata;
 
-    assign rd_load = isinteger(wb.ctrl.op) | isload(wb.ctrl.op) | isjump(wb.ctrl.op);
+    assign rd_load = source.tvalid & source.tready & (isinteger(wb.ctrl.op) | isload(wb.ctrl.op) | isjump(wb.ctrl.op));
 
     assign rd_addr = wb.data.rd.addr;
 
