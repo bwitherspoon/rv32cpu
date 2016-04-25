@@ -66,7 +66,7 @@
 
     assign cache.arprot = axi4::AXI4;
 
-    assign cache.rready = sink.tready;
+    assign cache.rready = ~(sink.tvalid & ~sink.tready);
 
     assign sink.tvalid = cache.rvalid & ~branch;
 
