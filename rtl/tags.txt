@@ -1,1 +1,0 @@
-ctags -f - --format=2 --excmd=pattern --extra= --fields=afmikKlnsStzZ
