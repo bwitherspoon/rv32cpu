@@ -20,7 +20,9 @@ test:
 
 boot.mem:
 
-boot.o: main.S handler.S
+boot.o: trap.S
+
+gpio.o: init.S
 
 %.o: %.c
 	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $^
@@ -29,7 +31,7 @@ boot.o: main.S handler.S
 	$(AS) -m32 -o $@ $^
 
 %.elf: %.o
-	$(LD) -nostdlib -T $(@:.elf=.ld) -o $@ $^
+	$(LD) -nostdlib -T core.ld -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@

@@ -5,7 +5,7 @@ SECTIONS
     .text : { *(.text) }
     . = 0x200;
     .ktext : { *(.ktext) }
-    . = 0x400;
+    . = 0x1000;
     .data : { *(.data) }
     .bss : { *(.bss) }
 }
