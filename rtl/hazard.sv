@@ -43,6 +43,6 @@ module hazard
 
     assign bubble = branch;
 
-    assign stall = core::isload(ex.ctrl.op) | core::isload(mm.ctrl.op);
+    assign stall = (execute.tvalid & core::isload(ex.ctrl.op)) | (memory.tvalid & core::isload(mm.ctrl.op));
 
 endmodule
