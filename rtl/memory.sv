@@ -152,6 +152,8 @@ module memory
 
     wire write = core::isstore(mm.ctrl.op) & source.tvalid & source.tready;
 
+    wire writing = cache.bready;
+
     assign cache.awprot = axi4::AXI4;
 
     always_ff @(posedge aclk)
@@ -193,6 +195,18 @@ module memory
 
     wire read = core::isload(mm.ctrl.op) & source.tvalid & source.tready;
 
+    logic reading = '0;
+
+    always_ff @(posedge aclk)
+        if (~cache.aresetn) begin
+            reading <= '0;
+        end else if (reading) begin
+            if (cache.rvalid & cache.rready)
+                reading <= '0;
+        end else if (read) begin
+                reading <= '1;
+        end
+
     assign cache.arprot = axi4::AXI4;
 
     always_ff @(posedge aclk)
@@ -225,18 +239,18 @@ module memory
      * Register stream
      */
 
-    assign source.tready = ~cache.arvalid & ~cache.rvalid & sink.tready;
+    assign source.tready = ~reading & ~writing & sink.tready;
 
     always_ff @(posedge aclk)
         if (~aresetn)
             sink.tvalid <= '0;
-        else if (~read | (cache.rvalid & cache.rready))
-            sink.tvalid <= '1;
+        else if (~read & ((source.tvalid & source.tready) | (cache.rvalid & cache.rready)))
+                sink.tvalid <= '1;
         else if (sink.tvalid & sink.tready)
             sink.tvalid <= '0;
 
     always_ff @(posedge aclk)
-        if (~read | (cache.rvalid & cache.rready)) begin
+        if (sink.tready) begin
             wb.ctrl.op      <= (cache.rvalid & cache.rready) ? op : mm.ctrl.op;
             wb.data.rd.data <= (cache.rvalid & cache.rready) ? rdata : mm.data.alu;
             wb.data.rd.addr <= mm.data.rd;
