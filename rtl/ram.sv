@@ -8,7 +8,6 @@
  * Module: ram
  */
 module ram #(
-    ADDR_DEPTH = 4,
     DATA_DEPTH = 1024,
     RESP_DEPTH = 4,
     INIT_DATA  = 32'h00000000,
