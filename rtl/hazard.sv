@@ -38,10 +38,11 @@ module hazard
 
     assign opcode = id.data.ir.r.opcode;
 
-    wire branch = opcode == opcodes::JAL || opcode == opcodes::JALR ||
-                  opcode == opcodes::BRANCH;
+    wire jump = opcode === opcodes::JAL ||
+                opcode === opcodes::JALR ||
+                opcode === opcodes::BRANCH;
 
-    assign bubble = branch;
+    assign bubble = decode.tvalid & jump;
 
     assign stall = (execute.tvalid & core::isload(ex.ctrl.op)) | (memory.tvalid & core::isload(mm.ctrl.op));
 

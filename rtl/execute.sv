@@ -32,8 +32,6 @@ module execute
 
     assign sink.tdata = mm;
 
-    assign source.tready = sink.tready;
-
     assign target = branch ? out : ex.data.pc + 4;
 
     assign bypass = out;
@@ -52,7 +50,7 @@ module execute
     wire bge  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BGE  & (eq | ~lt);
     wire bgeu = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BGEU & (eq | ~ltu);
 
-    assign branch = jmp | beq | bne | blt | bltu | bge | bgeu;
+    assign branch = source.tvalid & (jmp | beq | bne | blt | bltu | bge | bgeu);
 
     alu alu (
         .fn(ex.ctrl.fn),
@@ -60,6 +58,8 @@ module execute
         .op2(ex.data.op2),
         .out
     );
+
+    assign source.tready = sink.tready;
 
     always_ff @(posedge sink.aclk)
         if (~sink.aresetn)
