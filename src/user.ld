@@ -1,11 +1,10 @@
-ENTRY(_start)
+ENTRY(main)
 
 SECTIONS
 {
+    . = 0x400;
     .text : { *(.text) }
-    . = 0x200;
-    .ktext : { *(.ktext) }
     . = 0x1000;
     .data : { *(.data) }
-    .bss : { *(.bss) }
+    .bss  : { *(.bss) }
 }

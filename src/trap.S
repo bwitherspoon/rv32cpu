@@ -1,4 +1,4 @@
-        .section .ktext, "ax"
+        .section .kern, "ax"
         .align 5
 
 trap: lui  t0,0x40000

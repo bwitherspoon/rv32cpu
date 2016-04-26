@@ -11,18 +11,11 @@ TEXT    ?= 0x040
 DATA    ?= 0xC00
 BSS     ?= 0x800
 
-.PHONY: all test clean
-.INTERMEDIATE: boot.o
+.PHONY: all clean
 
 all: boot.mem
 
-test:
-
-boot.mem:
-
-boot.o: trap.S
-
-gpio.o: init.S
+boot.elf: trap.o init.o
 
 %.o: %.c
 	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $^
@@ -31,7 +24,7 @@ gpio.o: init.S
 	$(AS) -m32 -o $@ $^
 
 %.elf: %.o
-	$(LD) -nostdlib -T core.ld -o $@ $^
+	$(LD) -T $(@:.elf=.ld) -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@

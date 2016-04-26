@@ -1,8 +1,8 @@
-        .text
-        .align  5
-        .globl _start
+        .section .init, "ax"
+        .align 5
+        .globl init
 
-_start: lui  t0,0x40000 # GPIO base address
+init:   lui  t0,0x40000 # GPIO base address
         li   t1,-1      # GPIO 3-state control
         slli t1,t1,16
         sw   t1,4(t0)
