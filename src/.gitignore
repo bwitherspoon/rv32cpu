@@ -1,5 +1,6 @@
 *.o
 *.bin
+*.elf
 *.txt
 *.vh
 *.mem
