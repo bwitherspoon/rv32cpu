@@ -121,6 +121,7 @@ module memory
      * Internal signals
      */
 
+    addr_t rd;
     op_t op;
     word_t rdata;
 
@@ -221,6 +222,7 @@ module memory
         if (read & ~(cache.arvalid & ~cache.arready)) begin
             cache.araddr <= mm.data.alu;
             op <= mm.ctrl.op;
+            rd <= mm.data.rd;
         end
 
     assign cache.rready = sink.tready;
@@ -253,7 +255,7 @@ module memory
         if (sink.tready) begin
             wb.ctrl.op      <= (cache.rvalid & cache.rready) ? op : mm.ctrl.op;
             wb.data.rd.data <= (cache.rvalid & cache.rready) ? rdata : mm.data.alu;
-            wb.data.rd.addr <= mm.data.rd;
+            wb.data.rd.addr <= (cache.rvalid & cache.rready) ? rd : mm.data.rd;
         end
 
 endmodule : memory
