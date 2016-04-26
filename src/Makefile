@@ -18,13 +18,13 @@ all: boot.mem
 boot.elf: trap.o init.o
 
 %.o: %.c
-	$(CC) -m32 -O2 -std=gnu99 -c -o $@ $^
+	$(CC) -static -m32 -O2 -std=gnu99 -c -o $@ $^
 
 %.o: %.S
 	$(AS) -m32 -o $@ $^
 
 %.elf: %.o
-	$(LD) -T $(@:.elf=.ld) -o $@ $^
+	$(LD) -T $(@:.elf=.ld) -nostdlib -nostartfiles -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
