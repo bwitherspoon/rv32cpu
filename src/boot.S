@@ -39,4 +39,6 @@ wait:   lw   t3,8(t0)
         addi t1,t1,-1
         li   t6,1
         j    read
-done:   j    0x400
+done:   li   t6,0
+        sw   t6,0(s0)
+        j    0x400
