@@ -15,7 +15,7 @@ BSS     ?= 0x800
 
 all: boot.mem
 
-boot.elf: trap.o init.o
+boot.o: trap.S
 
 %.o: %.c
 	$(CC) -static -m32 -O2 -std=gnu99 -c -o $@ $^
