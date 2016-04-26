@@ -10,9 +10,9 @@ array:  .skip 256
         .align 5
         .globl main
 
-        .equ uart,   0x40001
-        .equ cr,     0x0d
-        .equ nl,     0x0a
+        .equ uart, 0x40001
+        .equ cr,   0x0d
+        .equ nl,   0x0a
 
 main:   la  a0,intro
         jal puts
@@ -33,6 +33,7 @@ getc:   lui  t0,uart
 gets:   lui  t0,uart
         mv   t1,a0
         li   t2,cr
+        li   t3,nl
 read:   bge  zero,a1,done
         mv   s0,t0
         mv   s1,t1
@@ -49,6 +50,7 @@ read:   bge  zero,a1,done
         addi a1,a1,-1
         addi t1,t1,1
         beq  a0,t2,gots
+        beq  a0,t3,gots
         j    read
 gots:   sb   zero,0(t1)
 done:   ret
