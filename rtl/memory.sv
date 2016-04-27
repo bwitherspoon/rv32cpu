@@ -246,16 +246,16 @@ module memory
     always_ff @(posedge aclk)
         if (~aresetn)
             sink.tvalid <= '0;
-        else if (~read & ((source.tvalid & source.tready) | (cache.rvalid & cache.rready)))
-                sink.tvalid <= '1;
+        else if (~read & ((source.tvalid & source.tready) | (cache.rvalid & cache.rready & cache.rresp == axi4::OKAY)))
+            sink.tvalid <= '1;
         else if (sink.tvalid & sink.tready)
             sink.tvalid <= '0;
 
     always_ff @(posedge aclk)
         if (sink.tready) begin
-            wb.ctrl.op      <= (cache.rvalid & cache.rready) ? op : mm.ctrl.op;
-            wb.data.rd.data <= (cache.rvalid & cache.rready) ? rdata : mm.data.alu;
-            wb.data.rd.addr <= (cache.rvalid & cache.rready) ? rd : mm.data.rd;
+            wb.ctrl.op      <= (cache.rvalid & cache.rready & cache.rresp == axi4::OKAY) ? op : mm.ctrl.op;
+            wb.data.rd.data <= (cache.rvalid & cache.rready & cache.rresp == axi4::OKAY) ? rdata : mm.data.alu;
+            wb.data.rd.addr <= (cache.rvalid & cache.rready & cache.rresp == axi4::OKAY) ? rd : mm.data.rd;
         end
 
 endmodule : memory

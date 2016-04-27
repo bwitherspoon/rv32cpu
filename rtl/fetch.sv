@@ -73,14 +73,15 @@
     always_ff @(posedge aclk)
         if (~aresetn)
             cache.araddr <= core::BOOT_BASE;
-        else if (trap)
-            cache.araddr <= handler;
-        else if (trapped)
-            cache.araddr <= cache.araddr + 4;
-        else if (branch)
-            cache.araddr <= target;
-        else if (~bubble)
-            cache.araddr <= cache.araddr + 4;
+        else if (~(cache.arvalid & ~cache.arready))
+            if (trap)
+                cache.araddr <= handler;
+            else if (trapped)
+                cache.araddr <= cache.araddr + 4;
+            else if (branch)
+                cache.araddr <= target;
+            else if (~bubble)
+                cache.araddr <= cache.araddr + 4;
 
     assign cache.arprot = axi4::AXI4;
 
