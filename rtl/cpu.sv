@@ -67,7 +67,8 @@ module cpu
      */
 
     wire invalid;
-    wire trap = ~rst & (irq | invalid);
+    wire fault;
+    wire trap = ~rst & (irq | invalid | fault);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,6 +99,8 @@ module cpu
     word_t target;
 
     fetch fetch (
+        .aclk,
+        .aresetn,
         .branch,
         .target,
         .trap,

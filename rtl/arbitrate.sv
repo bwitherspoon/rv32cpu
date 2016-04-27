@@ -8,6 +8,7 @@
  * Memory translate and multiplexing.
  */
 module arbitrate (
+    output logic fault,
     axi.slave  cache,
     axi.master code,
     axi.master data,
@@ -59,7 +60,7 @@ module arbitrate (
             CODE:    cache.awready = code.awready;
             DATA:    cache.awready = data.awready;
             MMIO:    cache.awready = mmio.awready;
-            default: cache.awready = '0;
+            default: cache.awready = '1;
         endcase
     end : awready
 
@@ -81,7 +82,7 @@ module arbitrate (
             CODE:    cache.wready = code.wready;
             DATA:    cache.wready = data.wready;
             MMIO:    cache.wready = mmio.wready;
-            default: cache.wready = '0;
+            default: cache.wready = '1;
         endcase
     end : wready
 
@@ -100,7 +101,7 @@ module arbitrate (
             CODE:    cache.bvalid = code.bvalid;
             DATA:    cache.bvalid = data.bvalid;
             MMIO:    cache.bvalid = mmio.bvalid;
-            default: cache.bvalid = '0;
+            default: cache.bvalid = '1;
         endcase
     end : bvalid
 
@@ -123,7 +124,7 @@ module arbitrate (
         unique case (read)
             DATA:    cache.arready = data.arready;
             MMIO:    cache.arready = mmio.arready;
-            default: cache.arready = '0;
+            default: cache.arready = '1;
         endcase
     end : arready
 
@@ -132,7 +133,7 @@ module arbitrate (
         unique case (read)
             DATA:    cache.rdata = data.rdata;
             MMIO:    cache.rdata = mmio.rdata;
-            default: cache.rdata = 'x;
+            default: cache.rdata = '0;
         endcase
     end
 
@@ -148,11 +149,14 @@ module arbitrate (
         unique case (read)
             DATA:    cache.rvalid = data.rvalid;
             MMIO:    cache.rvalid = mmio.rvalid;
-            default: cache.rvalid = '0;
+            default: cache.rvalid = '1;
         endcase
     end : rvalid
 
     assign data.rready = (read == DATA) ? cache.rready : '0;
     assign mmio.rready = (read == MMIO) ? cache.rready : '0;
+
+    // Faults
+    assign fault = cache.arvalid & read == NONE;
 
 endmodule : arbitrate
