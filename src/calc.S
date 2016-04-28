@@ -1,9 +1,6 @@
         .data
-        .align 5
-intro:  .string "Welcome\r\n"
-        .align 5
-prompt: .string "> \r\n"
-        .align 5
+intro:  .string "\r\nWelcome\n"
+prompt: .string "\r\n> "
 array:  .skip 256
 
         .text
@@ -21,7 +18,7 @@ loop:   la  a0,prompt
         la  a0,array
         li  a1,256
         jal gets
-        j   .
+        j   loop
 
 getc:   lui  t0,uart
         lb   t1,8(t0)
@@ -62,9 +59,10 @@ putc:   lui  t0,uart
 puts:   mv   s0,a0
 write:  lbu  a0,0(s0)
         beqz a0,wrote
+        mv   s1,ra
         jal  putc
+        mv   ra,s1
         addi s0,s0,1
         j    write
 wrote:  ret
 
-        .end
