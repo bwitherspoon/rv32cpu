@@ -7,7 +7,7 @@ import serial
 
 def main():
     parser = argparse.ArgumentParser(description='Program loader')
-    parser.add_argument('-f', '--file', required=True, help='set the input file')
+    parser.add_argument('-f', '--file', default='/dev/null', help='set the input file')
     parser.add_argument('-p', '--port', required=True, help='set the output port')
 
     args = parser.parse_args()
