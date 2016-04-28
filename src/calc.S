@@ -1,12 +1,14 @@
         .data
 intro:  .string "\r\nWelcome\n"
 prompt: .string "\r\n> "
-array:  .skip 256
+error:  .string "\r\nError"
+buffer: .skip 256
 
         .text
         .align 5
         .globl main
 
+        .equ gpio, 0x40000
         .equ uart, 0x40001
         .equ cr,   0x0d
         .equ nl,   0x0a
@@ -15,9 +17,11 @@ main:   la  a0,intro
         jal puts
 loop:   la  a0,prompt
         jal puts
-        la  a0,array
+        la  a0,buffer
         li  a1,256
         jal gets
+        la  a0,error
+        jal puts
         j   loop
 
 getc:   lui  t0,uart
@@ -27,7 +31,16 @@ getc:   lui  t0,uart
         lb   a0,0(t0)
         ret
 
-gets:   lui  t0,uart
+putc:   lui  t0,uart
+        sb   a0,4(t0)
+        ret
+
+gets:   addi sp,sp,-16
+        sw   t0,0(sp)
+        sw   t1,4(sp)
+        sw   t2,8(sp)
+        sw   t3,12(sp)
+        lui  t0,uart
         mv   t1,a0
         li   t2,cr
         li   t3,nl
@@ -50,13 +63,17 @@ read:   bge  zero,a1,done
         beq  a0,t3,gots
         j    read
 gots:   sb   zero,0(t1)
+        lw   t0,4(sp)
+        lw   t1,8(sp)
+        lw   t2,12(sp)
+        lw   t3,16(sp)
+        addi sp,sp,16
 done:   ret
 
-putc:   lui  t0,uart
-        sb   a0,4(t0)
-        ret
-
-puts:   mv   s0,a0
+puts:   addi sp,sp,-16
+        sw   s0,0(sp)
+        sw   s1,4(sp)
+        mv   s0,a0
 write:  lbu  a0,0(s0)
         beqz a0,wrote
         mv   s1,ra
@@ -64,5 +81,8 @@ write:  lbu  a0,0(s0)
         mv   ra,s1
         addi s0,s0,1
         j    write
-wrote:  ret
+wrote:  lw   s0,0(sp)
+        lw   s1,4(sp)
+        addi s0,s0,16
+        ret
 
