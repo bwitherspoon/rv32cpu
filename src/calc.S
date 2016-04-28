@@ -36,10 +36,10 @@ putc:   lui  t0,uart
         ret
 
 gets:   addi sp,sp,-16
-        sw   t0,0(sp)
-        sw   t1,4(sp)
-        sw   t2,8(sp)
-        sw   t3,12(sp)
+        sw   s0,0(sp)
+        sw   s1,4(sp)
+        sw   s2,8(sp)
+        sw   s3,12(sp)
         lui  t0,uart
         mv   t1,a0
         li   t2,cr
@@ -63,10 +63,10 @@ read:   bge  zero,a1,done
         beq  a0,t3,gots
         j    read
 gots:   sb   zero,0(t1)
-        lw   t0,4(sp)
-        lw   t1,8(sp)
-        lw   t2,12(sp)
-        lw   t3,16(sp)
+        lw   s0,4(sp)
+        lw   s1,8(sp)
+        lw   s2,12(sp)
+        lw   s3,16(sp)
         addi sp,sp,16
 done:   ret
 
