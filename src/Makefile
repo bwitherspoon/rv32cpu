@@ -17,6 +17,12 @@ all: boot.mem
 
 boot.o: trap.S
 
+%.text.bin: %.elf
+	$(OBJCOPY) -O binary -j .text $< $@
+
+%.data.bin: %.elf
+	$(OBJCOPY) -O binary -j .data -j .bss $< $@
+
 %.o: %.c
 	$(CC) -static -m32 -O2 -std=gnu99 -c -o $@ $^
 
@@ -24,7 +30,7 @@ boot.o: trap.S
 	$(AS) -m32 -o $@ $^
 
 %.elf: %.o
-	$(LD) -T $(@:.elf=.ld) -nostdlib -nostartfiles -o $@ $^
+	$(LD) -T link.ld -nostdlib -nostartfiles -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
