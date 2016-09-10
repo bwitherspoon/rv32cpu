@@ -121,7 +121,7 @@ module decode
     };
     localparam ctrl_t ADD = '{
         op:  core::INTEGER,
-        fn:  core::AND,
+        fn:  core::ADD,
         br:  core::NA,
         op1: core::RS1,
         op2: core::RS2
