@@ -15,8 +15,6 @@ BSS     ?= 0x800
 
 all: boot.mem
 
-boot.o: trap.S
-
 %.text.bin: %.elf
 	$(OBJCOPY) -O binary -j .text $< $@
 
@@ -27,10 +25,10 @@ boot.o: trap.S
 	$(CC) -static -m32 -O2 -std=gnu99 -c -o $@ $^
 
 %.o: %.S
-	$(AS) -m32 -o $@ $^
+	$(AS) -m32 -g -o $@ $^
 
 %.elf: %.o
-	$(LD) -T link.ld -nostdlib -nostartfiles -o $@ $^
+	$(LD) -T $(@:%.elf=%.ld) -nostdlib -nostartfiles -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@

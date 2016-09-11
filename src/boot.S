@@ -1,45 +1,61 @@
-        .section .boot, "ax"
-        .align  5
+        .text
+        .align 5
         .globl _start
 
 _start: la   s0,__gpio_start  # GPIO base address
-        li   t1,-1            # GPIO 3-state control
-        slli t1,t1,16
-        sw   t1,4(s0)
-        la   t0,__uart_start  # UART base address
-        li   t1,0x13          # UART reset and enable interrupt
-        sw   t1,0xC(t0)
+        li   t0,-1            # GPIO 3-state control
+        slli t0,t0,16
+        sw   t0,4(s0)
+        la   s1,__uart_start  # UART base address
+        li   t0,0x13          # UART reset and enable interrupt
+        sw   t0,0xC(s1)
         la   sp,__stack_start # Initialize stack pointer
-size0:  lw   t1,8(t0)
-        andi t1,t1,1
-        beq  t1,zero,size0
-        lw   t2,0(t0)
-        slli t2,t2,8
-size1:  lw   t1,8(t0)
+
+size0:  lw   t0,8(s1)         # Loop until read first byte of program size
+        andi t0,t0,1
+        beq  t0,zero,size0
+        lw   t0,0(s1)
+        slli t0,t0,8
+
+size1:  lw   t1,8(s1)         # Loop until read second byte of program size
         andi t1,t1,1
         beq  t1,zero,size1
-        lw   t3,0(t0)
-        or   t1,t2,t3
-        la   t5,__text_start
-        li   a0,0x1
-read:   beq  t1,zero,done     # UART read binary
+        lw   t1,0(s1)
+        or   t1,t0,t1
+
+        li   t0,1
+        sw   t0,0(s0)         # Turn on reading indicator LED
+        la   s2,__kern_start    # Read binary program from UART
+read:   beq  t1,zero,done
         li   t2,4
-        li   t4,0
-byte:   addi t2,t2,-1
-        sw   t6,0(s0)         # GPIO indicate byte
-        slli t4,t4,8
-wait:   lw   t3,8(t0)
-        andi t3,t3,1
-        beq  t3,zero,wait
-        lw   t3,0(t0)
-        or   t4,t4,t3
-        slli t6,t6,1
-        bne  t2,zero,byte
-        sw   t4,0(t5)
-        addi t5,t5,4
+        li   t3,0
+word:   addi t2,t2,-1
+byte:   lw   t4,8(s1)         # Loop and read byte when available
+        andi t4,t4,1
+        beq  t4,zero,byte
+        lw   t4,0(s1)
+        slli t3,t3,8          # Append byte to word
+        or   t3,t3,t4
+        bne  t2,zero,word     # Read until four bytes are recieved
+        sw   t3,0(s2)         # Store word in text section
+        addi s2,s2,4          # Increment counters
         addi t1,t1,-1
-        li   t6,1
         j    read
-done:   li   t6,0
-        sw   t6,0(s0)
-        j    __text_start
+done:   sw   zero,0(s0)
+        j    __kern_start
+
+      .section .isr, "ax"
+      .align 5
+
+trap: la   t0,__gpio_start
+      li   t1,0x8
+      li   t3,4
+loop: addi t3,t3,-1
+      lui  t4,0x200
+spin: addi t4,t4,-1
+      bne  t4,zero,spin
+      slli t1,t1,3
+      sw   t1,0(t0)
+      bne  t3,zero,loop
+      j    trap
+

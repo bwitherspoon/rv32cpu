@@ -1,3 +1,7 @@
+#
+# C. Brett Witherspoon
+#
+
         .data
 intro:  .string "\r\nWelcome\n"
 prompt: .string "\r\n> "
@@ -12,7 +16,7 @@ buffer: .skip 16
 #        .string "-3"
 #        .string "-2"
 #        .string "-1"
-digits: .string "9"
+#digits: .string "0"
 #        .string "1"
 #        .string "2"
 #        .string "3"
@@ -36,35 +40,51 @@ digits: .string "9"
         .align 5
         .globl _start
 
-        .equ gpio, 0x40000
-        .equ uart, 0x40001
+        .equ gpio, 0x00400
+        .equ uart, 0x00401
         .equ cr,   0x0d
         .equ nl,   0x0a
 
-_start: la  a0,intro
-        jal puts
-loop:   la  a0,0x30
+_start: la   s0,__gpio_start  # GPIO base address
+        li   t1,-1            # GPIO 3-state control
+        slli t1,t1,16
+        sw   t1,4(s0)
+        la   t0,__uart_start  # UART base address
+        li   t1,0x13          # UART reset and enable interrupt
+        sw   t1,0xC(t0)
+        la   sp,__stack_start # Initialize stack pointer
+        la   a0,intro         # Print message
+        jal  puts
+loop:   la   a0,prompt        # Print prompt
+        jal  puts
+        la   a0,buffer        # Read input
+        li   a1,16
+        jal  gets
+        la   a0,buffer        # Attempt to convert first digit
+        jal  atoi
+        bnez a1,fail
+        mv   s0,a2
+        jal  atoi             # Attempt to convert second digit
+        bnez a1,fail
+        mv   s1,a2
+        jal  atoi             # Fail if we find any more digits
+        beqz a1,fail
+        add  s2,s0,s1         # Add the first and second integers
+        addi s2,s2,0x30       # Convert to ASCII digit
+        li  a0,cr             # Print the result
         jal putc
-        la  a0,prompt
-        jal puts
-        la  a0,0x31
+        li  a0,nl
         jal putc
-        la  a0,buffer
-        li  a1,16
-        jal gets
-        la  a0,0x32
+        mv  a0,s2
         jal putc
-        #la  a0,buffer
-        #jal atoi
-        #bne zero,a1,fail
-        #mv  s0,a2
-        #jal atoi
-        #bne zero,a1,fail
         j   loop
-#fail:   la  a0,error
-#        jal puts
-#        j   loop
+fail:   la  a0,error          # Print error message on failure
+        jal puts
+        j   loop
 
+#
+# Read a character from the UART into a0. Spins if no character is available.
+#
 getc:   lui  t0,uart
         lb   t1,8(t0)
         andi t1,t1,1
@@ -72,70 +92,72 @@ getc:   lui  t0,uart
         lb   a0,0(t0)
         ret
 
+#
+# Write the character in a0 to the UART.
+#
 putc:   lui  t0,uart
         sb   a0,4(t0)
         ret
-
-gets:   #addi sp,sp,-16
-        #sw   s0,0(sp)
-        #sw   s1,4(sp)
-        #sw   s2,8(sp)
-        #sw   s3,12(sp)
-        lui  t0,uart
-        mv   t1,a0
-        li   t2,cr
-        li   t3,nl
-read:   bge  zero,a1,done
-        mv   s0,t0
-        mv   s1,t1
-        mv   s3,ra
+#
+# Reads a line from the UART and writes it to the buffer at the address in a0.
+# The limit on the number of characters to be read shall be in a1. The newline
+# character or last character is replaced with the null character.
+#
+gets:   addi sp,sp,-12
+        sw   s0,0(sp)
+        sw   s1,4(sp)
+        sw   ra,8(sp)
+        mv   s0,a0
+        mv   s1,a1
+read:   bge  zero,s1,done
         jal  getc
-        mv   t0,s0
-        mv   t1,s1
-        mv   ra,s3
         beqz a0,gots
-        mv   s0,t0
         jal  putc
-        mv   t0,s0
-        sb   a0,0(t1)
-        addi a1,a1,-1
-        addi t1,t1,1
-        beq  a0,t2,gots
-        beq  a0,t3,gots
+        sb   a0,0(s0)
+        addi s0,s0,1
+        addi s1,s1,-1
+        li   t0,cr
+        beq  a0,t0,gots
+        li   t0,nl
+        beq  a0,t0,gots
         j    read
-gots:   sb   zero,0(t1)
-        #lw   s0,4(sp)
-        #lw   s1,8(sp)
-        #lw   s2,12(sp)
-        #lw   s3,16(sp)
-        #addi sp,sp,16
-done:   ret
+gots:   sb   zero,0(s0)
+done:   lw   s0,0(sp)
+        lw   s1,4(sp)
+        lw   ra,8(sp)
+        addi sp,sp,12
+        ret
 
-puts:   #addi sp,sp,-16
-        #sw   s0,0(sp)
-        #sw   s1,4(sp)
-        #sw   s2,8(sp)
+#
+# Writes a null terminated string at the address in a0 to the UART.
+#
+puts:   addi sp,sp,-8
+        sw   s0,0(sp)
+        sw   ra,4(sp)
         mv   s0,a0
 write:  lbu  a0,0(s0)
         beqz a0,wrote
-        mv   s1,ra
         jal  putc
-        mv   ra,s1
         addi s0,s0,1
         j    write
-wrote:  #lw   s0,0(sp)
-        #lw   s1,4(sp)
-        #lw   s2,8(sp)
-        #addi s0,s0,16
+wrote:  lw   s0,0(sp)
+        lw   ra,4(sp)
+        addi s0,s0,8
         ret
-
+#
+# Converts the first numeric ASCII character to an integer 1-9 in a null
+# terminated string at the address in a0. Returns 1 in a1 on failure and 0 on
+# success. Returns the integer in register a2. The address in register a0 will
+# point to the character after the first integer 1-9 found.
+#
 atoi:   li   a1,1
 scan:   lbu  a2,0(a0)
         beqz a2,end
         addi a0,a0,1
-        andi a2,a2,0xF0
         li   t0,0x30
-        bne  t0,a2,scan
+        bltu a2,t0,scan
+        li   t0,0x3A
+        bgeu a2,t0,scan
         li   a1,0
         addi a2,a2,-48
 end:    ret
