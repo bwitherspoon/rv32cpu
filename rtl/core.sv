@@ -33,19 +33,10 @@ package core;
     } funct3_t;
 
     // Trap routine address
-    localparam TRAP_ADDR = 32'h00000200;
+    localparam TRAP_ADDR = 32'h00000000;
 
-    // Boot loader address space base
-    localparam BOOT_BASE = 32'h00000000;
-
-    // Boot loader address space size
-    localparam BOOT_SIZE = 32'h00000200;
-
-    // Kernal address space
-    localparam KERN_BASE = 32'h00000200;
-
-    // Kernal address space
-    localparam KERN_SIZE = 32'h00000200;
+    // Boot loader address
+    localparam BOOT_BASE = 32'h00000200;
 
     // Instruction address space base
     localparam CODE_BASE = 32'h00000400;
@@ -60,7 +51,7 @@ package core;
     localparam DATA_SIZE = 32'h00001000;
 
     // Memory mapped peripheral address space
-    localparam MMIO_BASE = 32'h40000000;
+    localparam MMIO_BASE = 32'h00400000;
 
     // Instruction type
     typedef union packed {
