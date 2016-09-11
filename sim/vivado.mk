@@ -58,7 +58,7 @@ $(LIBDIR)/$(INT:.sv=.sdb): | $(PKG:.sv=.sdb)
 $(LIBDIR)/$(RTL:.sv=.sdb): | $(PKG:.sv=.sdb) $(INT:.sv=.sdb)
 
 $(LIBDIR)/$(TOP:.sv=.sdb): $(TOP) | $(INIT) $(PKG:.sv=.sdb) $(INT:.sv=.sdb) $(RTL:.sv=.sdb)
-	xvlog --sv --work $(LIB) --define INIT_FILE=\"$(word 1,$|)\" -L $(LIB) $<
+	xvlog --sv --work $(LIB) --define TEXT_FILE=\"$(word 1,$|)\" --define DATA_FILE=\"$(word 2,$|)\" -L $(LIB) $<
 
 $(LIBDIR)/%.sdb: %.sv
 	xvlog --sv --work $(LIB) -L $(LIB) $<

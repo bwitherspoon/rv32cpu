@@ -23,5 +23,6 @@ RTL = alu.sv     \
       ram.sv     \
       regfile.sv \
       writeback.sv
+INIT = calc.text.mem calc.data.mem
 
 include ../vivado.mk

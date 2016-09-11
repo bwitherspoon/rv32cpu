@@ -13,11 +13,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="216778800fs"></ZoomStartTime>
-      <ZoomEndTime time="293832648fs"></ZoomEndTime>
-      <Cursor1Time time="420000000fs"></Cursor1Time>
+      <ZoomStartTime time="14133265600fs"></ZoomStartTime>
+      <ZoomEndTime time="14210565601fs"></ZoomEndTime>
+      <Cursor1Time time="14180000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="16" />
+   <WVObjectSize size="9" />
    <wvobject db_ref_id="1" type="logic" fp_name="/testbench/clk">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -25,18 +25,6 @@
    <wvobject db_ref_id="1" type="logic" fp_name="/testbench/rst">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/bubble">
-      <obj_property name="ElementShortName">bubble</obj_property>
-      <obj_property name="ObjectShortName">bubble</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/branch">
-      <obj_property name="ElementShortName">branch</obj_property>
-      <obj_property name="ObjectShortName">branch</obj_property>
-   </wvobject>
-   <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/target">
-      <obj_property name="ElementShortName">target[31:0]</obj_property>
-      <obj_property name="ObjectShortName">target[31:0]</obj_property>
    </wvobject>
    <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/fetch/id.data.pc">
       <obj_property name="DisplayName">label</obj_property>
@@ -58,11 +46,11 @@
       <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/fetch/id.data.ir.r">
          <obj_property name="ElementShortName">.r</obj_property>
          <obj_property name="ObjectShortName">id.data.ir.r</obj_property>
+         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/fetch/id.data.ir.i">
          <obj_property name="ElementShortName">.i</obj_property>
          <obj_property name="ObjectShortName">id.data.ir.i</obj_property>
-         <obj_property name="isExpanded"></obj_property>
       </wvobject>
       <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/fetch/id.data.ir.s">
          <obj_property name="ElementShortName">.s</obj_property>
@@ -81,271 +69,15 @@
          <obj_property name="ObjectShortName">id.data.ir.uj</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="group" fp_name="group15">
-      <obj_property name="label">ID</obj_property>
+   <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/regfile/regs">
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/id/tvalid">
-         <obj_property name="ElementShortName">tvalid</obj_property>
-         <obj_property name="ObjectShortName">tvalid</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/id/tready">
-         <obj_property name="ElementShortName">tready</obj_property>
-         <obj_property name="ObjectShortName">tready</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group19">
-      <obj_property name="label">EX</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/ex/tvalid">
-         <obj_property name="ElementShortName">tvalid</obj_property>
-         <obj_property name="ObjectShortName">tvalid</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/ex/tready">
-         <obj_property name="ElementShortName">tready</obj_property>
-         <obj_property name="ObjectShortName">tready</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group23">
-      <obj_property name="label">MM</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/mm/tvalid">
-         <obj_property name="ElementShortName">tvalid</obj_property>
-         <obj_property name="ObjectShortName">tvalid</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/mm/tready">
-         <obj_property name="ElementShortName">tready</obj_property>
-         <obj_property name="ObjectShortName">tready</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group27">
-      <obj_property name="label">WB</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/wb/tvalid">
-         <obj_property name="ElementShortName">tvalid</obj_property>
-         <obj_property name="ObjectShortName">tvalid</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/wb/tready">
-         <obj_property name="ElementShortName">tready</obj_property>
-         <obj_property name="ObjectShortName">tready</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group67">
-      <obj_property name="label">Code</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/araddr">
-         <obj_property name="ElementShortName">araddr[31:0]</obj_property>
-         <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/arprot">
-         <obj_property name="ElementShortName">arprot[2:0]</obj_property>
-         <obj_property name="ObjectShortName">arprot[2:0]</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/arvalid">
-         <obj_property name="ElementShortName">arvalid</obj_property>
-         <obj_property name="ObjectShortName">arvalid</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/arready">
-         <obj_property name="ElementShortName">arready</obj_property>
-         <obj_property name="ObjectShortName">arready</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/rdata">
-         <obj_property name="ElementShortName">rdata[31:0]</obj_property>
-         <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/rresp">
-         <obj_property name="ElementShortName">rresp[1:0]</obj_property>
-         <obj_property name="ObjectShortName">rresp[1:0]</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/rvalid">
-         <obj_property name="ElementShortName">rvalid</obj_property>
-         <obj_property name="ObjectShortName">rvalid</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/rready">
-         <obj_property name="ElementShortName">rready</obj_property>
-         <obj_property name="ObjectShortName">rready</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group55">
-      <obj_property name="label">Data</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="group" fp_name="group81">
-         <obj_property name="label">Write</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/awaddr">
-            <obj_property name="ElementShortName">awaddr[31:0]</obj_property>
-            <obj_property name="ObjectShortName">awaddr[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/awprot">
-            <obj_property name="ElementShortName">awprot[2:0]</obj_property>
-            <obj_property name="ObjectShortName">awprot[2:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/awvalid">
-            <obj_property name="ElementShortName">awvalid</obj_property>
-            <obj_property name="ObjectShortName">awvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/awready">
-            <obj_property name="ElementShortName">awready</obj_property>
-            <obj_property name="ObjectShortName">awready</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/wdata">
-            <obj_property name="ElementShortName">wdata[31:0]</obj_property>
-            <obj_property name="ObjectShortName">wdata[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/wstrb">
-            <obj_property name="ElementShortName">wstrb[3:0]</obj_property>
-            <obj_property name="ObjectShortName">wstrb[3:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/wvalid">
-            <obj_property name="ElementShortName">wvalid</obj_property>
-            <obj_property name="ObjectShortName">wvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/wready">
-            <obj_property name="ElementShortName">wready</obj_property>
-            <obj_property name="ObjectShortName">wready</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/bresp">
-            <obj_property name="ElementShortName">bresp[1:0]</obj_property>
-            <obj_property name="ObjectShortName">bresp[1:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/bvalid">
-            <obj_property name="ElementShortName">bvalid</obj_property>
-            <obj_property name="ObjectShortName">bvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/bready">
-            <obj_property name="ElementShortName">bready</obj_property>
-            <obj_property name="ObjectShortName">bready</obj_property>
-         </wvobject>
-      </wvobject>
-      <wvobject type="group" fp_name="group82">
-         <obj_property name="label">Read</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/araddr">
-            <obj_property name="ElementShortName">araddr[31:0]</obj_property>
-            <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/arprot">
-            <obj_property name="ElementShortName">arprot[2:0]</obj_property>
-            <obj_property name="ObjectShortName">arprot[2:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/arvalid">
-            <obj_property name="ElementShortName">arvalid</obj_property>
-            <obj_property name="ObjectShortName">arvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/arready">
-            <obj_property name="ElementShortName">arready</obj_property>
-            <obj_property name="ObjectShortName">arready</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/rdata">
-            <obj_property name="ElementShortName">rdata[31:0]</obj_property>
-            <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/rresp">
-            <obj_property name="ElementShortName">rresp[1:0]</obj_property>
-            <obj_property name="ObjectShortName">rresp[1:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/rvalid">
-            <obj_property name="ElementShortName">rvalid</obj_property>
-            <obj_property name="ObjectShortName">rvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/rready">
-            <obj_property name="ElementShortName">rready</obj_property>
-            <obj_property name="ObjectShortName">rready</obj_property>
-         </wvobject>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group88">
-      <obj_property name="label">IO</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="group" fp_name="group104">
-         <obj_property name="label">Write</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/awaddr">
-            <obj_property name="ElementShortName">awaddr[31:0]</obj_property>
-            <obj_property name="ObjectShortName">awaddr[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/awprot">
-            <obj_property name="ElementShortName">awprot[2:0]</obj_property>
-            <obj_property name="ObjectShortName">awprot[2:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/awvalid">
-            <obj_property name="ElementShortName">awvalid</obj_property>
-            <obj_property name="ObjectShortName">awvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/awready">
-            <obj_property name="ElementShortName">awready</obj_property>
-            <obj_property name="ObjectShortName">awready</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/wdata">
-            <obj_property name="ElementShortName">wdata[31:0]</obj_property>
-            <obj_property name="ObjectShortName">wdata[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/wstrb">
-            <obj_property name="ElementShortName">wstrb[3:0]</obj_property>
-            <obj_property name="ObjectShortName">wstrb[3:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/wvalid">
-            <obj_property name="ElementShortName">wvalid</obj_property>
-            <obj_property name="ObjectShortName">wvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/wready">
-            <obj_property name="ElementShortName">wready</obj_property>
-            <obj_property name="ObjectShortName">wready</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/bresp">
-            <obj_property name="ElementShortName">bresp[1:0]</obj_property>
-            <obj_property name="ObjectShortName">bresp[1:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/bvalid">
-            <obj_property name="ElementShortName">bvalid</obj_property>
-            <obj_property name="ObjectShortName">bvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/bready">
-            <obj_property name="ElementShortName">bready</obj_property>
-            <obj_property name="ObjectShortName">bready</obj_property>
-         </wvobject>
-      </wvobject>
-      <wvobject type="group" fp_name="group105">
-         <obj_property name="label">Read</obj_property>
-         <obj_property name="DisplayName">label</obj_property>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/araddr">
-            <obj_property name="ElementShortName">araddr[31:0]</obj_property>
-            <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/arprot">
-            <obj_property name="ElementShortName">arprot[2:0]</obj_property>
-            <obj_property name="ObjectShortName">arprot[2:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/arvalid">
-            <obj_property name="ElementShortName">arvalid</obj_property>
-            <obj_property name="ObjectShortName">arvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/arready">
-            <obj_property name="ElementShortName">arready</obj_property>
-            <obj_property name="ObjectShortName">arready</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/rdata">
-            <obj_property name="ElementShortName">rdata[31:0]</obj_property>
-            <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/rresp">
-            <obj_property name="ElementShortName">rresp[1:0]</obj_property>
-            <obj_property name="ObjectShortName">rresp[1:0]</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/rvalid">
-            <obj_property name="ElementShortName">rvalid</obj_property>
-            <obj_property name="ObjectShortName">rvalid</obj_property>
-         </wvobject>
-         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/rready">
-            <obj_property name="ElementShortName">rready</obj_property>
-            <obj_property name="ObjectShortName">rready</obj_property>
-         </wvobject>
-      </wvobject>
+      <obj_property name="ElementShortName">regs[1:31][31:0]</obj_property>
+      <obj_property name="ObjectShortName">regs[1:31][31:0]</obj_property>
+      <obj_property name="label">Registers</obj_property>
    </wvobject>
    <wvobject type="group" fp_name="group66">
       <obj_property name="label">ALU</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/execute/alu/op1">
          <obj_property name="ElementShortName">op1[31:0]</obj_property>
          <obj_property name="ObjectShortName">op1[31:0]</obj_property>
@@ -357,6 +89,302 @@
       <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/execute/alu/out">
          <obj_property name="ElementShortName">out[31:0]</obj_property>
          <obj_property name="ObjectShortName">out[31:0]</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/execute/alu/fn">
+         <obj_property name="ElementShortName">fn[3:0]</obj_property>
+         <obj_property name="ObjectShortName">fn[3:0]</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="array" fp_name="/testbench/cpu/execute/alu/shamt">
+         <obj_property name="ElementShortName">shamt[4:0]</obj_property>
+         <obj_property name="ObjectShortName">shamt[4:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group129">
+      <obj_property name="label">Control</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/bubble">
+         <obj_property name="ElementShortName">bubble</obj_property>
+         <obj_property name="ObjectShortName">bubble</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/branch">
+         <obj_property name="ElementShortName">branch</obj_property>
+         <obj_property name="ObjectShortName">branch</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/fault">
+         <obj_property name="ElementShortName">fault</obj_property>
+         <obj_property name="ObjectShortName">fault</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/fetch/trap">
+         <obj_property name="ElementShortName">trap</obj_property>
+         <obj_property name="ObjectShortName">trap</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group130">
+      <obj_property name="label">AXI4</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group67">
+         <obj_property name="label">Code</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/araddr">
+            <obj_property name="ElementShortName">araddr[31:0]</obj_property>
+            <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/arprot">
+            <obj_property name="ElementShortName">arprot[2:0]</obj_property>
+            <obj_property name="ObjectShortName">arprot[2:0]</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/arvalid">
+            <obj_property name="ElementShortName">arvalid</obj_property>
+            <obj_property name="ObjectShortName">arvalid</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/arready">
+            <obj_property name="ElementShortName">arready</obj_property>
+            <obj_property name="ObjectShortName">arready</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/rdata">
+            <obj_property name="ElementShortName">rdata[31:0]</obj_property>
+            <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="array" fp_name="/testbench/code/rresp">
+            <obj_property name="ElementShortName">rresp[1:0]</obj_property>
+            <obj_property name="ObjectShortName">rresp[1:0]</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/rvalid">
+            <obj_property name="ElementShortName">rvalid</obj_property>
+            <obj_property name="ObjectShortName">rvalid</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/code/rready">
+            <obj_property name="ElementShortName">rready</obj_property>
+            <obj_property name="ObjectShortName">rready</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group55">
+         <obj_property name="label">Data</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="group" fp_name="group81">
+            <obj_property name="label">Write</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/awaddr">
+               <obj_property name="ElementShortName">awaddr[31:0]</obj_property>
+               <obj_property name="ObjectShortName">awaddr[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/awprot">
+               <obj_property name="ElementShortName">awprot[2:0]</obj_property>
+               <obj_property name="ObjectShortName">awprot[2:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/awvalid">
+               <obj_property name="ElementShortName">awvalid</obj_property>
+               <obj_property name="ObjectShortName">awvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/awready">
+               <obj_property name="ElementShortName">awready</obj_property>
+               <obj_property name="ObjectShortName">awready</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/wdata">
+               <obj_property name="ElementShortName">wdata[31:0]</obj_property>
+               <obj_property name="ObjectShortName">wdata[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/wstrb">
+               <obj_property name="ElementShortName">wstrb[3:0]</obj_property>
+               <obj_property name="ObjectShortName">wstrb[3:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/wvalid">
+               <obj_property name="ElementShortName">wvalid</obj_property>
+               <obj_property name="ObjectShortName">wvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/wready">
+               <obj_property name="ElementShortName">wready</obj_property>
+               <obj_property name="ObjectShortName">wready</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/bresp">
+               <obj_property name="ElementShortName">bresp[1:0]</obj_property>
+               <obj_property name="ObjectShortName">bresp[1:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/bvalid">
+               <obj_property name="ElementShortName">bvalid</obj_property>
+               <obj_property name="ObjectShortName">bvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/bready">
+               <obj_property name="ElementShortName">bready</obj_property>
+               <obj_property name="ObjectShortName">bready</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group82">
+            <obj_property name="label">Read</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/araddr">
+               <obj_property name="ElementShortName">araddr[31:0]</obj_property>
+               <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/arprot">
+               <obj_property name="ElementShortName">arprot[2:0]</obj_property>
+               <obj_property name="ObjectShortName">arprot[2:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/arvalid">
+               <obj_property name="ElementShortName">arvalid</obj_property>
+               <obj_property name="ObjectShortName">arvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/arready">
+               <obj_property name="ElementShortName">arready</obj_property>
+               <obj_property name="ObjectShortName">arready</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/rdata">
+               <obj_property name="ElementShortName">rdata[31:0]</obj_property>
+               <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/data/rresp">
+               <obj_property name="ElementShortName">rresp[1:0]</obj_property>
+               <obj_property name="ObjectShortName">rresp[1:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/rvalid">
+               <obj_property name="ElementShortName">rvalid</obj_property>
+               <obj_property name="ObjectShortName">rvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/data/rready">
+               <obj_property name="ElementShortName">rready</obj_property>
+               <obj_property name="ObjectShortName">rready</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group88">
+         <obj_property name="label">IO</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="group" fp_name="group104">
+            <obj_property name="label">Write</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/awaddr">
+               <obj_property name="ElementShortName">awaddr[31:0]</obj_property>
+               <obj_property name="ObjectShortName">awaddr[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/awprot">
+               <obj_property name="ElementShortName">awprot[2:0]</obj_property>
+               <obj_property name="ObjectShortName">awprot[2:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/awvalid">
+               <obj_property name="ElementShortName">awvalid</obj_property>
+               <obj_property name="ObjectShortName">awvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/awready">
+               <obj_property name="ElementShortName">awready</obj_property>
+               <obj_property name="ObjectShortName">awready</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/wdata">
+               <obj_property name="ElementShortName">wdata[31:0]</obj_property>
+               <obj_property name="ObjectShortName">wdata[31:0]</obj_property>
+               <obj_property name="Radix">ASCIIRADIX</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/wstrb">
+               <obj_property name="ElementShortName">wstrb[3:0]</obj_property>
+               <obj_property name="ObjectShortName">wstrb[3:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/wvalid">
+               <obj_property name="ElementShortName">wvalid</obj_property>
+               <obj_property name="ObjectShortName">wvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/wready">
+               <obj_property name="ElementShortName">wready</obj_property>
+               <obj_property name="ObjectShortName">wready</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/bresp">
+               <obj_property name="ElementShortName">bresp[1:0]</obj_property>
+               <obj_property name="ObjectShortName">bresp[1:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/bvalid">
+               <obj_property name="ElementShortName">bvalid</obj_property>
+               <obj_property name="ObjectShortName">bvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/bready">
+               <obj_property name="ElementShortName">bready</obj_property>
+               <obj_property name="ObjectShortName">bready</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group105">
+            <obj_property name="label">Read</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/araddr">
+               <obj_property name="ElementShortName">araddr[31:0]</obj_property>
+               <obj_property name="ObjectShortName">araddr[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/arprot">
+               <obj_property name="ElementShortName">arprot[2:0]</obj_property>
+               <obj_property name="ObjectShortName">arprot[2:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/arvalid">
+               <obj_property name="ElementShortName">arvalid</obj_property>
+               <obj_property name="ObjectShortName">arvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/arready">
+               <obj_property name="ElementShortName">arready</obj_property>
+               <obj_property name="ObjectShortName">arready</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/rdata">
+               <obj_property name="ElementShortName">rdata[31:0]</obj_property>
+               <obj_property name="ObjectShortName">rdata[31:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="array" fp_name="/testbench/mmio/rresp">
+               <obj_property name="ElementShortName">rresp[1:0]</obj_property>
+               <obj_property name="ObjectShortName">rresp[1:0]</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/rvalid">
+               <obj_property name="ElementShortName">rvalid</obj_property>
+               <obj_property name="ObjectShortName">rvalid</obj_property>
+            </wvobject>
+            <wvobject db_ref_id="1" type="logic" fp_name="/testbench/mmio/rready">
+               <obj_property name="ElementShortName">rready</obj_property>
+               <obj_property name="ObjectShortName">rready</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group15">
+         <obj_property name="label">ID</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/id/tvalid">
+            <obj_property name="ElementShortName">tvalid</obj_property>
+            <obj_property name="ObjectShortName">tvalid</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/id/tready">
+            <obj_property name="ElementShortName">tready</obj_property>
+            <obj_property name="ObjectShortName">tready</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group19">
+         <obj_property name="label">EX</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/ex/tvalid">
+            <obj_property name="ElementShortName">tvalid</obj_property>
+            <obj_property name="ObjectShortName">tvalid</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/ex/tready">
+            <obj_property name="ElementShortName">tready</obj_property>
+            <obj_property name="ObjectShortName">tready</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group23">
+         <obj_property name="label">MM</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/mm/tvalid">
+            <obj_property name="ElementShortName">tvalid</obj_property>
+            <obj_property name="ObjectShortName">tvalid</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/mm/tready">
+            <obj_property name="ElementShortName">tready</obj_property>
+            <obj_property name="ObjectShortName">tready</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group27">
+         <obj_property name="label">WB</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/wb/tvalid">
+            <obj_property name="ElementShortName">tvalid</obj_property>
+            <obj_property name="ObjectShortName">tvalid</obj_property>
+         </wvobject>
+         <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/wb/tready">
+            <obj_property name="ElementShortName">tready</obj_property>
+            <obj_property name="ObjectShortName">tready</obj_property>
+         </wvobject>
       </wvobject>
    </wvobject>
 </wave_config>

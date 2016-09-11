@@ -1,9 +1,13 @@
 /*
- * Copyright (c) 2015, C. Brett Witherspoon
+ * Copyright (c) 2015, 2016 C. Brett Witherspoon
  */
 
-`ifndef INIT_FILE
-    `define INIT_FILE "boot.mem"
+`ifndef TEXT_FILE
+    `define TEXT_FILE "calc.text.mem"
+`endif
+
+`ifndef DATA_FILE
+    `define DATA_FILE "calc.data.mem"
 `endif
 
 /**
@@ -33,9 +37,9 @@ module testbench;
     axi data (.*);
     axi mmio (.*);
 
-    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`INIT_FILE)) rom (.bus(code));
-    ram ram (.bus(data));
-    ram io (.bus(mmio));
+    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`TEXT_FILE)) rom (.bus(code));
+    ram #(.INIT_FILE(`DATA_FILE)) ram (.bus(data));
+    ram #(.DATA_DEPTH(2048)) io (.bus(mmio));
 
     cpu cpu (.*);
 
