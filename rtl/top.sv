@@ -2,15 +2,20 @@
  * Copyright (c) 2016, C. Brett Witherspoon
  */
 
-`ifndef INIT_FILE
-    `define INIT_FILE "boot.mem"
+`ifndef TEXT_FILE
+    `define TEXT_FILE "boot.mem"
+`endif
+
+`ifndef DATA_FILE
+    `define DATA_FILE ""
 `endif
 
 /**
  * Module: top
  */
 module top #(
-    parameter INIT_FILE = `INIT_FILE
+    parameter TEXT_FILE = `TEXT_FILE,
+    parameter DATA_FILE = `DATA_FILE
 )(
     input  logic        clk,
     input  logic        rst,
@@ -73,10 +78,12 @@ module top #(
 
     ram #(
         .INIT_DATA(core::NOP),
-        .INIT_FILE(INIT_FILE)
+        .INIT_FILE(TEXT_FILE)
     ) rom (.bus(code), .*);
 
-    ram ram (.bus(data), .*);
+    ram #(
+        .INIT_FILE(DATA_FILE)
+    ) ram (.bus(data), .*);
 
     cpu cpu (.data(data), .code(code), .mmio(mmio), .*);
 
