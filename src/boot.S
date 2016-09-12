@@ -1,4 +1,4 @@
-        .text
+        .section .boot, "ax"
         .align 5
         .globl _start
 
@@ -25,7 +25,7 @@ size1:  lw   t1,8(s1)         # Loop until read second byte of program size
 
         li   t0,1
         sw   t0,0(s0)         # Turn on reading indicator LED
-        la   s2,__kern_start    # Read binary program from UART
+        la   s2,__text_start    # Read binary program from UART
 read:   beq  t1,zero,done
         li   t2,4
         li   t3,0
@@ -42,7 +42,7 @@ byte:   lw   t4,8(s1)         # Loop and read byte when available
         addi t1,t1,-1
         j    read
 done:   sw   zero,0(s0)
-        j    __kern_start
+        j    __text_start
 
       .section .isr, "ax"
       .align 5

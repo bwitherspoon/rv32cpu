@@ -13,10 +13,10 @@ BSS     ?= 0x800
 
 .PHONY: all clean
 
-all: boot.mem
+all: boot.mem calc.bin gpio.bin
 
 %.text.bin: %.elf
-	$(OBJCOPY) -O binary -j .text $< $@
+	$(OBJCOPY) -O binary -j .text -j .boot -j .isr $< $@
 
 %.data.bin: %.elf
 	$(OBJCOPY) -O binary -j .data -j .bss $< $@
@@ -28,7 +28,7 @@ all: boot.mem
 	$(AS) -m32 -g -o $@ $^
 
 %.elf: %.o
-	$(LD) -T $(@:%.elf=%.ld) -nostdlib -nostartfiles -o $@ $^
+	$(LD) -T link.ld -nostdlib -nostartfiles -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
