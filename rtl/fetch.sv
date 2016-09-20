@@ -20,7 +20,7 @@
     input  word_t target,
     input  logic  trap,
     input  word_t handler,
-    input  logic  bubble,
+    input  logic  stall,
     axi.master    cache,
     axis.master   sink
 );
@@ -33,7 +33,7 @@
     id_t id;
     word_t pc;
 
-    wire stall = sink.tvalid & ~sink.tready;
+    wire lock = sink.tvalid & ~sink.tready;
 
     // Fetch structure
     assign sink.tdata = id;
@@ -47,7 +47,7 @@
     always_ff @(posedge aclk)
         if (~aresetn)
             pc <= core::BOOT_BASE;
-        else if (~stall)
+        else if (~lock)
             pc <= cache.araddr;
 
     // Trap
@@ -65,7 +65,7 @@
     always_ff @(posedge aclk)
         if (~aresetn)
             cache.arvalid <= '1;
-        else if (trap | trapped | branch | ~bubble)
+        else if (trap | trapped | branch | ~stall)
             cache.arvalid <= '1;
         else if (cache.arvalid & cache.arready)
             cache.arvalid <= '0;
@@ -80,12 +80,12 @@
                 cache.araddr <= cache.araddr + 4;
             else if (branch)
                 cache.araddr <= target;
-            else if (~bubble)
+            else if (~stall)
                 cache.araddr <= cache.araddr + 4;
 
     assign cache.arprot = axi4::AXI4;
 
-    assign cache.rready = ~stall;
+    assign cache.rready = ~lock;
 
     assign sink.tvalid = cache.rvalid & ~branch & ~trapped;
 

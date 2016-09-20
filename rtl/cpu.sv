@@ -48,16 +48,16 @@ module cpu
      * Hazards
      */
 
-    wire bubble;
     wire stall;
+    wire lock;
 
     hazard hazard (
         .decode(id),
         .execute(ex),
         .memory(mm),
         .writeback(wb),
-        .bubble,
-        .stall
+        .stall,
+        .lock
     );
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ module cpu
         .target,
         .trap,
         .handler(core::TRAP_ADDR),
-        .bubble,
+        .stall,
         .cache(code),
         .sink(id)
     );
@@ -145,7 +145,7 @@ module cpu
     );
 
     decode decode (
-        .stall,
+        .lock,
         .rs1_sel(rs1),
         .rs2_sel(rs2),
         .alu_data,

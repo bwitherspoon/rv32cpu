@@ -21,8 +21,8 @@ module hazard
     axis.monitor execute,
     axis.monitor memory,
     axis.monitor writeback,
-    output logic bubble,
-    output logic stall
+    output logic stall,
+    output logic lock
 );
     id_t id;
     ex_t ex;
@@ -42,8 +42,8 @@ module hazard
                 opcode === opcodes::JALR ||
                 opcode === opcodes::BRANCH;
 
-    assign bubble = decode.tvalid & jump;
+    assign stall = decode.tvalid & jump;
 
-    assign stall = (execute.tvalid & core::isload(ex.ctrl.op)) | (memory.tvalid & core::isload(mm.ctrl.op));
+    assign lock = (execute.tvalid & core::isload(ex.ctrl.op)) | (memory.tvalid & core::isload(mm.ctrl.op));
 
 endmodule
