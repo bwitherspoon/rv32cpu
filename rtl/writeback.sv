@@ -18,7 +18,6 @@ module writeback
     output logic  rd_load,
     output addr_t rd_addr,
     output word_t rd_data,
-    output word_t count,
     axis.slave    source
 );
     wb_t wb;
@@ -32,12 +31,6 @@ module writeback
     assign rd_data = wb.data.rd.data;
 
     assign source.tready = '1;
-
-    always_ff @(posedge source.aclk)
-        if (~source.aresetn)
-            count <= '0;
-        else if (source.tvalid & source.tready)
-            count <= count + 1;
 
 endmodule
 
