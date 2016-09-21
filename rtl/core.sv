@@ -17,9 +17,6 @@ package core;
     // Immediate type
     typedef logic signed [31:0] imm_t;
 
-    // Instruction funct7 type
-    typedef logic [6:0] funct7_t;
-
     // Instruction funct3 type
     typedef enum logic [2:0] {
         BEQ_LB_SB_ADD_SUB = 'b000,
@@ -56,24 +53,24 @@ package core;
     // Instruction type
     typedef union packed {
         struct packed {
-            funct7_t funct7;
-            addr_t   rs2;
-            addr_t   rs1;
-            funct3_t funct3;
-            addr_t   rd;
+            logic [6:0] funct7;
+            logic [4:0] rs2;
+            logic [4:0] rs1;
+            funct3_t    funct3;
+            logic [4:0] rd;
             opcode_t opcode;
         } r;
        struct packed {
             logic [11:0] imm_11_0;
-            addr_t       rs1;
+            logic [4:0]  rs1;
             funct3_t     funct3;
-            addr_t       rd;
+            logic [4:0]  rd;
             opcode_t     opcode;
         } i;
         struct packed {
             logic [6:0] imm_11_5;
-            addr_t      rs2;
-            addr_t      rs1;
+            logic [4:0] rs2;
+            logic [4:0] rs1;
             funct3_t    funct3;
             logic [4:0] imm_4_0;
             opcode_t    opcode;
@@ -81,8 +78,8 @@ package core;
         struct packed {
             logic       imm_12;
             logic [5:0] imm_10_5;
-            addr_t      rs2;
-            addr_t      rs1;
+            logic [4:0] rs2;
+            logic [4:0] rs1;
             funct3_t    funct3;
             logic [3:0] imm_4_1;
             logic       imm_11;
@@ -90,7 +87,7 @@ package core;
         } sb;
         struct packed {
             logic [19:0] imm_31_12;
-            addr_t       rd;
+            logic [4:0]  rd;
             opcode_t     opcode;
         } u;
         struct packed {
@@ -98,7 +95,7 @@ package core;
             logic [9:0] imm_10_1;
             logic       imm_11;
             logic [7:0] imm_19_12;
-            addr_t      rd;
+            logic [4:0] rd;
             opcode_t    opcode;
         } uj;
     } inst_t;
