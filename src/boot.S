@@ -2,14 +2,14 @@
         .align 5
         .globl _start
 
-_start: la   s0,__gpio_start  # GPIO base address
+_start: la   s0,_gpio         # GPIO base address
         li   t0,-1            # GPIO 3-state control
         slli t0,t0,16
         sw   t0,4(s0)
-        la   s1,__uart_start  # UART base address
+        la   s1,_uart         # UART base address
         li   t0,0x13          # UART reset and enable interrupt
         sw   t0,0xC(s1)
-        la   sp,__stack_start # Initialize stack pointer
+        la   sp,_stack        # Initialize stack pointer
 
 size0:  lw   t0,8(s1)         # Loop until read first byte of program size
         andi t0,t0,1
@@ -25,7 +25,7 @@ size1:  lw   t1,8(s1)         # Loop until read second byte of program size
 
         li   t0,1
         sw   t0,0(s0)         # Turn on reading indicator LED
-        la   s2,__text_start    # Read binary program from UART
+        la   s2,_ftext        # Read binary program from UART
 read:   beq  t1,zero,done
         li   t2,4
         li   t3,0
@@ -42,12 +42,12 @@ byte:   lw   t4,8(s1)         # Loop and read byte when available
         addi t1,t1,-1
         j    read
 done:   sw   zero,0(s0)
-        j    __text_start
+        j    _ftext
 
       .section .isr, "ax"
       .align 5
 
-trap: la   t0,__gpio_start
+trap: la   t0,_gpio
       li   t1,0x8
       li   t3,4
 loop: addi t3,t3,-1

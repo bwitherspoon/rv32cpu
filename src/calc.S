@@ -15,14 +15,14 @@ buffer: .skip 16
         .equ cr,   0x0d
         .equ nl,   0x0a
 
-_start: la   t0,__gpio_start  # GPIO base address
+_start: la   t0,_gpio        # GPIO base address
         li   t1,-1            # GPIO 3-state control
         slli t1,t1,16
         sw   t1,4(t0)
-        la   t0,__uart_start  # UART base address
+        la   t0,_uart         # UART base address
         li   t1,0x13          # UART reset and enable interrupt
         sw   t1,0xC(t0)
-        la   sp,__stack_start # Initialize stack pointer
+        la   sp,_stack        # Initialize stack pointer
         la   a0,intro         # Print message
         jal  puts
 loop:   la   a0,prompt        # Print prompt
@@ -59,7 +59,7 @@ fail:   la  a0,error          # Print error message on failure
 #
 # Read a character from the UART into a0. Spins if no character is available.
 #
-getc:   la   t0,__uart_start
+getc:   la   t0,_uart
         lb   t1,8(t0)
         andi t1,t1,1
         beqz t1,getc
@@ -69,7 +69,7 @@ getc:   la   t0,__uart_start
 #
 # Write the character in a0 to the UART.
 #
-putc:   la   t0,__uart_start
+putc:   la   t0,_uart
         sb   a0,4(t0)
         ret
 #

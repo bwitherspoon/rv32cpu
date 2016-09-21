@@ -21,14 +21,14 @@ all: boot.mem calc.bin gpio.bin
 %.data.bin: %.elf
 	$(OBJCOPY) -O binary -j .data -j .bss $< $@
 
-%.o: %.c
-	$(CC) -static -m32 -O2 -std=gnu99 -c -o $@ $^
+%.elf: %.c crt0.S
+	$(CC) -T core.ld -nostdlib -nostartfiles -o $@ $^
 
 %.o: %.S
 	$(AS) -m32 -g -o $@ $^
 
 %.elf: %.o
-	$(LD) -T link.ld -nostdlib -nostartfiles -o $@ $^
+	$(CC) -T core.ld -nostdlib -nostartfiles -o $@ $^
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
