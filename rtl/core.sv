@@ -33,7 +33,7 @@ package core;
     localparam TRAP_ADDR = 32'h00000000;
 
     // Boot loader address
-    localparam BOOT_BASE = 32'h00000200;
+    localparam BOOT_BASE = 32'h00000040;
 
     // Instruction address space base
     localparam CODE_BASE = 32'h00000400;
