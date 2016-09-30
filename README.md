@@ -3,8 +3,6 @@ Core
 
 ![Diagram](http://bwitherspoon.github.io/core/core.svg)
 
-![VivadoBoard](http://bwitherspoon.github.io/core/bd.png)
-
 Summary
 -------
 
@@ -14,8 +12,10 @@ The processor executes the base integer instruction set of the user level 32-bit
 Platforms
 ------------------
 
-The design is targeted for the Xilinx 7 Series FPGAs and SoCs.
+The design is targeted for Xilinx 7 Series FPGAs and SoCs.
 The [Arty][arty] board from Digilent is used for development and testing.
+
+![VivadoBoard](http://bwitherspoon.github.io/core/bd.png)
 
 Dependencies
 --------------
