@@ -13,7 +13,7 @@ BSS     ?= 0x800
 
 .PHONY: all clean
 
-all: boot.mem calc.bin gpio.bin
+all: boot.mem
 
 %.text.bin: %.elf
 	$(OBJCOPY) -O binary -j .text -j .boot -j .isr $< $@
