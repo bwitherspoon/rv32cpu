@@ -23,7 +23,7 @@ RTL = alu.sv     \
       ram.sv     \
       regfile.sv \
       writeback.sv
-INIT = testbench.data.mem testbench.text.mem
+INIT = testbench.text.mem testbench.data.mem
 
 %.mem:
 	make -C ../src/ $@
