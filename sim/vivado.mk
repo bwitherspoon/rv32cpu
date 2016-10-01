@@ -16,7 +16,7 @@ TIME ?= "1ns/1ps"
 LIB  = work
 SNAP = $(LIB).$(basename $(TOP))
 
-PRJDIR = ../..
+PRJDIR = ..
 SIMDIR = $(PRJDIR)/sim
 RTLDIR = $(PRJDIR)/rtl
 SRCDIR = $(PRJDIR)/src
