@@ -77,11 +77,13 @@ module top #(
     assign m_axi_rready  = mmio.rready;
 
     ram #(
+        .DATA_DEPTH(1024),
         .INIT_DATA(core::NOP),
         .INIT_FILE(TEXT_FILE)
     ) rom (.bus(code), .*);
 
     ram #(
+        .DATA_DEPTH(1024),
         .INIT_FILE(DATA_FILE)
     ) ram (.bus(data), .*);
 
