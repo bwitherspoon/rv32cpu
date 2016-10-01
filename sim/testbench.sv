@@ -44,19 +44,41 @@ module testbench;
     cpu cpu (.*);
 
     task dump();
-        $error("dumping memory contents");
-        for (int i = 0; i < 8; i++) begin : pretty_print
-            $write("%08d:", i*4);
+        $write("\nRegisters:\n\n");
+        for (int i = 1; i < 32; i++) begin : dump_registers
+            $write("%2d: %08h\n", i, cpu.regfile.regs[i]);
+        end : dump_registers
+        $write("\nMemory:\n\n");
+        for (int i = 0; i < 8; i++) begin : dump_memory
+            $write("%08h: ", i*4);
             for (int j = 0; j < 4; j++)
                 $write("%08h ", io.blockram.mem[i+j]);
             $write("\n");
-        end : pretty_print
+        end : dump_memory
+        $write("\n");
     endtask
 
     initial begin
         reset(); // GSR ~100 ns
-        repeat (100) @(posedge clk);
-        $finish;
+
+        repeat (7) @(posedge clk);
+        @(negedge clk) assert(cpu.regfile.regs[7] == 5) begin
+            $info("execute and memory forwarding succeeded");
+        end else begin
+            dump();
+            $fatal(1, "execute and memory forwarding failed");
+        end
+
+        repeat (4) @(posedge clk);
+        @(negedge clk) assert(cpu.regfile.regs[7] == 9) begin
+            $info("memory and writeback forwarding succeeded");
+        end else begin
+            dump();
+            $fatal(1, "memory and writeback forwarding failed");
+        end
+
+        $info("all tests passed");
+        $finish(0);
     end
 
 endmodule : testbench
