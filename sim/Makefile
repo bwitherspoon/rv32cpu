@@ -23,6 +23,9 @@ RTL = alu.sv     \
       ram.sv     \
       regfile.sv \
       writeback.sv
-INIT = calc.text.mem calc.data.mem
+INIT = testbench.data.mem testbench.text.mem
+
+%.mem:
+	make -C ../src/ $@
 
 include vivado.mk
