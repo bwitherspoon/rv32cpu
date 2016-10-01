@@ -13,9 +13,9 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="14133265600fs"></ZoomStartTime>
-      <ZoomEndTime time="14210565601fs"></ZoomEndTime>
-      <Cursor1Time time="14180000000fs"></Cursor1Time>
+      <ZoomStartTime time="83683600fs"></ZoomStartTime>
+      <ZoomEndTime time="160983602fs"></ZoomEndTime>
+      <Cursor1Time time="2090000000fs"></Cursor1Time>
    </zoom_setting>
    <WVObjectSize size="9" />
    <wvobject db_ref_id="1" type="logic" fp_name="/testbench/clk">
@@ -102,21 +102,18 @@
    <wvobject type="group" fp_name="group129">
       <obj_property name="label">Control</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/bubble">
-         <obj_property name="ElementShortName">bubble</obj_property>
-         <obj_property name="ObjectShortName">bubble</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/branch">
-         <obj_property name="ElementShortName">branch</obj_property>
-         <obj_property name="ObjectShortName">branch</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/fault">
-         <obj_property name="ElementShortName">fault</obj_property>
-         <obj_property name="ObjectShortName">fault</obj_property>
-      </wvobject>
-      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/fetch/trap">
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/trap">
          <obj_property name="ElementShortName">trap</obj_property>
          <obj_property name="ObjectShortName">trap</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/stall">
+         <obj_property name="ElementShortName">stall</obj_property>
+         <obj_property name="ObjectShortName">stall</obj_property>
+      </wvobject>
+      <wvobject db_ref_id="1" type="logic" fp_name="/testbench/cpu/lock">
+         <obj_property name="ElementShortName">lock</obj_property>
+         <obj_property name="ObjectShortName">lock</obj_property>
       </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group130">
