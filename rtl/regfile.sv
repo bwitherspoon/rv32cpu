@@ -27,7 +27,7 @@ module regfile
     initial for (int i = 1; i < 2**$bits(addr_t); i++) regs[i] = '0;
 `endif
 
-    always @(negedge clk)
+    always @(posedge clk)
         if (rd_en && rd_addr != '0)
             regs[rd_addr] <= rd_data;
 

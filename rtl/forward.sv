@@ -35,9 +35,11 @@ module forward
 
     wire ex_rs1 = execute.tvalid && id.data.ir.r.rs1 == ex.data.rd && isinteger(ex.ctrl.op);
     wire mm_rs1 = memory.tvalid && id.data.ir.r.rs1 == mm.data.rd && isinteger(mm.ctrl.op);
+    wire wb_rs1 = writeback.tvalid && id.data.ir.r.rs1 == wb.data.rd.addr && isinteger(wb.ctrl.op);
 
     wire ex_rs2 = execute.tvalid && id.data.ir.r.rs2 == ex.data.rd && isinteger(ex.ctrl.op);
     wire mm_rs2 = memory.tvalid && id.data.ir.r.rs2 == mm.data.rd && isinteger(mm.ctrl.op);
+    wire wb_rs2 = writeback.tvalid && id.data.ir.r.rs2 == wb.data.rd.addr && isinteger(wb.ctrl.op);
 
     always_comb begin : src1
         rs1 = core::REG;
@@ -46,6 +48,8 @@ module forward
                 rs1 = core::ALU;
             else if (mm_rs1)
                 rs1 = core::EXE;
+            else if (wb_rs1)
+                rs1 = core::MEM;
         end
     end : src1
 
@@ -56,6 +60,8 @@ module forward
                 rs2 = core::ALU;
             else if (mm_rs2)
                 rs2 = core::EXE;
+            else if (wb_rs2)
+                rs2 = core::MEM;
         end
     end : src2
 

@@ -133,6 +133,11 @@ module cpu
     assign exe = mm_t'(mm.tdata);
     assign exe_data = exe.data.alu;
 
+    // The output of the memory stage is available on the writeback stream interface.
+    wb_t mem;
+    assign mem = wb_t'(wb.tdata);
+    assign mem_data = mem.data.rd.data;
+
     regfile regfile (
         .clk,
         .rs1_addr,
