@@ -15,7 +15,7 @@ Platforms
 The design is targeted for Xilinx 7 Series FPGAs and SoCs.
 The [Arty][arty] board from Digilent is used for development and testing.
 
-![VivadoBoard](http://bwitherspoon.github.io/core/bd.png)
+![VivadoSystem](http://bwitherspoon.github.io/core/system.svg)
 
 Dependencies
 --------------
