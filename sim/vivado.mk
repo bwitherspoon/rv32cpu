@@ -22,7 +22,7 @@ RTLDIR = $(PRJDIR)/rtl
 SRCDIR = $(PRJDIR)/src
 LIBDIR = xsim.dir/$(LIB)
 
-VIVADO_DIR ?= /opt/Xilinx/Vivado/2015.4
+VIVADO_DIR ?= /opt/Xilinx/Vivado/2016.2
 
 PATH := $(VIVADO_DIR)/bin:$(PATH)
 

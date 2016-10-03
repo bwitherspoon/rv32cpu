@@ -20,7 +20,7 @@ The [Arty][arty] board from Digilent is used for development and testing.
 Dependencies
 --------------
 
-[Xilinx Vivado 2015.4][vivado] is used for hardware synthesis and simulation.
+[Xilinx Vivado 2016.2][vivado] is used for hardware synthesis and simulation.
 The [RISC-V GNU toolchain][riscv-gnu-toolchain] is used for software compiling and linking.
 
 [systemverilog]: http://standards.ieee.org/findstds/standard/1800-2012.html
