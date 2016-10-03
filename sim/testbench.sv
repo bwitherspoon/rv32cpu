@@ -3,11 +3,11 @@
  */
 
 `ifndef TEXT_FILE
-    `define TEXT_FILE "calc.text.mem"
+    `define TEXT_FILE "testbench.text.mem"
 `endif
 
 `ifndef DATA_FILE
-    `define DATA_FILE "calc.data.mem"
+    `define DATA_FILE "testbench.data.mem"
 `endif
 
 /**
@@ -17,9 +17,9 @@ module testbench;
     // timeunit 1ns;
     // timeprecision 1ps;
 
-    // Clock (50 MHz)
+    // Clock (100 MHz)
     bit clk = 0;
-    always #10ns clk <= ~clk;
+    always #5ns clk <= ~clk;
 
     // Reset
     bit rst;
@@ -77,7 +77,7 @@ module testbench;
             $fatal(1, "memory and writeback forwarding failed");
         end
 
-        $info("all tests passed");
+        $info("all tests succeeded");
         $finish(0);
     end
 
