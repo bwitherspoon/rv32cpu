@@ -61,7 +61,7 @@ module testbench;
     initial begin
         reset(); // GSR ~100 ns
 
-        repeat (7) @(posedge clk);
+        repeat (14) @(posedge clk);
         @(negedge clk) assert(cpu.regfile.regs[7] == 5) begin
             $info("execute and memory forwarding succeeded");
         end else begin
