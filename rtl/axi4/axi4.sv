@@ -6,8 +6,8 @@
 
 /**
  * Package: axi4
- * 
- * A package for ARM AMBA AXI4 definitions 
+ *
+ * A package for ARM AMBA AXI4 definitions.
  */
 package axi4;
 

@@ -5,23 +5,23 @@
 #
 
 TOP = testbench.sv
-PKG = axi4.sv    \
-      opcodes.sv \
+PKG = axi4/axi4.sv \
+      opcodes.sv   \
       core.sv
-INT = axi.sv     \
-      axis.sv
-RTL = alu.sv     \
+INT = axi4/axi.sv  \
+      axi4/axis.sv
+RTL = alu.sv       \
       arbitrate.sv \
       blockram.sv  \
-      cpu.sv     \
-      decode.sv  \
-      execute.sv \
-      fetch.sv   \
-      forward.sv \
-      hazard.sv  \
-      memory.sv  \
-      ram.sv     \
-      regfile.sv \
+      cpu.sv       \
+      decode.sv    \
+      execute.sv   \
+      fetch.sv     \
+      forward.sv   \
+      hazard.sv    \
+      memory.sv    \
+      ram.sv       \
+      regfile.sv   \
       writeback.sv
 INIT = testbench.text.mem testbench.data.mem
 
