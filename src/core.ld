@@ -6,11 +6,12 @@ GROUP(-lc -lnosys -lgcc)
 
 SECTIONS
 {
-    .boot :
+    .loader :
     {
-        *(.isr)
-        *(.boot)
+        *(.vector)
+        *(.loader)
     }
+
     . = 0x00000400;
     _ftext = .;
 
