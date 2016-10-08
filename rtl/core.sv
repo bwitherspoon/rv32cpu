@@ -29,11 +29,11 @@ package core;
         BGEU_AND          = 'b111
     } funct3_t;
 
-    // Trap routine address
-    localparam TRAP_ADDR = 32'h00000000;
+    // Reset address
+    localparam RESET_ADDR = 32'h00000000;
 
-    // Boot loader address
-    localparam BOOT_BASE = 32'h00000040;
+    // Trap address
+    localparam TRAP_ADDR = 32'h00000004;
 
     // Instruction address space base
     localparam CODE_BASE = 32'h00000400;

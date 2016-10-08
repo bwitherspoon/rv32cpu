@@ -46,7 +46,7 @@
 
     always_ff @(posedge aclk)
         if (~aresetn)
-            pc <= core::BOOT_BASE;
+            pc <= core::RESET_ADDR;
         else if (~lock)
             pc <= cache.araddr;
 
@@ -72,7 +72,7 @@
 
     always_ff @(posedge aclk)
         if (~aresetn)
-            cache.araddr <= core::BOOT_BASE;
+            cache.araddr <= core::RESET_ADDR;
         else if (~(cache.arvalid & ~cache.arready))
             if (trap)
                 cache.araddr <= handler;
