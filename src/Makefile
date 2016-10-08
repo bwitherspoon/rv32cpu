@@ -16,7 +16,7 @@ BSS     ?= 0x800
 all: boot.mem
 
 %.text.bin: %.elf
-	$(OBJCOPY) -O binary -j .text -j .boot -j .isr $< $@
+	$(OBJCOPY) -O binary -j .vector -j .loader -j .text $< $@
 
 %.data.bin: %.elf
 	$(OBJCOPY) -O binary -j .data -j .bss $< $@
