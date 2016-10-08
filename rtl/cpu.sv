@@ -193,6 +193,7 @@ module cpu
     memory memory (
         .aclk,
         .aresetn,
+        .fault,
         .cache(cache),
         .source(mm),
         .sink(wb)
