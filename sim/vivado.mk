@@ -51,7 +51,7 @@ $(TOP:.sv=.wcfg):
 	touch $@
 
 xsim.dir/$(LIB).$(basename $(TOP))/xsimk: $(addprefix $(LIBDIR)/,$(ALL:.sv=.sdb))
-	xelab -nolog --timescale "1ns/1ps" --debug typical -L $(LIB) $(SNAP)
+	xelab -nolog --timescale $(TIME) --debug typical -L $(LIB) $(SNAP)
 
 $(LIBDIR)/$(INT:.sv=.sdb): | $(PKG:.sv=.sdb)
 
