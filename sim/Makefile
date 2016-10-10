@@ -5,11 +5,11 @@
 #
 
 TOP = testbench.sv
-PKG = axi4/axi4.sv \
+PKG = axi4.sv      \
       opcodes.sv   \
       core.sv
-INT = axi4/axi.sv  \
-      axi4/axis.sv
+INT = axi.sv       \
+      axis.sv
 RTL = alu.sv       \
       arbitrate.sv \
       blockram.sv  \

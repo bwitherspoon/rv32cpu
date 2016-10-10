@@ -26,7 +26,7 @@ VIVADO_DIR ?= /opt/Xilinx/Vivado/2016.2
 
 PATH := $(VIVADO_DIR)/bin:$(PATH)
 
-VPATH = $(RTLDIR):$(SRCDIR):$(LIBDIR)
+VPATH = $(RTLDIR):$(RTLDIR)/axi4:$(SRCDIR):$(LIBDIR)
 
 .PHONY: all test tcl gui xsim xelab xvlog clean
 
