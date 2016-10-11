@@ -7,6 +7,7 @@
 TOP = testbench.sv
 PKG = axi4.sv      \
       opcodes.sv   \
+      funct3.sv    \
       core.sv
 INT = axi.sv       \
       axis.sv

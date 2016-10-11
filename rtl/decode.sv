@@ -341,27 +341,27 @@ module decode
         unique case (ir.r.opcode)
             opcodes::OP_IMM:
                 unique case (ir.r.funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = ADDI;
-                    core::BNE_LH_SH_SLL:     ctrl = SLLI;
-                    core::LW_SW_SLT:         ctrl = SLTI;
-                    core::SLTU_SLTIU:        ctrl = SLTIU;
-                    core::BLT_LBU_XOR:       ctrl = XORI;
-                    core::BGE_LHU_SRL_SRA:   ctrl = (ir.r.funct7[5]) ? SRAI : SRLI;
-                    core::BLTU_OR:           ctrl = ORI;
-                    core::BGEU_AND:          ctrl = ANDI;
-                    default:                 ctrl = NONE;
+                    funct3::ADD:   ctrl = ADDI;
+                    funct3::SLL:   ctrl = SLLI;
+                    funct3::SLT:   ctrl = SLTI;
+                    funct3::SLTIU: ctrl = SLTIU;
+                    funct3::XOR:   ctrl = XORI;
+                    funct3::SRL:   ctrl = (ir.r.funct7[5]) ? SRAI : SRLI;
+                    funct3::OR:    ctrl = ORI;
+                    funct3::AND:   ctrl = ANDI;
+                    default:       ctrl = NONE;
                 endcase
             opcodes::OP:
                 unique case (ir.r.funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = (ir.r.funct7[5]) ? SUB : ADD;
-                    core::BNE_LH_SH_SLL:     ctrl = SLL;
-                    core::LW_SW_SLT:         ctrl = SLT;
-                    core::SLTU_SLTIU:        ctrl = SLTU;
-                    core::BLT_LBU_XOR:       ctrl = XOR;
-                    core::BGE_LHU_SRL_SRA:   ctrl = (ir.r.funct7[5]) ? SRA : SRL;
-                    core::BLTU_OR:           ctrl = OR;
-                    core::BGEU_AND:          ctrl = AND;
-                    default:                 ctrl = NONE;
+                    funct3::ADD:  ctrl = (ir.r.funct7[5]) ? SUB : ADD;
+                    funct3::SLL:  ctrl = SLL;
+                    funct3::SLT:  ctrl = SLT;
+                    funct3::SLTU: ctrl = SLTU;
+                    funct3::XOR:  ctrl = XOR;
+                    funct3::SRL:  ctrl = (ir.r.funct7[5]) ? SRA : SRL;
+                    funct3::OR:   ctrl = OR;
+                    funct3::AND:  ctrl = AND;
+                    default:      ctrl = NONE;
                 endcase
             opcodes::LUI:   ctrl = LUI;
             opcodes::AUIPC: ctrl = AUIPC;
@@ -369,29 +369,29 @@ module decode
             opcodes::JALR:  ctrl = JALR;
             opcodes::BRANCH:
                 unique case (ir.r.funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = BEQ;
-                    core::BNE_LH_SH_SLL:     ctrl = BNE;
-                    core::BLT_LBU_XOR :      ctrl = BLT;
-                    core::BLTU_OR:           ctrl = BLTU;
-                    core::BGE_LHU_SRL_SRA:   ctrl = BGE;
-                    core::BGEU_AND:          ctrl = BGEU;
-                    default:                 ctrl = NONE;
+                    funct3::BEQ:  ctrl = BEQ;
+                    funct3::BNE:  ctrl = BNE;
+                    funct3::BLT:  ctrl = BLT;
+                    funct3::BLTU: ctrl = BLTU;
+                    funct3::BGE:  ctrl = BGE;
+                    funct3::BGEU: ctrl = BGEU;
+                    default:      ctrl = NONE;
                 endcase
             opcodes::LOAD:
                 unique case (ir.r.funct3)
-                    core::LW_SW_SLT:         ctrl = LW;
-                    core::BNE_LH_SH_SLL:     ctrl = LH;
-                    core::BGE_LHU_SRL_SRA:   ctrl = LHU;
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = LB;
-                    core::BLT_LBU_XOR:       ctrl = LBU;
-                    default:                 ctrl = NONE;
+                    funct3::LW:  ctrl = LW;
+                    funct3::LH:  ctrl = LH;
+                    funct3::LHU: ctrl = LHU;
+                    funct3::LB:  ctrl = LB;
+                    funct3::LBU: ctrl = LBU;
+                    default:     ctrl = NONE;
                 endcase
             opcodes::STORE:
                 unique case (ir.r.funct3)
-                    core::BEQ_LB_SB_ADD_SUB: ctrl = SB;
-                    core::BNE_LH_SH_SLL:     ctrl = SH;
-                    core::LW_SW_SLT:         ctrl = SW;
-                    default:                 ctrl = NONE;
+                    funct3::SB: ctrl = SB;
+                    funct3::SH: ctrl = SH;
+                    funct3::SW: ctrl = SW;
+                    default:    ctrl = NONE;
                 endcase
             default:
                 ctrl = NONE;

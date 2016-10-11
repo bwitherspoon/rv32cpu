@@ -17,18 +17,6 @@ package core;
     // Immediate type
     typedef logic signed [31:0] imm_t;
 
-    // Instruction funct3 type
-    typedef enum logic [2:0] {
-        BEQ_LB_SB_ADD_SUB = 'b000,
-        BNE_LH_SH_SLL     = 'b001,
-        LW_SW_SLT         = 'b010,
-        SLTU_SLTIU        = 'b011,
-        BLT_LBU_XOR       = 'b100,
-        BGE_LHU_SRL_SRA   = 'b101,
-        BLTU_OR           = 'b110,
-        BGEU_AND          = 'b111
-    } funct3_t;
-
     // Reset address
     localparam RESET_ADDR = 32'h00000000;
 
@@ -56,14 +44,14 @@ package core;
             logic [6:0] funct7;
             logic [4:0] rs2;
             logic [4:0] rs1;
-            funct3_t    funct3;
+            logic [2:0] funct3;
             logic [4:0] rd;
-            opcode_t opcode;
+            opcode_t    opcode;
         } r;
        struct packed {
             logic [11:0] imm_11_0;
             logic [4:0]  rs1;
-            funct3_t     funct3;
+            logic [2:0]  funct3;
             logic [4:0]  rd;
             opcode_t     opcode;
         } i;
@@ -71,7 +59,7 @@ package core;
             logic [6:0] imm_11_5;
             logic [4:0] rs2;
             logic [4:0] rs1;
-            funct3_t    funct3;
+            logic [2:0] funct3;
             logic [4:0] imm_4_0;
             opcode_t    opcode;
         } s;
@@ -80,7 +68,7 @@ package core;
             logic [5:0] imm_10_5;
             logic [4:0] rs2;
             logic [4:0] rs1;
-            funct3_t    funct3;
+            logic [2:0] funct3;
             logic [3:0] imm_4_1;
             logic       imm_11;
             opcode_t    opcode;
