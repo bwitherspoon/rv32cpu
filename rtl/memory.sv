@@ -17,7 +17,6 @@ module memory
 (
     logic       aclk,
     logic       aresetn,
-    logic       fault,
     axi.master  cache,
     axis.slave  source,
     axis.master sink
@@ -258,10 +257,6 @@ module memory
             wb.data.rd.data <= (cache.rvalid & cache.rready & cache.rresp == axi4::OKAY) ? rdata : mm.data.alu;
             wb.data.rd.addr <= (cache.rvalid & cache.rready & cache.rresp == axi4::OKAY) ? rd : mm.data.rd;
         end
-
-///////////////////////////////////////////////////////////////////////////////
-
-    assign fault = cache.rvalid & cache.rready & cache.rresp != axi4::OKAY;
 
 endmodule : memory
 
