@@ -13,7 +13,7 @@ BSS     ?= 0x800
 
 .PHONY: all clean
 
-all: boot.mem
+all: boot.mem testbench.text.mem testbench.data.mem
 
 %.text.bin: %.elf
 	$(OBJCOPY) -O binary -j .vector -j .loader -j .text $< $@
