@@ -11,6 +11,10 @@ TEXT    ?= 0x040
 DATA    ?= 0xC00
 BSS     ?= 0x800
 
+RISCV ?= $(HOME)/.local/riscv
+
+PATH := $(RISCV)/bin:$(PATH)
+
 .PHONY: all clean
 
 all: boot.mem
@@ -27,7 +31,7 @@ test: testbench.text.mem testbench.data.mem
 	$(CC) -T core.ld -nostdlib -nostartfiles -o $@ $^
 
 %.o: %.S
-	$(AS) -m32 -g -o $@ $^
+	$(AS) -march=rv32i -mabi=ilp32 -g -o $@ $^
 
 %.elf: %.o
 	$(CC) -T core.ld -nostdlib -nostartfiles -o $@ $^
