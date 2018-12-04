@@ -1,7 +1,7 @@
 /**
- * Copyright (c) 2015, 2016 C. Brett Witherspoon
+ * Copyright (c) 2015-2018 C. Brett Witherspoon
  */
-package core;
+package rv32;
 
     import opcodes::opcode_t;
 

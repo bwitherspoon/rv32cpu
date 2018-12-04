@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 C. Brett Witherspoon
+ * Copyright (c) 2016-2018 C. Brett Witherspoon
  *
  * See LICENSE for more details.
  */
@@ -8,13 +8,13 @@
  * Module: forward
  */
 module forward
-    import core::id_t;
-    import core::ex_t;
-    import core::mm_t;
-    import core::wb_t;
-    import core::rs_t;
-    import core::isinteger;
-    import core::isload;
+    import rv32::id_t;
+    import rv32::ex_t;
+    import rv32::mm_t;
+    import rv32::wb_t;
+    import rv32::rs_t;
+    import rv32::isinteger;
+    import rv32::isload;
 (
     axis.monitor decode,
     axis.monitor execute,
@@ -42,28 +42,27 @@ module forward
     wire wb_rs2 = writeback.tvalid && id.data.ir.r.rs2 == wb.data.rd.addr && (isinteger(wb.ctrl.op) || isload(wb.ctrl.op));
 
     always_comb begin : src1
-        rs1 = core::REG;
+        rs1 = rv32::REG;
         if (id.data.ir.r.rs1 != 0) begin
             if (ex_rs1)
-                rs1 = core::ALU;
+                rs1 = rv32::ALU;
             else if (mm_rs1)
-                rs1 = core::EXE;
+                rs1 = rv32::EXE;
             else if (wb_rs1)
-                rs1 = core::MEM;
+                rs1 = rv32::MEM;
         end
     end : src1
 
     always_comb begin : src2
-        rs2 = core::REG;
+        rs2 = rv32::REG;
         if (id.data.ir.r.rs2 != 0) begin
             if (ex_rs2)
-                rs2 = core::ALU;
+                rs2 = rv32::ALU;
             else if (mm_rs2)
-                rs2 = core::EXE;
+                rs2 = rv32::EXE;
             else if (wb_rs2)
-                rs2 = core::MEM;
+                rs2 = rv32::MEM;
         end
     end : src2
 
 endmodule : forward
-

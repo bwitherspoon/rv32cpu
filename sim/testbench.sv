@@ -37,7 +37,7 @@ module testbench;
     axi data (.*);
     axi mmio (.*);
 
-    ram #(.INIT_DATA(core::NOP), .INIT_FILE(`TEXT_FILE)) rom (.bus(code));
+    ram #(.INIT_DATA(rv32::NOP), .INIT_FILE(`TEXT_FILE)) rom (.bus(code));
     ram #(.INIT_FILE(`DATA_FILE)) ram (.bus(data));
     ram #(.DATA_DEPTH(2048)) io (.bus(mmio));
 

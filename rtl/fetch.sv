@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, 2016 C. Brett Witherspoon
+ * Copyright 2015-2018 C. Brett Witherspoon
  *
  * See LICENSE for more details.
  */
@@ -10,9 +10,9 @@
  * Instruction fetch module.
  */
  module fetch
-    import core::id_t;
-    import core::inst_t;
-    import core::word_t;
+    import rv32::id_t;
+    import rv32::inst_t;
+    import rv32::word_t;
 (
     input  logic  aclk,
     input  logic  aresetn,
@@ -46,7 +46,7 @@
 
     always_ff @(posedge aclk)
         if (~aresetn)
-            pc <= core::RESET_ADDR;
+            pc <= rv32::RESET_ADDR;
         else if (~lock)
             pc <= cache.araddr;
 
@@ -72,7 +72,7 @@
 
     always_ff @(posedge aclk)
         if (~aresetn)
-            cache.araddr <= core::RESET_ADDR;
+            cache.araddr <= rv32::RESET_ADDR;
         else if (~(cache.arvalid & ~cache.arready))
             if (trap)
                 cache.araddr <= handler;

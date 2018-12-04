@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, C. Brett Witherspoon
+ * Copyright (c) 2015-2018 C. Brett Witherspoon
  */
 
 /**
@@ -8,8 +8,8 @@
  * A 32 width and 32 depth register file with two read and one write port..
  */
 module regfile
-    import core::addr_t;
-    import core::word_t;
+    import rv32::addr_t;
+    import rv32::word_t;
 (
     input  logic  clk,
     input  addr_t rs1_addr,

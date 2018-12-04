@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 C. Brett Witherspoon
+ * Copyright 2016-2018 C. Brett Witherspoon
  *
  * See LICENSE for more details.
  */
@@ -8,14 +8,14 @@
  * Module: hazard
  */
 module hazard
-    import core::id_t;
-    import core::ex_t;
-    import core::mm_t;
-    import core::wb_t;
-    import core::isload;
-    import core::isstore;
-    import core::isjump;
-    import core::isbranch;
+    import rv32::id_t;
+    import rv32::ex_t;
+    import rv32::mm_t;
+    import rv32::wb_t;
+    import rv32::isload;
+    import rv32::isstore;
+    import rv32::isjump;
+    import rv32::isbranch;
 (
     axis.monitor decode,
     axis.monitor execute,
@@ -44,6 +44,6 @@ module hazard
 
     assign stall = decode.tvalid & jump;
 
-    assign lock = (execute.tvalid & core::isload(ex.ctrl.op)) | (memory.tvalid & core::isload(mm.ctrl.op));
+    assign lock = (execute.tvalid & rv32::isload(ex.ctrl.op)) | (memory.tvalid & rv32::isload(mm.ctrl.op));
 
 endmodule

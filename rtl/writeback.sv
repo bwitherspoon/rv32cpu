@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 C. Brett Witherspoon
+ * Copyright 2016-2018 C. Brett Witherspoon
  *
  * See LICENSE for more details.
  */
@@ -8,12 +8,12 @@
  * Module: writeback
  */
 module writeback
-    import core::addr_t;
-    import core::word_t;
-    import core::wb_t;
-    import core::isinteger;
-    import core::isload;
-    import core::isjump;
+    import rv32::addr_t;
+    import rv32::word_t;
+    import rv32::wb_t;
+    import rv32::isinteger;
+    import rv32::isload;
+    import rv32::isjump;
 (
     output logic  rd_load,
     output addr_t rd_addr,
@@ -33,5 +33,3 @@ module writeback
     assign source.tready = '1;
 
 endmodule
-
-

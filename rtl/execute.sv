@@ -1,21 +1,18 @@
 /*
- * Copyright 2016 C. Brett Witherspoon
+ * Copyright 2016-2018 C. Brett Witherspoon
  *
  * See LICENSE for more details.
  */
 
 /**
  * Module: execute
-<<<<<<< HEAD
-=======
  *
  * Execute stage
->>>>>>> master
  */
 module execute
-    import core::ex_t;
-    import core::mm_t;
-    import core::word_t;
+    import rv32::ex_t;
+    import rv32::mm_t;
+    import rv32::word_t;
 (
     output logic  branch,
     output word_t target,
@@ -42,13 +39,13 @@ module execute
     wire ltu = ex.data.rs1 < ex.data.rs2;
 
     // Jump / Branch
-    wire jmp  = ex.ctrl.op == core::JUMP;
-    wire beq  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BEQ  & eq;
-    wire bne  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BNE  & ~eq;
-    wire blt  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BLT  & lt;
-    wire bltu = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BLTU & ltu;
-    wire bge  = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BGE  & (eq | ~lt);
-    wire bgeu = ex.ctrl.op == core::BRANCH & ex.ctrl.br == core::BGEU & (eq | ~ltu);
+    wire jmp  = ex.ctrl.op == rv32::JUMP;
+    wire beq  = ex.ctrl.op == rv32::BRANCH & ex.ctrl.br == rv32::BEQ  & eq;
+    wire bne  = ex.ctrl.op == rv32::BRANCH & ex.ctrl.br == rv32::BNE  & ~eq;
+    wire blt  = ex.ctrl.op == rv32::BRANCH & ex.ctrl.br == rv32::BLT  & lt;
+    wire bltu = ex.ctrl.op == rv32::BRANCH & ex.ctrl.br == rv32::BLTU & ltu;
+    wire bge  = ex.ctrl.op == rv32::BRANCH & ex.ctrl.br == rv32::BGE  & (eq | ~lt);
+    wire bgeu = ex.ctrl.op == rv32::BRANCH & ex.ctrl.br == rv32::BGEU & (eq | ~ltu);
 
     assign branch = source.tvalid & (jmp | beq | bne | blt | bltu | bge | bgeu);
 
@@ -80,4 +77,3 @@ module execute
     end : registers
 
 endmodule
-

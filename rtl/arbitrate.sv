@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 C. Brett Witherspoon
+ * Copyright (c) 2016-2018 C. Brett Witherspoon
  */
 
 /**
@@ -21,9 +21,9 @@ module arbitrate (
     request_t write;
 
     // Write state
-    wire wcode = cache.awaddr >= core::CODE_BASE && cache.awaddr < core::CODE_BASE + core::CODE_SIZE;
-    wire wdata = cache.awaddr >= core::DATA_BASE && cache.awaddr < core::DATA_BASE + core::DATA_SIZE;
-    wire wmmio = cache.awaddr >= core::MMIO_BASE;
+    wire wcode = cache.awaddr >= rv32::CODE_BASE && cache.awaddr < rv32::CODE_BASE + rv32::CODE_SIZE;
+    wire wdata = cache.awaddr >= rv32::DATA_BASE && cache.awaddr < rv32::DATA_BASE + rv32::DATA_SIZE;
+    wire wmmio = cache.awaddr >= rv32::MMIO_BASE;
 
     always_comb
         if (wcode)      write = CODE;
@@ -32,9 +32,9 @@ module arbitrate (
         else            write = NONE;
 
     // Read state
-    wire rcode = cache.araddr >= core::CODE_BASE && cache.araddr < core::CODE_BASE + core::CODE_SIZE;
-    wire rdata = cache.araddr >= core::DATA_BASE && cache.araddr < core::DATA_BASE + core::DATA_SIZE;
-    wire rmmio = cache.araddr >= core::MMIO_BASE;
+    wire rcode = cache.araddr >= rv32::CODE_BASE && cache.araddr < rv32::CODE_BASE + rv32::CODE_SIZE;
+    wire rdata = cache.araddr >= rv32::DATA_BASE && cache.araddr < rv32::DATA_BASE + rv32::DATA_SIZE;
+    wire rmmio = cache.araddr >= rv32::MMIO_BASE;
 
     always_comb
         if (rcode)      read = CODE;

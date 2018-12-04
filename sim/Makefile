@@ -8,7 +8,7 @@ TOP = testbench.sv
 PKG = axi4.sv      \
       opcodes.sv   \
       funct3.sv    \
-      core.sv
+      rv32.sv
 INT = axi.sv       \
       axis.sv
 RTL = alu.sv       \

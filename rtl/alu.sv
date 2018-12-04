@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, C. Brett Witherspoon
+ * Copyright (c) 2015-2018 C. Brett Witherspoon
  */
 
 /**
@@ -8,8 +8,8 @@
  * An arithmetic and logic unit (ALU) for RISC-V
  */
 module alu
-    import core::fn_t;
-    import core::word_t;
+    import rv32::fn_t;
+    import rv32::word_t;
 (
     input  fn_t   fn,
     input  word_t op1,
@@ -20,17 +20,17 @@ module alu
 
     always_comb
         unique case (fn)
-            core::ADD:  out = op1 + op2;
-            core::SUB:  out = op1 - op2;
-            core::SLL:  out = op1 << shamt;
-            core::SLT:  out = word_t'(signed'(op1) < signed'(op2));
-            core::SLTU: out = word_t'(op1 < op2);
-            core::XOR:  out = op1 ^ op2;
-            core::SRL:  out = op1 >> shamt;
-            core::SRA:  out = signed'(op1) >>> shamt;
-            core::OR:   out = op1 | op2;
-            core::AND:  out = op1 & op2;
-            core::OP2:  out = op2;
+            rv32::ADD:  out = op1 + op2;
+            rv32::SUB:  out = op1 - op2;
+            rv32::SLL:  out = op1 << shamt;
+            rv32::SLT:  out = word_t'(signed'(op1) < signed'(op2));
+            rv32::SLTU: out = word_t'(op1 < op2);
+            rv32::XOR:  out = op1 ^ op2;
+            rv32::SRL:  out = op1 >> shamt;
+            rv32::SRA:  out = signed'(op1) >>> shamt;
+            rv32::OR:   out = op1 | op2;
+            rv32::AND:  out = op1 & op2;
+            rv32::OP2:  out = op2;
             default:    out = 'x;
         endcase
 endmodule

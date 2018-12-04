@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2016 C. Brett Witherspoon
+ * Copyright (c) 2015-2018 C. Brett Witherspoon
  */
 
 /**
@@ -8,12 +8,12 @@
  * A memory controller. Data MUST be naturally aligned.
  */
 module memory
-    import core::addr_t;
-    import core::op_t;
-    import core::mm_t;
-    import core::strb_t;
-    import core::wb_t;
-    import core::word_t;
+    import rv32::addr_t;
+    import rv32::op_t;
+    import rv32::mm_t;
+    import rv32::strb_t;
+    import rv32::wb_t;
+    import rv32::word_t;
 (
     logic       aclk,
     logic       aresetn,
@@ -34,11 +34,11 @@ module memory
         output strb_t strb
     );
         unique case (op)
-            core::STORE_WORD: begin
+            rv32::STORE_WORD: begin
                 dout = din;
                 strb = '1;
             end
-            core::STORE_HALF: begin
+            rv32::STORE_HALF: begin
                 if (addr[1]) begin
                     dout = din << 16;
                     strb = 4'b1100;
@@ -47,7 +47,7 @@ module memory
                     strb = 4'b0011;
                 end
             end
-            core::STORE_BYTE:
+            rv32::STORE_BYTE:
                 unique case (addr[1:0])
                     2'b00: begin
                         dout = din;
@@ -88,22 +88,22 @@ module memory
         output word_t dout
     );
         unique case (op)
-            core::LOAD_WORD:
+            rv32::LOAD_WORD:
                 dout = din;
-            core::LOAD_HALF:
+            rv32::LOAD_HALF:
                 if (addr[1]) dout = {{16{din[31]}}, din[31:16]};
                 else         dout = {{16{din[15]}}, din[15:0]};
-            core::LOAD_BYTE:
+            rv32::LOAD_BYTE:
                 unique case (addr[1:0])
                     2'b00: dout = {{24{din[7]}},  din[7:0]};
                     2'b01: dout = {{24{din[15]}}, din[15:8]};
                     2'b10: dout = {{24{din[23]}}, din[23:16]};
                     2'b11: dout = {{24{din[31]}}, din[31:24]};
                 endcase
-            core::LOAD_HALF_UNSIGNED:
+            rv32::LOAD_HALF_UNSIGNED:
                 if (addr[1]) dout = {16'h0000, din[31:16]};
                 else         dout = {16'h0000, din[15:0]};
-            core::LOAD_BYTE_UNSIGNED:
+            rv32::LOAD_BYTE_UNSIGNED:
                 unique case (addr[1:0])
                     2'b00: dout = {24'h000000, din[7:0]};
                     2'b01: dout = {24'h000000, din[15:8]};
@@ -151,7 +151,7 @@ module memory
             .dout(wdata)
         );
 
-    wire write = core::isstore(mm.ctrl.op) & source.tvalid & source.tready;
+    wire write = rv32::isstore(mm.ctrl.op) & source.tvalid & source.tready;
 
     wire writing = cache.bready;
 
@@ -194,7 +194,7 @@ module memory
      * Cache read
      */
 
-    wire read = core::isload(mm.ctrl.op) & source.tvalid & source.tready;
+    wire read = rv32::isload(mm.ctrl.op) & source.tvalid & source.tready;
 
     logic reading = '0;
 
@@ -259,4 +259,3 @@ module memory
         end
 
 endmodule : memory
-

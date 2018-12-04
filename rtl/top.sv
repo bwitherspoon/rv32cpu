@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, C. Brett Witherspoon
+ * Copyright (c) 2016-2018 C. Brett Witherspoon
  */
 
 `ifndef TEXT_FILE
@@ -78,7 +78,7 @@ module top #(
 
     ram #(
         .DATA_DEPTH(1024),
-        .INIT_DATA(core::NOP),
+        .INIT_DATA(rv32::NOP),
         .INIT_FILE(TEXT_FILE)
     ) rom (.bus(code), .*);
 

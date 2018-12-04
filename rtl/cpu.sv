@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2016 C. Brett Witherspoon
+ * Copyright (c) 2015-2018 C. Brett Witherspoon
  *
  * See LICENSE for more details.
  */
@@ -8,17 +8,17 @@
  * Module: cpu
  */
 module cpu
-    import core::addr_t;
-    import core::ctrl_t;
-    import core::ex_t;
-    import core::imm_t;
-    import core::inst_t;
-    import core::id_t;
-    import core::mm_t;
-    import core::op_t;
-    import core::rs_t;
-    import core::wb_t;
-    import core::word_t;
+    import rv32::addr_t;
+    import rv32::ctrl_t;
+    import rv32::ex_t;
+    import rv32::imm_t;
+    import rv32::inst_t;
+    import rv32::id_t;
+    import rv32::mm_t;
+    import rv32::op_t;
+    import rv32::rs_t;
+    import rv32::wb_t;
+    import rv32::word_t;
 (
     input  logic clk,
     input  logic rst,
@@ -104,7 +104,7 @@ module cpu
         .branch,
         .target,
         .trap,
-        .handler(core::TRAP_ADDR),
+        .handler(rv32::TRAP_ADDR),
         .stall,
         .cache(code),
         .sink(id)
