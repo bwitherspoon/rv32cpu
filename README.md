@@ -1,4 +1,4 @@
-Core
+RV32CPU
 ====
 
 ![Diagram](http://bwitherspoon.github.io/core/core.svg)
