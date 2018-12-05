@@ -8,4 +8,4 @@ xsim.dir
 *.pb
 *.str
 .Xil/
-ip/core.*
+xpr/
