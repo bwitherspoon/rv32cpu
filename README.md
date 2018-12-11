@@ -1,7 +1,7 @@
 RV32CPU
 ====
 
-![Diagram](http://bwitherspoon.github.io/core/core.svg)
+![Diagram](http://bwitherspoon.github.io/rv32cpu/core.svg)
 
 Summary
 -------
@@ -15,7 +15,7 @@ Platforms
 The design is targeted for Xilinx 7 Series FPGAs and SoCs.
 The [Arty][arty] board from Digilent is used for development and testing.
 
-![VivadoSystem](http://bwitherspoon.github.io/core/system.svg)
+![VivadoSystem](http://bwitherspoon.github.io/rv32cpu/system.svg)
 
 Dependencies
 --------------
